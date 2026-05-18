@@ -1,9 +1,12 @@
 import { FormEvent, useMemo, useRef, useState } from 'react';
-import { Bot, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
+import { Bot, Mic, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { formatTime } from '@/utils/formatters';
+import { cn } from '@/utils/cn';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -53,9 +56,36 @@ export function ChatPage() {
   const endRef = useRef<HTMLDivElement>(null);
   const quickReplies = useMemo(() => t.chat.quickReplies, [t.chat.quickReplies]);
 
+  // ── Voice input — browser Web Speech API, frontend only ──────────
+  const toast = useToast();
+  const voiceBaseRef = useRef('');
+  const voice = useSpeechRecognition({
+    lang,
+    onResult: (transcript) => {
+      const base = voiceBaseRef.current;
+      setText(base ? `${base} ${transcript}` : transcript);
+    },
+  });
+
+  // Click the mic: toggle listening; warn once if the API is missing.
+  // Speech only fills the input — the user still presses Send themselves.
+  const toggleVoice = () => {
+    if (!voice.supported) {
+      toast(t.chat.voiceUnsupported, 'error');
+      return;
+    }
+    if (voice.listening) {
+      voice.stop();
+      return;
+    }
+    voiceBaseRef.current = text.trim();
+    voice.start();
+  };
+
   const send = (value = text) => {
     const trimmed = value.trim();
     if (!trimmed || typing) return;
+    if (voice.listening) voice.stop();
     setMessages((prev) => [...prev, { role: 'user', content: trimmed, timestamp: Date.now() }]);
     setText('');
     setTyping(true);
@@ -101,8 +131,36 @@ export function ChatPage() {
           <div ref={endRef} />
         </div>
         <form onSubmit={submit} className="border-t border-line p-3">
+          {voice.listening && (
+            <div className="mb-2 flex items-center justify-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-black text-primary-700">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary-500" />
+              </span>
+              {t.chat.listening}
+            </div>
+          )}
           <div className="flex gap-2 rounded-full bg-white/80 p-2 shadow-inner">
             <input value={text} onChange={(e) => setText(e.target.value)} placeholder={t.chat.placeholder} className="min-w-0 flex-1 bg-transparent px-4 font-bold text-ink outline-none" />
+            <div className="relative shrink-0">
+              {voice.listening && (
+                <span className="pointer-events-none absolute inset-0 animate-pulse-ring rounded-full bg-rose-gradient" aria-hidden />
+              )}
+              <button
+                type="button"
+                onClick={toggleVoice}
+                aria-pressed={voice.listening}
+                aria-label={voice.listening ? t.chat.listening : t.chat.voiceLabel}
+                className={cn(
+                  'relative grid h-12 w-12 place-items-center rounded-full transition-all duration-200 active:scale-95',
+                  voice.listening
+                    ? 'bg-rose-gradient text-white shadow-petal-lg'
+                    : 'bg-primary-50 text-primary-600 hover:bg-primary-100',
+                )}
+              >
+                <Mic size={18} />
+              </button>
+            </div>
             <Button type="submit" disabled={!text.trim()} aria-label={t.common.send}><Send size={18} /></Button>
           </div>
         </form>

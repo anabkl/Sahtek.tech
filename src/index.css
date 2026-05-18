@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --------------------------------------------------------------------
+   Sahtek design system tokens. Semantic surfaces flip with the theme;
+   the rose accent stays constant in light and dark.
+   -------------------------------------------------------------------- */
+:root {
+  --canvas: 255 245 247;
+  --card: 255 255 255;
+  --elevated: 255 255 255;
+  --ink: 45 31 45;
+  --muted: 122 100 115;
+  --faint: 168 146 160;
+  --line: 243 220 230;
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: 26 16 32;
+  --card: 38 26 46;
+  --elevated: 47 33 56;
+  --ink: 251 238 244;
+  --muted: 201 169 190;
+  --faint: 138 115 132;
+  --line: 61 43 68;
+  color-scheme: dark;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--canvas));
+  color: rgb(var(--ink));
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Soft rose blooms for atmospheric depth. */
+  background-image:
+    radial-gradient(60% 40% at 85% 0%, rgba(214, 51, 132, 0.10), transparent 70%),
+    radial-gradient(50% 35% at 0% 100%, rgba(255, 92, 149, 0.10), transparent 70%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(60% 40% at 85% 0%, rgba(214, 51, 132, 0.22), transparent 70%),
+    radial-gradient(50% 35% at 0% 100%, rgba(140, 26, 85, 0.30), transparent 70%);
+}
+
+[dir='rtl'] body {
+  font-family: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* -- Typographic rhythm -------------------------------------------- */
+h1,
+h2,
+h3 {
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+::selection {
+  background: rgba(214, 51, 132, 0.22);
+  color: rgb(var(--ink));
+}
+
+/* -- Scrollbars ---------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(214, 51, 132, 0.28);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(214, 51, 132, 0.5);
+  background-clip: padding-box;
+}
+
+/* -- Reusable component layer -------------------------------------- */
+@layer components {
+  .glass {
+    background-color: rgb(var(--card) / 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Gradient text used for highlighted words. */
+  .text-gradient {
+    background: linear-gradient(120deg, #d63384 0%, #ff5c95 55%, #ff94ba 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Focus ring for keyboard accessibility. */
+  .focus-ring:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(var(--canvas)), 0 0 0 5px rgba(214, 51, 132, 0.55);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* -- Honour reduced-motion preference ------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* -- Print: clean self-check guide hand-out ------------------------ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

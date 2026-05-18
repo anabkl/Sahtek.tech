@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="pwa-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF5C95" />
+      <stop offset="0.55" stop-color="#D63384" />
+      <stop offset="1" stop-color="#8C1A55" />
+    </linearGradient>
+    <linearGradient id="pwa-ribbon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#FFE0EC" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#pwa-bg)" />
+  <circle cx="256" cy="256" r="150" fill="#FFFFFF" opacity="0.10" />
+  <g fill="none" stroke="url(#pwa-ribbon)" stroke-width="42" stroke-linecap="round">
+    <path d="M256 152 C212 216 168 250 168 296 C168 366 270 416 350 470" />
+    <path d="M256 152 C300 216 344 250 344 296 C344 366 242 416 162 470" />
+  </g>
+</svg>

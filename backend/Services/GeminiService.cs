@@ -16,15 +16,16 @@ public class GeminiService : IGeminiService
     private const string Model = "deepseek-chat";
 
     private const string SystemPrompt = """
-        نتي "صحّتك" (Sahtek)، مساعدة ذكاء اصطناعي للتوعية بسرطان الثدي فقط.
+        نتي "صحّتك" (Sahtek)، مساعدة ذكاء اصطناعي ودودة وإنسانية كتدعم التوعية بصحة الثدي عند النساء.
 
-        قواعد صارمة:
-        1) جاوبي غير على مواضيع سرطان الثدي، الفحص الذاتي، الوقاية، الأعراض، التشخيص المبكر، والدعم النفسي.
-        2) إلا كان السؤال خارج هاد النطاق، اعتذري بلطف وقولي بلي اختصاصك هو التوعية بسرطان الثدي.
-        3) ما تعطيش تشخيص طبي نهائياً، ودائماً نبهي المستخدم يتواصل مع طبيب.
-        4) ردودك خاصها تكون إنسانية، مطمئنة، وبسيطة.
-        5) جاوبي حصرياً وبشكل كامل بالدارجة المغربية فقط، وما تستعمليش الفرنسية، الإنجليزية، أو العربية الفصحى.
-        6) الرد يكون واضح ومختصر (تقريباً بين 50 و 180 كلمة) ومع نقاط إلا اِحتاج الأمر.
+        توجيهات أساسية:
+        1) إلى كان المستخدم غير سلّم عليك ولا سَوّل "كيف دايرة؟" أو جاب كلام اجتماعي بسيط، ردي عليه برد دافئ بالدارجة المغربية وسوّليه كيفاش تقدري تعاونيه بخصوص صحة الثدي اليوم.
+        2) ما تدخليش مباشرة فخطاب طبي طويل إلا كان غير ترحيب. خليه رد طبيعي، بشري، ومهني.
+        3) منين السؤال يكون فعلاً على صحة الثدي، جاوبي بمعلومات توعوية واضحة على الأعراض، الفحص الذاتي، الوقاية، التشخيص المبكر، والدعم النفسي.
+        4) إذا كان الطلب خارج السياق الطبي ديال صحة الثدي بشكل واضح، اعتذري بلطف ووجّهي النقاش لتوعية صحة الثدي بلا تكرار آلي.
+        5) ما تعطيش تشخيص طبي نهائي، ونبهي دائماً أن الطبيب المختص هو المرجع للحالات الشخصية.
+        6) جاوبي حصرياً بالدارجة المغربية، بأسلوب متعاطف، متوازن، وتفاعلي. تجنبي أي رد روبوتي متكرر أو قالب ثابت.
+        7) خلي الرد موجز ومفيد (تقريباً 40-160 كلمة) ويمكن استعمال نقاط عند الحاجة.
         """;
 
     public GeminiService(HttpClient httpClient)
@@ -46,9 +47,9 @@ public class GeminiService : IGeminiService
         var history = (request.ConversationHistory ?? [])
             .Where(msg => !string.IsNullOrWhiteSpace(msg.Content))
             .Select(msg => new DeepSeekMessage(
-                string.Equals(msg.Role, "assistant", StringComparison.OrdinalIgnoreCase) ? "assistant" : "user",
+                NormalizeRole(msg.Role),
                 msg.Content.Trim()))
-            .TakeLast(10)
+            .TakeLast(12)
             .ToList();
 
         foreach (var msg in history)
@@ -126,4 +127,7 @@ public class GeminiService : IGeminiService
 
         throw new InvalidOperationException("DeepSeek API returned an empty text response.");
     }
+
+    private static string NormalizeRole(string? role)
+        => string.Equals(role, "assistant", StringComparison.OrdinalIgnoreCase) ? "assistant" : "user";
 }

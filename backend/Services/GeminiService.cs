@@ -49,6 +49,8 @@ public class GeminiService : IGeminiService
             .Select(msg => new DeepSeekMessage(
                 NormalizeRole(msg.Role),
                 msg.Content.Trim()))
+            // Keep a short but slightly broader context window to preserve recent flow
+            // (including greetings + follow-up question) without large token growth.
             .TakeLast(12)
             .ToList();
 

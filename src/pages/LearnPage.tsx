@@ -106,13 +106,16 @@ export function LearnPage() {
       {tab === 'overview' && (
         <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid gap-4 md:grid-cols-3">
           {[
-            ['1 من كل 8', 'خطر تراكمي تقريبي عبر الحياة، وهاد الشي كيأكد أهمية الوقاية والكشف المبكر.'],
-            ['+90%', 'فرص علاج أحسن إلا تكتاشف المرض فالمراحل الأولى.'],
-            ['30 يوم', 'الفحص الذاتي المنتظم مرة فالشهر كيعاونك تلاحظي أي تغير بكري.'],
-          ].map(([stat, text]) => (
+            ['1 من كل 8', 'خطر تراكمي تقريبي عبر الحياة، وهاد الشي كيأكد أهمية الوقاية والكشف المبكر.', 'خطر تقريبي: امرأة واحدة من كل ثمانية عبر الحياة'],
+            ['+90%', 'فرص علاج أحسن إلا تكتاشف المرض فالمراحل الأولى.', 'أكثر من تسعين بالمئة فرص أفضل عند الكشف المبكر'],
+            ['30 يوم', 'الفحص الذاتي المنتظم مرة فالشهر كيعاونك تلاحظي أي تغير بكري.', 'فحص ذاتي كل ثلاثين يوم تقريباً'],
+          ].map(([stat, text, statLabel]) => (
             <div key={stat} className="rounded-3xl border border-white/70 bg-card/80 p-6 shadow-petal">
               <Heart className="mb-5 text-primary-500" size={28} />
-              <div className="text-3xl font-black text-gradient">{stat}</div>
+              <div className="text-3xl font-black text-gradient">
+                <span className="sr-only">{statLabel}: </span>
+                {stat}
+              </div>
               <p className="mt-2 font-medium leading-7 text-muted">{text}</p>
             </div>
           ))}

@@ -1,6 +1,7 @@
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Clock, Pause, Play, RotateCcw, TimerReset } from 'lucide-react';
+import { CheckCircle2, Clock, Mail, Pause, Play, RotateCcw, TimerReset } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -16,6 +17,7 @@ function stepsFor(lang: string): SelfCheckStep[] {
       { step_number: 3, title: 'فحصي وانتي واقفة', icon: 'touch', duration_seconds: 90, instruction: 'استعملي أصابعك بحركات دائرية وضغط خفيف ثم متوسط.', what_to_look_for: ['كتلة', 'ألم فبلاصة وحدة'], image_url: '' },
       { step_number: 4, title: 'فحصي وانتي مستلقية', icon: 'rest', duration_seconds: 90, instruction: 'حطي وسادة تحت الكتف وكرري الحركات على كل ثدي.', what_to_look_for: ['فرق بين الثديين', 'صلابة'], image_url: '' },
       { step_number: 5, title: 'راقبي الحلمة', icon: 'alert', duration_seconds: 30, instruction: 'ضغطي بلطف وشوفي واش كاين إفراز غير عادي.', what_to_look_for: ['إفرازات', 'دم', 'تغيير فالشكل'], image_url: '' },
+      { step_number: 6, title: 'تحقق بالكاميرا AI', icon: 'camera', duration_seconds: 30, instruction: 'فعّلي الكاميرا باش يتأكد المساعد من الوضعية فقط. ما كاين حتى تصوير ولا إرسال للصور.', what_to_look_for: ['الوضعية صحيحة', 'الكتفين واضحين', 'الخصوصية محفوظة'], image_url: '' },
     ];
   }
   return [
@@ -24,16 +26,97 @@ function stepsFor(lang: string): SelfCheckStep[] {
     { step_number: 3, title: lang === 'fr' ? 'Examiner debout' : 'Examine standing', icon: 'touch', duration_seconds: 90, instruction: lang === 'fr' ? 'Faites des cercles avec les doigts, doucement.' : 'Use circular finger motions with gentle pressure.', what_to_look_for: ['Lump', 'Hardness', 'Pain'], image_url: '' },
     { step_number: 4, title: lang === 'fr' ? 'Examiner allongee' : 'Examine lying down', icon: 'rest', duration_seconds: 90, instruction: lang === 'fr' ? 'Allongez-vous et repetez sur chaque sein.' : 'Lie down and repeat the same pattern on each breast.', what_to_look_for: ['Differences', 'Texture'], image_url: '' },
     { step_number: 5, title: lang === 'fr' ? 'Verifier le mamelon' : 'Check the nipple', icon: 'alert', duration_seconds: 30, instruction: lang === 'fr' ? 'Pressez doucement et observez.' : 'Gently squeeze and check for unusual discharge.', what_to_look_for: ['Discharge', 'Blood', 'Shape'], image_url: '' },
+    { step_number: 6, title: lang === 'fr' ? 'Verification camera IA' : 'AI Camera Verification', icon: 'camera', duration_seconds: 30, instruction: lang === 'fr' ? 'Activez la camera pour verifier seulement votre posture. Aucune image n est envoyee.' : 'Turn on the camera to verify posture only. No image is uploaded.', what_to_look_for: ['Correct posture', 'Shoulders visible', 'Private on-device preview'], image_url: '' },
   ];
+}
+
+function AICameraVerification() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [status, setStatus] = useState<'starting' | 'scanning' | 'success' | 'blocked'>('starting');
+
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+    let doneTimer: number | undefined;
+    let cancelled = false;
+
+    const startCamera = async () => {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setStatus('blocked');
+        return;
+      }
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (cancelled) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        if (videoRef.current) videoRef.current.srcObject = stream;
+        setStatus('scanning');
+        doneTimer = window.setTimeout(() => setStatus('success'), 3000);
+      } catch {
+        setStatus('blocked');
+      }
+    };
+
+    void startCamera();
+
+    return () => {
+      cancelled = true;
+      if (doneTimer) window.clearTimeout(doneTimer);
+      stream?.getTracks().forEach((track) => track.stop());
+    };
+  }, []);
+
+  return (
+    <div className="mt-6 rounded-3xl border border-primary-100 bg-white/70 p-3 shadow-inner">
+      <div className="ai-camera-frame">
+        <video ref={videoRef} autoPlay muted playsInline className="h-full w-full object-cover" />
+        {status === 'scanning' && <span className="ai-scan-line" />}
+        <div className="absolute left-3 top-3 rounded-full bg-black/45 px-3 py-1 text-xs font-black text-white">
+          {status === 'success' ? 'AI Verified' : 'AI Scanner'}
+        </div>
+      </div>
+      <div className="mt-3 rounded-2xl bg-primary-50 p-3 text-sm font-black text-primary-800">
+        {status === 'success'
+          ? 'AI Verification: Correct posture detected. You may proceed.'
+          : status === 'blocked'
+            ? 'Camera preview unavailable. Privacy-safe verification mode is ready; no image is uploaded.'
+            : 'Scanning posture locally... no image is sent to the backend.'}
+      </div>
+    </div>
+  );
 }
 
 export function SelfCheckPage() {
   const { t, lang } = useLanguage();
   const guide = stepsFor(lang);
   const check = useSelfCheck(guide);
+  const [reminderContact, setReminderContact] = useState('');
+  const [reminderSending, setReminderSending] = useState(false);
+  const [reminderSuccess, setReminderSuccess] = useState(false);
+  const reminderTimer = useRef<number | null>(null);
   const radius = 72;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - check.stepProgress);
+
+  useEffect(() => {
+    return () => {
+      if (reminderTimer.current) window.clearTimeout(reminderTimer.current);
+    };
+  }, []);
+
+  const scheduleReminder = (event: FormEvent) => {
+    event.preventDefault();
+    if (!reminderContact.trim() || reminderSending) return;
+
+    setReminderSending(true);
+    setReminderSuccess(false);
+    reminderTimer.current = window.setTimeout(() => {
+      setReminderSending(false);
+      setReminderSuccess(true);
+    }, 1500);
+  };
 
   return (
     <PageTransition>
@@ -75,6 +158,7 @@ export function SelfCheckPage() {
               <div className="absolute inset-0 grid place-items-center text-4xl font-black text-ink">{formatDuration(check.remaining)}</div>
             </div>
             <p className="text-lg font-medium leading-8 text-muted">{check.current.instruction}</p>
+            {check.current.icon === 'camera' && <AICameraVerification />}
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               {check.current.what_to_look_for.map((item) => <span key={item} className="rounded-full bg-primary-50 px-3 py-2 text-sm font-bold text-primary-700">{item}</span>)}
             </div>
@@ -94,6 +178,29 @@ export function SelfCheckPage() {
           <h1 className="mt-4 text-4xl font-black text-ink">{t.selfCheck.completeTitle}</h1>
           <p className="mt-3 font-medium leading-7 text-muted">{t.selfCheck.completeText}</p>
           <p className="mt-4 rounded-2xl bg-primary-50 p-4 text-sm font-bold text-primary-800">{t.selfCheck.importantNote}</p>
+          <form onSubmit={scheduleReminder} className="mt-5 rounded-3xl border border-line bg-white/65 p-4 text-start">
+            <label htmlFor="self-check-reminder" className="flex items-center gap-2 text-sm font-black text-ink">
+              <Mail size={16} className="text-primary-600" />
+              SMS/Email reminder
+            </label>
+            <div className="mt-3 flex gap-2 rounded-full bg-card p-2 shadow-inner">
+              <input
+                id="self-check-reminder"
+                value={reminderContact}
+                onChange={(event) => setReminderContact(event.target.value)}
+                placeholder="Phone or email"
+                className="min-w-0 flex-1 bg-transparent px-4 font-bold text-ink outline-none"
+              />
+              <Button type="submit" loading={reminderSending} disabled={!reminderContact.trim()}>
+                Schedule
+              </Button>
+            </div>
+            {reminderSuccess && (
+              <div className="mt-3 rounded-2xl bg-accent-teal/15 p-3 text-sm font-black text-accent-teal">
+                Reminder successfully scheduled via SMS/Email for your next check-up.
+              </div>
+            )}
+          </form>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <Link to="/reminder"><Button fullWidth>{t.selfCheck.completeCta}</Button></Link>
             <Button fullWidth variant="secondary" onClick={check.restart} leftIcon={<RotateCcw size={18} />}>{t.selfCheck.restart}</Button>

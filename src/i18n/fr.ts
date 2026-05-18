@@ -6,7 +6,7 @@ export const fr: Translation = {
   common: {
     start: 'Commencer', next: 'Suivant', previous: 'Precedent', back: 'Retour', finish: 'Terminer', retry: 'Reessayer',
     close: 'Fermer', loading: 'Chargement...', send: 'Envoyer', copy: 'Copier', copied: 'Copie', you: 'Vous',
-    assistant: 'Sahtek IA', of: 'sur', step: 'Etape', optional: 'optionnel', demoMode: 'Demo hors ligne',
+    assistant: 'Sahtek IA', of: 'sur', step: 'Etape', optional: 'optionnel', demoMode: 'API en direct',
     comingSoon: 'Bientot', learnMore: 'En savoir plus', getStarted: 'Commencer', skip: 'Passer',
   },
   disclaimer: {
@@ -24,7 +24,7 @@ export const fr: Translation = {
   },
   home: {
     badge: 'Pour les femmes marocaines', heroTitle: 'Votre sante,', heroHighlight: 'avec douceur',
-    heroSubtitle: 'Sahtek aide a apprendre, s auto-examiner et comprendre la sante du sein avec confidentialite, chaleur et IA meme hors ligne.',
+    heroSubtitle: 'Sahtek aide a apprendre, s auto-examiner et comprendre la sante du sein avec confidentialite, chaleur et IA connectee.',
     ctaPrimary: 'Commencer l auto-examen', ctaSecondary: 'Voir les signes', statsTitle: 'La detection precoce change tout',
     stats: [
       { prefix: '1/', value: 8, suffix: '', label: 'femmes', caption: 'peut etre concernee dans sa vie' },
@@ -45,7 +45,7 @@ export const fr: Translation = {
       { quote: 'Je l ai partage avec ma mere et mes soeurs.', name: 'Salma', role: 'Fes' },
       { quote: 'L assistante m a repondu avec douceur.', name: 'Naima', role: 'Marrakech' },
     ],
-    trustNote: 'Mode demo local: l experience cle fonctionne sans backend.',
+    trustNote: 'Connecte au backend Sahtek en direct pour le chat IA et l evaluation du risque.',
   },
   learn: {
     title: 'Comprendre la sante du sein', subtitle: 'Information claire, soutien et prochaines etapes.',
@@ -77,7 +77,7 @@ export const fr: Translation = {
     noProtective: 'Ajoutez plus d habitudes protectrices.',
   },
   chat: {
-    title: 'Assistante Sahtek', subtitle: 'Posez vos questions sur la sante du sein.', online: 'Prete en mode demo',
+    title: 'Assistante Sahtek', subtitle: 'Posez vos questions sur la sante du sein.', online: 'Connectee a l IA en direct',
     placeholder: 'Ecrivez votre question...', disclaimer: 'Information educative uniquement. Pas un diagnostic.',
     quickRepliesTitle: 'Essayez', quickReplies: ['Quels signes surveiller ?', 'Comment m examiner ?', 'J ai peur', 'La famille compte ?'],
     typing: 'Sahtek ecrit...', clear: 'Effacer', relatedTopics: 'Sujets lies',

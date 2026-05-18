@@ -23,7 +23,7 @@ import {
 import { nextReminderDate } from '@/utils/formatters';
 
 // ════════════════════════════════════════════════════════════════════
-//  DEMO MODE — a fully offline mock of the Sahtek backend.
+//  Local mock helpers retained for development/testing only.
 //  Same shapes as the real API, so swapping in the live backend is a
 //  one-line change in .env. This is what the jury sees if the API is
 //  unavailable, so it must feel polished and intelligent.

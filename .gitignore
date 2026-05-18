@@ -6,29 +6,33 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependencies
+node_modules/
+backend/bin/
+backend/obj/
 
-# Editor
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Env
-.env
-.env.production
-# Build cache
+# Build outputs
+dist/
+dist-ssr/
 .npm-cache/
 *.tsbuildinfo
 
 # Generated Vite files
 vite.config.js
 vite.config.d.ts
+
+# Environment
+.env
+.env.production
+backend/appsettings.Development.json
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

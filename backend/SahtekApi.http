@@ -1,0 +1,6 @@
+@SahtekApi_HostAddress = http://localhost:5190
+
+GET {{SahtekApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

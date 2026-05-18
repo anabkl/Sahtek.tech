@@ -6,7 +6,7 @@ export const ar: Translation = {
   common: {
     start: 'بداي', next: 'التالي', previous: 'السابق', back: 'رجوع', finish: 'سالي', retry: 'عاودي',
     close: 'سدي', loading: 'كيتحمل...', send: 'صيفطي', copy: 'نسخي', copied: 'تنسخ', you: 'نتي',
-    assistant: 'مساعدة صحّتك', of: 'من', step: 'خطوة', optional: 'اختياري', demoMode: 'وضع العرض',
+    assistant: 'مساعدة صحّتك', of: 'من', step: 'خطوة', optional: 'اختياري', demoMode: 'API مباشر',
     comingSoon: 'قريبا', learnMore: 'زيدي عرفي', getStarted: 'بداي دابا', skip: 'دوزي',
   },
   disclaimer: {
@@ -45,7 +45,7 @@ export const ar: Translation = {
       { quote: 'شاركت صحّتك مع يما وخواتاتي.', name: 'سلمى', role: 'فاس' },
       { quote: 'المساعدة جاوبتني بلطف ملي كنت خايفة نسول.', name: 'نعيمة', role: 'مراكش' },
     ],
-    trustNote: 'وضع العرض محلي: التجربة الأساسية خدامة بلا باكند.',
+    trustNote: 'متصلة بالباكند المباشر ديال صحّتك للدردشة الذكية وتقييم المخاطر.',
   },
   learn: {
     title: 'تعلمي على صحة الثدي', subtitle: 'معلومات واضحة، دعم حنين، وخطوات عملية.',
@@ -77,7 +77,7 @@ export const ar: Translation = {
     noProtective: 'زيدي عادات كتعاون تحميك.',
   },
   chat: {
-    title: 'مساعدة صحّتك', subtitle: 'سولي على صحة الثدي، الفحص، أو الخطوات الجاية.', online: 'حاضرة فالعرض',
+    title: 'مساعدة صحّتك', subtitle: 'سولي على صحة الثدي، الفحص، أو الخطوات الجاية.', online: 'متصلة بالذكاء الاصطناعي المباشر',
     placeholder: 'كتبي سؤالك...', disclaimer: 'معلومات توعوية فقط. ماشي تشخيص.',
     quickRepliesTitle: 'جربي تسولي', quickReplies: ['شنو الأعراض؟', 'كيفاش نفحص راسي؟', 'أنا خايفة', 'واش الوراثة مهمة؟'],
     typing: 'صحّتك كتكتب...', voiceLabel: 'إدخال صوتي', listening: 'كنسمع ليك...',

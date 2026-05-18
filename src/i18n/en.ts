@@ -29,7 +29,7 @@ export const en = {
     of: 'of',
     step: 'Step',
     optional: 'optional',
-    demoMode: 'Offline demo',
+    demoMode: 'Live API',
     comingSoon: 'Coming soon',
     learnMore: 'Learn more',
     getStarted: 'Get started',
@@ -53,7 +53,7 @@ export const en = {
     heroTitle: 'Your health,',
     heroHighlight: 'held with care',
     heroSubtitle:
-      'Sahtek helps women learn, self-check and understand breast health with privacy, warmth and an AI guide that works even offline.',
+      'Sahtek helps women learn, self-check and understand breast health with privacy, warmth and a connected AI guide.',
     ctaPrimary: 'Start self-check',
     ctaSecondary: 'Learn the signs',
     statsTitle: 'Early awareness changes everything',
@@ -79,7 +79,7 @@ export const en = {
       { quote: 'I shared it with my mother and sisters. The Darija makes it feel close.', name: 'Salma', role: 'Fes' },
       { quote: 'The assistant answered kindly when I was too scared to ask.', name: 'Naima', role: 'Marrakech' },
     ],
-    trustNote: 'Demo mode is local first: the core experience works without a backend.',
+    trustNote: 'Connected to the live Sahtek backend for AI chat and risk assessment.',
   },
   learn: {
     title: 'Learn breast health',
@@ -157,7 +157,7 @@ export const en = {
   chat: {
     title: 'Sahtek Assistant',
     subtitle: 'Ask about breast health, self-checks or next steps.',
-    online: 'Ready in demo mode',
+    online: 'Connected to live AI',
     placeholder: 'Write your question...',
     disclaimer: 'Educational information only. Not a diagnosis.',
     quickRepliesTitle: 'Try asking',

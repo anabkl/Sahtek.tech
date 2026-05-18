@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useRef, useState } from 'react';
+import { FormEvent, ReactNode, useMemo, useRef, useState } from 'react';
 import { Bot, Mic, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +12,28 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
+}
+
+function renderMarkdownBold(content: string): ReactNode {
+  const parts: ReactNode[] = [];
+  const regex = /\*\*(.+?)\*\*/g;
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(content)) !== null) {
+    const [fullMatch, boldText] = match;
+    if (match.index > cursor) {
+      parts.push(content.slice(cursor, match.index));
+    }
+    parts.push(<strong key={`${match.index}-${boldText}`}>{boldText}</strong>);
+    cursor = match.index + fullMatch.length;
+  }
+
+  if (cursor < content.length) {
+    parts.push(content.slice(cursor));
+  }
+
+  return parts.length > 0 ? <>{parts}</> : content;
 }
 
 function answerFor(text: string, lang: string): string {
@@ -121,7 +143,7 @@ export function ChatPage() {
             <div key={`${message.timestamp}-${index}`} className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {message.role === 'assistant' && <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 text-primary-700"><Sparkles size={16} /></span>}
               <div className={`max-w-[82%] rounded-3xl p-4 shadow-petal ${message.role === 'user' ? 'bg-rose-gradient text-white' : 'bg-white/80 text-ink'}`}>
-                <p className="font-medium leading-7">{message.content}</p>
+                <p className="whitespace-pre-wrap font-medium leading-7">{renderMarkdownBold(message.content)}</p>
                 <p className="mt-2 text-[11px] opacity-70">{formatTime(message.timestamp, lang)}</p>
               </div>
               {message.role === 'user' && <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-teal/15 text-accent-teal"><UserRound size={16} /></span>}

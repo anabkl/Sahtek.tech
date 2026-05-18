@@ -33,7 +33,7 @@ export function useChat() {
       setIsTyping(true);
 
       // Send only the last 10 turns as context (per the API contract).
-      const history = [...messages, userMessage]
+      const history = messages
         .slice(-10)
         .map((m) => ({ role: m.role, content: m.content }));
 

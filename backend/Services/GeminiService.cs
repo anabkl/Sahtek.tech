@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using SahtekApi.Models;
 
@@ -6,83 +7,86 @@ namespace SahtekApi.Services;
 
 public class GeminiService : IGeminiService
 {
+    private sealed record DeepSeekMessage(string role, string content);
+
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
 
+    private const string Endpoint = "https://api.deepseek.com/chat/completions";
+    private const string Model = "deepseek-chat";
+
     private const string SystemPrompt = """
-        Tu es "صحّتك" (Sahtek), une assistante IA spécialisée UNIQUEMENT dans la sensibilisation au cancer du sein, conçue pour les femmes marocaines.
+        نتي "صحّتك" (Sahtek)، مساعدة ذكاء اصطناعي للتوعية بسرطان الثدي فقط.
 
-        RÈGLES ABSOLUES:
-        1. Tu réponds UNIQUEMENT aux questions liées au cancer du sein, à la santé du sein, à l'auto-examen, à la prévention, aux symptômes, au dépistage et au soutien émotionnel.
-        2. Si la question est hors sujet, dis poliment que tu es spécialisée dans le cancer du sein.
-        3. Tu n'es PAS médecin. Tu ne fais JAMAIS de diagnostic. Tu donnes des informations éducatives.
-        4. Ajoute TOUJOURS un rappel de consulter un médecin pour toute préoccupation.
-        5. Sois empathique, chaleureuse et rassurante. Beaucoup de femmes ont peur.
-        6. Utilise un langage simple et accessible.
-
-        LANGUES:
-        - Si language="ar": Réponds en Darija marocaine. Utilise des mots comme "خاصك", "كيداير", "بزاف", "ديال". PAS en arabe classique.
-        - Si language="fr": Réponds en français simple.
-        - Si language="en": Réponds en anglais simple.
-
-        FORMAT:
-        - Réponses entre 50 et 200 mots maximum.
-        - Utilise des émojis pertinents (💗🎀🩺💪✅).
-        - Structure avec des tirets si plusieurs points.
+        قواعد صارمة:
+        1) جاوبي غير على مواضيع سرطان الثدي، الفحص الذاتي، الوقاية، الأعراض، التشخيص المبكر، والدعم النفسي.
+        2) إلا كان السؤال خارج هاد النطاق، اعتذري بلطف وقولي بلي اختصاصك هو التوعية بسرطان الثدي.
+        3) ما تعطيش تشخيص طبي نهائياً، ودائماً نبهي المستخدم يتواصل مع طبيب.
+        4) ردودك خاصها تكون إنسانية، مطمئنة، وبسيطة.
+        5) جاوبي حصرياً وبشكل كامل بالدارجة المغربية فقط، وما تستعمليش الفرنسية، الإنجليزية، أو العربية الفصحى.
+        6) الرد يكون واضح ومختصر (تقريباً بين 50 و 180 كلمة) ومع نقاط إلا اِحتاج الأمر.
         """;
 
     public GeminiService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY")
-            ?? throw new InvalidOperationException("GEMINI_API_KEY environment variable is not configured.");
+        _apiKey = Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY")
+            ?? throw new InvalidOperationException("DEEPSEEK_API_KEY environment variable is not configured.");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
     }
 
     public async Task<ChatResponse> GenerateChatResponseAsync(ChatRequest request, CancellationToken cancellationToken)
     {
-        var contents = new List<object>();
-
-        if (request.ConversationHistory != null)
+        var trimmedMessage = request.Message.Trim();
+        var messages = new List<DeepSeekMessage>
         {
-            foreach (var msg in request.ConversationHistory.TakeLast(10))
+            new("system", SystemPrompt)
+        };
+
+        var history = (request.ConversationHistory ?? [])
+            .Where(msg => !string.IsNullOrWhiteSpace(msg.Content))
+            .Select(msg => new DeepSeekMessage(
+                string.Equals(msg.Role, "assistant", StringComparison.OrdinalIgnoreCase) ? "assistant" : "user",
+                msg.Content.Trim()))
+            .TakeLast(10)
+            .ToList();
+
+        foreach (var msg in history)
+        {
+            // Guard against repeated adjacent turns that can cause loop-like model replies.
+            if (messages.Count > 0 &&
+                messages[^1].role == msg.role &&
+                messages[^1].content == msg.content)
             {
-                if (string.IsNullOrWhiteSpace(msg.Content))
-                {
-                    continue;
-                }
-
-                var role = string.Equals(msg.Role, "assistant", StringComparison.OrdinalIgnoreCase)
-                    ? "model"
-                    : "user";
-
-                contents.Add(new
-                {
-                    role,
-                    parts = new[] { new { text = msg.Content } }
-                });
+                continue;
             }
+
+            messages.Add(msg);
         }
 
-        contents.Add(new
+        var alreadyIncludedAsLastUserMessage =
+            history.Count > 0 &&
+            history[^1].role == "user" &&
+            string.Equals(history[^1].content, trimmedMessage, StringComparison.Ordinal);
+
+        if (!alreadyIncludedAsLastUserMessage)
         {
-            role = "user",
-            parts = new[] { new { text = $"language={request.Language}\n\n{request.Message}" } }
-        });
+            messages.Add(new("user", trimmedMessage));
+        }
 
         var payload = new
         {
-            system_instruction = new { parts = new[] { new { text = SystemPrompt } } },
-            contents = contents
+            model = Model,
+            messages,
+            temperature = 0.4
         };
 
-        var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={_apiKey}";
-
-        var response = await _httpClient.PostAsJsonAsync(url, payload, cancellationToken);
+        var response = await _httpClient.PostAsJsonAsync(Endpoint, payload, cancellationToken);
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new InvalidOperationException($"Gemini API request failed with status {(int)response.StatusCode}.");
+            throw new InvalidOperationException($"DeepSeek API request failed with status {(int)response.StatusCode}.");
         }
 
         using var jsonDoc = JsonDocument.Parse(json);
@@ -100,33 +104,26 @@ public class GeminiService : IGeminiService
 
     private static string ExtractText(JsonElement root)
     {
-        if (!root.TryGetProperty("candidates", out var candidates) ||
-            candidates.ValueKind != JsonValueKind.Array ||
-            candidates.GetArrayLength() == 0)
+        if (!root.TryGetProperty("choices", out var choices) ||
+            choices.ValueKind != JsonValueKind.Array ||
+            choices.GetArrayLength() == 0)
         {
-            throw new InvalidOperationException("Gemini API returned no candidates.");
+            throw new InvalidOperationException("DeepSeek API returned no choices.");
         }
 
-        var candidate = candidates[0];
-        if (!candidate.TryGetProperty("content", out var content) ||
-            !content.TryGetProperty("parts", out var parts) ||
-            parts.ValueKind != JsonValueKind.Array)
+        var firstChoice = choices[0];
+        if (!firstChoice.TryGetProperty("message", out var messageElement) ||
+            !messageElement.TryGetProperty("content", out var contentElement))
         {
-            throw new InvalidOperationException("Gemini API returned an invalid response shape.");
+            throw new InvalidOperationException("DeepSeek API returned an invalid response shape.");
         }
 
-        foreach (var part in parts.EnumerateArray())
+        var aiText = contentElement.GetString();
+        if (!string.IsNullOrWhiteSpace(aiText))
         {
-            if (part.TryGetProperty("text", out var textElement))
-            {
-                var text = textElement.GetString();
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    return text;
-                }
-            }
+            return aiText;
         }
 
-        throw new InvalidOperationException("Gemini API returned an empty text response.");
+        throw new InvalidOperationException("DeepSeek API returned an empty text response.");
     }
 }

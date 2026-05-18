@@ -1,9 +1,14 @@
 import axios from 'axios';
 import { API_PREFIX, API_TIMEOUT, API_URL } from '@/config/api';
 
+const normalizedApiUrl = API_URL.replace(/\/+$/, '');
+const apiBaseUrl = normalizedApiUrl.endsWith(API_PREFIX)
+  ? normalizedApiUrl
+  : `${normalizedApiUrl}${API_PREFIX}`;
+
 // ── Shared axios instance ───────────────────────────────────────────
 export const api = axios.create({
-  baseURL: API_URL ? `${API_URL}${API_PREFIX}` : API_PREFIX,
+  baseURL: normalizedApiUrl ? apiBaseUrl : API_PREFIX,
   timeout: API_TIMEOUT,
   headers: { 'Content-Type': 'application/json' },
 });

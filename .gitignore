@@ -10,6 +10,7 @@ pnpm-debug.log*
 node_modules/
 backend/bin/
 backend/obj/
+.nuget/
 
 # Build outputs
 dist/
@@ -23,7 +24,7 @@ vite.config.d.ts
 
 # Environment
 .env
-.env.production
+.env.local
 backend/appsettings.Development.json
 
 # Editor

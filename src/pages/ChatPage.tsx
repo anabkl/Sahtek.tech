@@ -3,44 +3,13 @@ import { Bot, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useLanguage } from '@/hooks/useLanguage';
+import { sendChatMessage } from '@/services/chatService';
 import { formatTime } from '@/utils/formatters';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
-}
-
-function answerFor(text: string, lang: string): string {
-  const q = text.toLowerCase();
-  const ar = lang === 'ar';
-  const fr = lang === 'fr';
-  if (q.includes('symptom') || q.includes('sign') || q.includes('عرض') || q.includes('signe')) {
-    return ar
-      ? 'راقبي أي كتلة جديدة، تغيير فالجلد، إفراز من الحلمة، ألم مركز، أو تغيير فالحجم. أغلب التغييرات ماشي سرطان، ولكن أي تغيير جديد خاصو طبيب.'
-      : fr
-        ? 'Surveillez une masse nouvelle, changement de peau, ecoulement du mamelon, douleur localisee ou changement de taille. Un changement nouveau merite un avis medical.'
-        : 'Watch for a new lump, skin change, nipple discharge, focused pain or size change. Most changes are not cancer, but new changes deserve a doctor visit.';
-  }
-  if (q.includes('check') || q.includes('فحص') || q.includes('exam')) {
-    return ar
-      ? 'ديري الفحص مرة فالشهر: شوفي فالمرآة، رفعي يديك، فحصي بحركات دائرية وانتي واقفة ومستلقيّة، ومن بعد راقبي الحلمة بلطف.'
-      : fr
-        ? 'Faites-le une fois par mois: miroir, bras leves, mouvements circulaires debout puis allongee, puis verification douce du mamelon.'
-        : 'Do it once a month: mirror check, arms raised, circular touch while standing and lying down, then a gentle nipple check.';
-  }
-  if (q.includes('scared') || q.includes('خايف') || q.includes('peur')) {
-    return ar
-      ? 'الخوف مفهوم. خدي نفس، وما تبقايش بوحدك. هاد الدردشة للتوعية فقط، وأحسن خطوة هي تحددي موعد مع طبيب باش تطمني.'
-      : fr
-        ? 'La peur est normale. Respirez, ne restez pas seule. Cette discussion informe seulement; le meilleur geste est de prendre rendez-vous avec un medecin.'
-        : 'Fear is understandable. Breathe and do not stay alone with it. This chat is educational; the best next step is booking a doctor visit for reassurance.';
-  }
-  return ar
-    ? 'نقدر نعاونك بمعلومات توعوية على صحة الثدي، الفحص الذاتي، العلامات، والوقاية. ما نقدرش نعطي تشخيص، والطبيب هو المرجع.'
-    : fr
-      ? 'Je peux aider avec des informations educatives sur la sante du sein, les signes, l auto-examen et la prevention. Je ne pose pas de diagnostic.'
-      : 'I can help with educational breast-health information, signs, self-checks and prevention. I cannot diagnose; a clinician is the right person for medical decisions.';
 }
 
 export function ChatPage() {
@@ -53,22 +22,32 @@ export function ChatPage() {
   const endRef = useRef<HTMLDivElement>(null);
   const quickReplies = useMemo(() => t.chat.quickReplies, [t.chat.quickReplies]);
 
-  const send = (value = text) => {
+  const send = async (value = text) => {
     const trimmed = value.trim();
     if (!trimmed || typing) return;
-    setMessages((prev) => [...prev, { role: 'user', content: trimmed, timestamp: Date.now() }]);
+    const userMessage: Message = { role: 'user', content: trimmed, timestamp: Date.now() };
+    const conversation = [...messages, userMessage].slice(-10);
+    setMessages((prev) => [...prev, userMessage]);
     setText('');
     setTyping(true);
-    window.setTimeout(() => {
-      setMessages((prev) => [...prev, { role: 'assistant', content: answerFor(trimmed, lang), timestamp: Date.now() }]);
+    try {
+      const response = await sendChatMessage({
+        message: trimmed,
+        language: lang,
+        conversation_history: conversation.map(({ role, content }) => ({ role, content })),
+      });
+      setMessages((prev) => [...prev, { role: 'assistant', content: response.response, timestamp: Date.now() }]);
+    } catch {
+      setMessages((prev) => [...prev, { role: 'assistant', content: t.chat.disclaimer, timestamp: Date.now() }]);
+    } finally {
       setTyping(false);
       window.setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
-    }, 650);
+    }
   };
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    send();
+    void send();
   };
 
   return (
@@ -83,7 +62,7 @@ export function ChatPage() {
             <button onClick={() => setMessages([])} className="grid h-11 w-11 place-items-center rounded-full bg-primary-50 text-primary-700" aria-label={t.chat.clear}><Trash2 size={18} /></button>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-            {quickReplies.map((reply) => <button key={reply} onClick={() => send(reply)} className="shrink-0 rounded-full bg-white/70 px-4 py-2 text-sm font-bold text-primary-700 shadow-petal">{reply}</button>)}
+            {quickReplies.map((reply) => <button key={reply} onClick={() => void send(reply)} className="shrink-0 rounded-full bg-white/70 px-4 py-2 text-sm font-bold text-primary-700 shadow-petal">{reply}</button>)}
           </div>
         </header>
         <div className="flex-1 space-y-4 overflow-y-auto p-4">

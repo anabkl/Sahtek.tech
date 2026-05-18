@@ -1,6 +1,3 @@
-bin/
-obj/
 .nuget/
-*.user
-*.suo
-appsettings.Local.json
+.DS_Store
+frontend/node_modules/

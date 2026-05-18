@@ -1,0 +1,6 @@
+bin/
+obj/
+.nuget/
+*.user
+*.suo
+appsettings.Local.json

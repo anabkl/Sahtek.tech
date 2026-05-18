@@ -24,7 +24,7 @@ public class GeminiService : IGeminiService
         3) ما تعطيش تشخيص طبي نهائياً، ودائماً نبهي المستخدم يتواصل مع طبيب.
         4) ردودك خاصها تكون إنسانية، مطمئنة، وبسيطة.
         5) جاوبي حصرياً وبشكل كامل بالدارجة المغربية فقط، وما تستعمليش الفرنسية، الإنجليزية، أو العربية الفصحى.
-        6) الرد يكون واضح ومختصر (تقريباً بين 50 و 180 كلمة) ومع نقاط إلا احتاج الأمر.
+        6) الرد يكون واضح ومختصر (تقريباً بين 50 و 180 كلمة) ومع نقاط إلا اِحتاج الأمر.
         """;
 
     public GeminiService(HttpClient httpClient)
@@ -48,11 +48,12 @@ public class GeminiService : IGeminiService
             .Select(msg => new DeepSeekMessage(
                 string.Equals(msg.Role, "assistant", StringComparison.OrdinalIgnoreCase) ? "assistant" : "user",
                 msg.Content.Trim()))
-            .TakeLast(12)
+            .TakeLast(10)
             .ToList();
 
         foreach (var msg in history)
         {
+            // Guard against repeated adjacent turns that can cause loop-like model replies.
             if (messages.Count > 0 &&
                 messages[^1].role == msg.role &&
                 messages[^1].content == msg.content)

@@ -1,13 +1,22 @@
-using System.Net.Http.Json;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SahtekApi.Models;
 
 namespace SahtekApi.Services;
 
 public class GeminiService : IGeminiService
 {
-    private sealed record DeepSeekMessage(string role, string content);
+    private sealed record DeepSeekMessage(
+        [property: JsonPropertyName("role")] string Role,
+        [property: JsonPropertyName("content")] string Content
+    );
+
+    private sealed record DeepSeekRequest(
+        [property: JsonPropertyName("model")] string Model,
+        [property: JsonPropertyName("messages")] List<DeepSeekMessage> Messages
+    );
 
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
@@ -15,18 +24,7 @@ public class GeminiService : IGeminiService
     private const string Endpoint = "https://api.deepseek.com/chat/completions";
     private const string Model = "deepseek-chat";
 
-    private const string SystemPrompt = """
-        نتي "صحّتك" (Sahtek)، مساعدة ذكاء اصطناعي ودودة وإنسانية كتدعم التوعية بصحة الثدي عند النساء.
-
-        توجيهات أساسية:
-        1) إلى كان المستخدم غير سلّم عليك ولا سَوّل "كيف دايرة؟" أو جاب كلام اجتماعي بسيط، ردي عليه برد دافئ بالدارجة المغربية وسوّليه كيفاش تقدري تعاونيه بخصوص صحة الثدي اليوم.
-        2) ما تدخليش مباشرة فخطاب طبي طويل إلا كان غير ترحيب. خليه رد طبيعي، بشري، ومهني.
-        3) منين السؤال يكون فعلاً على صحة الثدي، جاوبي بمعلومات توعوية واضحة على الأعراض، الفحص الذاتي، الوقاية، التشخيص المبكر، والدعم النفسي.
-        4) إذا كان الطلب خارج السياق الطبي ديال صحة الثدي بشكل واضح، اعتذري بلطف ووجّهي النقاش لتوعية صحة الثدي بلا تكرار آلي.
-        5) ما تعطيش تشخيص طبي نهائي، ونبهي دائماً أن الطبيب المختص هو المرجع للحالات الشخصية.
-        6) جاوبي حصرياً بالدارجة المغربية، بأسلوب متعاطف، متوازن، وتفاعلي. تجنبي أي رد روبوتي متكرر أو قالب ثابت.
-        7) خلي الرد موجز ومفيد (تقريباً 40-160 كلمة) ويمكن استعمال نقاط عند الحاجة.
-        """;
+    private const string SystemPrompt = "You are 'Sahtek', a friendly Moroccan AI assistant. Always greet back warmly in Darija if the user says hello (salam, cv, etc). Never reply with robotic fallback text.";
 
     public GeminiService(HttpClient httpClient)
     {
@@ -38,53 +36,26 @@ public class GeminiService : IGeminiService
 
     public async Task<ChatResponse> GenerateChatResponseAsync(ChatRequest request, CancellationToken cancellationToken)
     {
-        var trimmedMessage = request.Message.Trim();
-        var messages = new List<DeepSeekMessage>
+        var trimmedMessage = request.Message?.Trim();
+        if (string.IsNullOrWhiteSpace(trimmedMessage))
         {
-            new("system", SystemPrompt)
-        };
-
-        var history = (request.ConversationHistory ?? [])
-            .Where(msg => !string.IsNullOrWhiteSpace(msg.Content))
-            .Select(msg => new DeepSeekMessage(
-                NormalizeRole(msg.Role),
-                msg.Content.Trim()))
-            // Keep a short but slightly broader context window to preserve recent flow
-            // (including greetings + follow-up question) without large token growth.
-            .TakeLast(12)
-            .ToList();
-
-        foreach (var msg in history)
-        {
-            // Guard against repeated adjacent turns that can cause loop-like model replies.
-            if (messages.Count > 0 &&
-                messages[^1].role == msg.role &&
-                messages[^1].content == msg.content)
-            {
-                continue;
-            }
-
-            messages.Add(msg);
+            throw new InvalidOperationException("User message cannot be empty.");
         }
 
-        var alreadyIncludedAsLastUserMessage =
-            history.Count > 0 &&
-            history[^1].role == "user" &&
-            string.Equals(history[^1].content, trimmedMessage, StringComparison.Ordinal);
+        var payload = new DeepSeekRequest(
+            Model,
+            [
+                new DeepSeekMessage("system", SystemPrompt),
+                new DeepSeekMessage("user", trimmedMessage)
+            ]
+        );
 
-        if (!alreadyIncludedAsLastUserMessage)
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, Endpoint)
         {
-            messages.Add(new("user", trimmedMessage));
-        }
-
-        var payload = new
-        {
-            model = Model,
-            messages,
-            temperature = 0.4
+            Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
         };
 
-        var response = await _httpClient.PostAsJsonAsync(Endpoint, payload, cancellationToken);
+        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
@@ -130,6 +101,4 @@ public class GeminiService : IGeminiService
         throw new InvalidOperationException("DeepSeek API returned an empty text response.");
     }
 
-    private static string NormalizeRole(string? role)
-        => string.Equals(role, "assistant", StringComparison.OrdinalIgnoreCase) ? "assistant" : "user";
 }

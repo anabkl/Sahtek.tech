@@ -54,7 +54,6 @@ public class GeminiService : IGeminiService
         {
             Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
         };
-        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
         var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
         var json = await response.Content.ReadAsStringAsync(cancellationToken);

@@ -11,6 +11,7 @@ public class GeminiService : IGeminiService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<GeminiService> _logger;
+    private readonly string? _apiKey;
 
     private const string Endpoint = "https://api.deepseek.com/chat/completions";
     private const string Model = "deepseek-chat";
@@ -21,12 +22,12 @@ public class GeminiService : IGeminiService
     {
         _httpClient = httpClient;
         _logger = logger;
+        _apiKey = Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY");
     }
 
     public async Task<ChatResponse> GenerateChatResponseAsync(ChatRequest request, CancellationToken cancellationToken)
     {
-        var apiKey = Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY");
-        if (string.IsNullOrWhiteSpace(apiKey))
+        if (string.IsNullOrWhiteSpace(_apiKey))
         {
             _logger.LogError("DEEPSEEK_API_KEY environment variable is not configured.");
             throw new InvalidOperationException("AI service is not configured. Please contact support.");
@@ -52,7 +53,7 @@ public class GeminiService : IGeminiService
         {
             Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
         };
-        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
         HttpResponseMessage response;
         string json;
@@ -73,7 +74,7 @@ public class GeminiService : IGeminiService
             throw new InvalidOperationException($"DeepSeek API request failed with status {(int)response.StatusCode}.");
         }
 
-        var aiText = ExtractText(json);
+        var aiText = ExtractText(json, _logger);
 
         return new ChatResponse
         {
@@ -85,7 +86,7 @@ public class GeminiService : IGeminiService
         };
     }
 
-    private string ExtractText(string json)
+    private static string ExtractText(string json, ILogger logger)
     {
         try
         {
@@ -96,12 +97,12 @@ public class GeminiService : IGeminiService
                 return content;
             }
 
-            _logger.LogError("DeepSeek API returned unexpected response shape. Raw JSON: {Json}", json);
+            logger.LogError("DeepSeek API returned unexpected response shape. Raw JSON: {Json}", json);
             throw new InvalidOperationException("DeepSeek API returned an unexpected response shape.");
         }
         catch (Exception ex) when (ex is not InvalidOperationException)
         {
-            _logger.LogError(ex, "Failed to parse DeepSeek API response. InnerException: {Inner}. Raw JSON: {Json}",
+            logger.LogError(ex, "Failed to parse DeepSeek API response. InnerException: {Inner}. Raw JSON: {Json}",
                 ex.InnerException?.Message, json);
             throw new InvalidOperationException("Failed to parse the AI service response.", ex);
         }

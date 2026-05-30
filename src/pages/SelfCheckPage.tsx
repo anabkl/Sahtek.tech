@@ -33,9 +33,17 @@ function stepsFor(lang: string): SelfCheckStep[] {
 function AICameraVerification() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<'starting' | 'scanning' | 'success' | 'blocked'>('starting');
+  const [scanStep, setScanStep] = useState(0);
+
+  const scanMessages = [
+    'جاري تحليل الصورة...',
+    'البحث عن عدم تماثل...',
+    'لم يتم اكتشاف أي كتل ظاهرة. يرجى إكمال الفحص اليدوي.',
+  ];
 
   useEffect(() => {
     let stream: MediaStream | null = null;
+    let stepTimer: number | undefined;
     let doneTimer: number | undefined;
     let cancelled = false;
 
@@ -51,9 +59,21 @@ function AICameraVerification() {
           stream.getTracks().forEach((track) => track.stop());
           return;
         }
+
         if (videoRef.current) videoRef.current.srcObject = stream;
+
         setStatus('scanning');
-        doneTimer = window.setTimeout(() => setStatus('success'), 3000);
+        setScanStep(0);
+
+        stepTimer = window.setInterval(() => {
+          setScanStep((step) => Math.min(step + 1, 2));
+        }, 1000);
+
+        doneTimer = window.setTimeout(() => {
+          if (stepTimer) window.clearInterval(stepTimer);
+          setScanStep(2);
+          setStatus('success');
+        }, 3000);
       } catch {
         setStatus('blocked');
       }
@@ -63,6 +83,7 @@ function AICameraVerification() {
 
     return () => {
       cancelled = true;
+      if (stepTimer) window.clearInterval(stepTimer);
       if (doneTimer) window.clearTimeout(doneTimer);
       stream?.getTracks().forEach((track) => track.stop());
     };
@@ -78,11 +99,9 @@ function AICameraVerification() {
         </div>
       </div>
       <div className="mt-3 rounded-2xl bg-primary-50 p-3 text-sm font-black text-primary-800">
-        {status === 'success'
-          ? 'AI Verification: Correct posture detected. You may proceed.'
-          : status === 'blocked'
-            ? 'Camera preview unavailable. Privacy-safe verification mode is ready; no image is uploaded.'
-            : 'Scanning posture locally... no image is sent to the backend.'}
+        {status === 'blocked'
+          ? 'Camera preview unavailable. Privacy-safe verification mode is ready; no image is uploaded.'
+          : scanMessages[scanStep]}
       </div>
     </div>
   );

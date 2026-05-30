@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Gauge, Share2 } from 'lucide-react';
+import { CheckCircle2, Download, Gauge, Share2 } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
@@ -18,6 +18,50 @@ export function RiskAssessmentPage() {
     if (!risk.result) return;
     await navigator.clipboard?.writeText(`${t.risk.yourScore}: ${pct}% - ${levelLabel}. ${t.disclaimer.short}`);
     setCopied(true);
+  };
+
+  const downloadMedicalReport = () => {
+    if (!risk.result) return;
+
+    const answers = risk.questions.map((question) => {
+      const value = risk.answers[question.id];
+      const option = question.options.find((item) => item.value === value);
+
+      return {
+        id: question.id,
+        question: question.question,
+        answer_value: value ?? null,
+        answer_label: option?.label ?? value ?? 'Not answered',
+      };
+    });
+
+    const report = {
+      report_type: 'Sahtek Clinical Data Export',
+      generated_at: new Date().toISOString(),
+      risk_level: risk.result.risk_level,
+      risk_score: risk.result.risk_score,
+      max_score: risk.result.max_score,
+      risk_percentage: risk.result.risk_percentage,
+      summary: risk.result.summary,
+      recommendations: risk.result.recommendations,
+      risk_factors_identified: risk.result.risk_factors_identified,
+      protective_factors_identified: risk.result.protective_factors_identified,
+      next_steps: risk.result.next_steps,
+      disclaimer: risk.result.disclaimer,
+      answers,
+    };
+
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+      type: 'application/json;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `sahtek-medical-report-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -100,6 +144,7 @@ export function RiskAssessmentPage() {
             <p className="mt-5 rounded-2xl bg-white/60 p-4 text-sm font-bold leading-6 text-muted">{t.disclaimer.short}</p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <Button onClick={copy} leftIcon={<Share2 size={18} />}>{copied ? t.risk.shared : t.risk.shareBtn}</Button>
+              <Button variant="secondary" onClick={downloadMedicalReport} leftIcon={<Download size={18} />}>تحميل التقرير الطبي</Button>
               <Button variant="secondary" onClick={risk.restart}>{t.risk.retakeBtn}</Button>
             </div>
           </div>

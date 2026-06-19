@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SelfCheckStep } from '@/types/api';
 
 export type SelfCheckStage = 'intro' | 'active' | 'done';
@@ -25,14 +25,16 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     }
   }, [index, stage, steps]);
 
-  // Tick the countdown once per second while running.
+  // Tick the countdown once per second while running. The interval is created
+  // once per run/pause cycle (not re-created each second) — the functional
+  // updater keeps it decrementing without needing `remaining` in the deps.
   useEffect(() => {
-    if (stage !== 'active' || paused || remaining <= 0) return;
+    if (stage !== 'active' || paused) return;
     const id = window.setInterval(() => {
       setRemaining((r) => (r <= 1 ? 0 : r - 1));
     }, 1000);
     return () => window.clearInterval(id);
-  }, [stage, paused, remaining]);
+  }, [stage, paused]);
 
   const start = useCallback(() => {
     setIndex(0);
@@ -71,6 +73,18 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     },
     [index, total],
   );
+
+  // Auto-advance when the countdown hits zero. Tracking the previous value
+  // ensures we only fire on a true >0 → 0 transition (the timer running out or
+  // an explicit skip) and never on the reset that re-arms each step from 0.
+  const prevRemaining = useRef(remaining);
+  useEffect(() => {
+    const wasRunning = prevRemaining.current > 0;
+    prevRemaining.current = remaining;
+    if (stage === 'active' && wasRunning && remaining === 0) {
+      next();
+    }
+  }, [remaining, stage, next]);
 
   const stepDuration = current?.duration_seconds ?? 1;
   const stepProgress = current ? (stepDuration - remaining) / stepDuration : 0;

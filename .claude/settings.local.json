@@ -7,7 +7,13 @@
       "Bash(echo \"===VITE_EXIT:$?===\")",
       "Bash(npm.cmd run *)",
       "Bash(echo \"===EXIT:$?===\")",
-      "Bash(node -e \"const fs=require\\('fs'\\);const s=fs.readFileSync\\('src/i18n/ar.ts','utf8'\\);const m=s.match\\(/listening:\\\\s*'\\([^']*\\)'/\\);console.log\\('FOUND:',JSON.stringify\\(m&&m[1]\\)\\);console.log\\('CODEPOINTS:',[...\\(m?m[1]:''\\)].map\\(c=>c.codePointAt\\(0\\).toString\\(16\\)\\).join\\(' '\\)\\);const want='كنسمع ليك...';console.log\\('WANT  :',JSON.stringify\\(want\\)\\);console.log\\('WANTCP:',[...want].map\\(c=>c.codePointAt\\(0\\).toString\\(16\\)\\).join\\(' '\\)\\);console.log\\('EQUAL:',m&&m[1]===want\\);\")"
+      "Bash(node -e \"const fs=require\\('fs'\\);const s=fs.readFileSync\\('src/i18n/ar.ts','utf8'\\);const m=s.match\\(/listening:\\\\s*'\\([^']*\\)'/\\);console.log\\('FOUND:',JSON.stringify\\(m&&m[1]\\)\\);console.log\\('CODEPOINTS:',[...\\(m?m[1]:''\\)].map\\(c=>c.codePointAt\\(0\\).toString\\(16\\)\\).join\\(' '\\)\\);const want='كنسمع ليك...';console.log\\('WANT  :',JSON.stringify\\(want\\)\\);console.log\\('WANTCP:',[...want].map\\(c=>c.codePointAt\\(0\\).toString\\(16\\)\\).join\\(' '\\)\\);console.log\\('EQUAL:',m&&m[1]===want\\);\")",
+      "Bash(git show *)",
+      "Bash(echo \"exit:$?\")",
+      "Read(//tmp/**)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(npm run *)"
     ]
   }
 }

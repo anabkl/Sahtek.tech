@@ -1,9 +1,10 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { CheckCircle2, Clock, Mail, Pause, Play, RotateCcw, TimerReset } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { BellRing, CheckCircle2, Clock, Pause, Play, RotateCcw, TimerReset } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
+import { Confetti } from '@/components/ui/Confetti';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useSelfCheck } from '@/hooks/useSelfCheck';
 import { formatDuration } from '@/utils/formatters';
@@ -109,33 +110,28 @@ function AICameraVerification() {
 
 export function SelfCheckPage() {
   const { t, lang } = useLanguage();
-  const guide = stepsFor(lang);
+  // Memoize so the steps array keeps a stable identity across renders —
+  // otherwise the timer's reset effect refires every render and freezes the countdown.
+  const guide = useMemo(() => stepsFor(lang), [lang]);
   const check = useSelfCheck(guide);
-  const [reminderContact, setReminderContact] = useState('');
-  const [reminderSending, setReminderSending] = useState(false);
-  const [reminderSuccess, setReminderSuccess] = useState(false);
-  const reminderTimer = useRef<number | null>(null);
+  const navigate = useNavigate();
+  const [showReminderCta, setShowReminderCta] = useState(false);
+  const ctaTimer = useRef<number | null>(null);
   const radius = 72;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - check.stepProgress);
 
+  // Reveal the reminder nudge ~2s after the user finishes the guide.
   useEffect(() => {
+    if (check.stage !== 'done') {
+      setShowReminderCta(false);
+      return;
+    }
+    ctaTimer.current = window.setTimeout(() => setShowReminderCta(true), 2000);
     return () => {
-      if (reminderTimer.current) window.clearTimeout(reminderTimer.current);
+      if (ctaTimer.current) window.clearTimeout(ctaTimer.current);
     };
-  }, []);
-
-  const scheduleReminder = (event: FormEvent) => {
-    event.preventDefault();
-    if (!reminderContact.trim() || reminderSending) return;
-
-    setReminderSending(true);
-    setReminderSuccess(false);
-    reminderTimer.current = window.setTimeout(() => {
-      setReminderSending(false);
-      setReminderSuccess(true);
-    }, 1500);
-  };
+  }, [check.stage]);
 
   return (
     <PageTransition>
@@ -192,38 +188,46 @@ export function SelfCheckPage() {
       )}
 
       {check.stage === 'done' && (
-        <section className="mx-auto max-w-xl rounded-[2rem] border border-white/70 bg-card/85 p-6 text-center shadow-petal-xl">
+        <section className="relative mx-auto max-w-xl overflow-hidden rounded-[2rem] border border-white/70 bg-card/85 p-6 text-center shadow-petal-xl">
+          <Confetti />
           <CheckCircle2 className="mx-auto text-accent-teal" size={56} />
-          <h1 className="mt-4 text-4xl font-black text-ink">{t.selfCheck.completeTitle}</h1>
+          <h1 className="mt-4 text-3xl font-black text-ink sm:text-4xl">{t.selfCheck.celebrateTitle}</h1>
           <p className="mt-3 font-medium leading-7 text-muted">{t.selfCheck.completeText}</p>
           <p className="mt-4 rounded-2xl bg-primary-50 p-4 text-sm font-bold text-primary-800">{t.selfCheck.importantNote}</p>
-          <form onSubmit={scheduleReminder} className="mt-5 rounded-3xl border border-line bg-white/65 p-4 text-start">
-            <label htmlFor="self-check-reminder" className="flex items-center gap-2 text-sm font-black text-ink">
-              <Mail size={16} className="text-primary-600" />
-              SMS/Email reminder
-            </label>
-            <div className="mt-3 flex gap-2 rounded-full bg-card p-2 shadow-inner">
-              <input
-                id="self-check-reminder"
-                value={reminderContact}
-                onChange={(event) => setReminderContact(event.target.value)}
-                placeholder="Phone or email"
-                className="min-w-0 flex-1 bg-transparent px-4 font-bold text-ink outline-none"
-              />
-              <Button type="submit" loading={reminderSending} disabled={!reminderContact.trim()}>
-                Schedule
-              </Button>
-            </div>
-            {reminderSuccess && (
-              <div className="mt-3 rounded-2xl bg-accent-teal/15 p-3 text-sm font-black text-accent-teal">
-                Reminder successfully scheduled via SMS/Email for your next check-up.
-              </div>
+
+          <AnimatePresence>
+            {showReminderCta && (
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 28 }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+                className="mt-6 rounded-[1.75rem] bg-rose-gradient p-5 text-start text-white shadow-petal-xl"
+              >
+                <div className="flex items-center gap-2">
+                  <BellRing size={22} />
+                  <h2 className="text-xl font-black">{t.selfCheck.reminderCtaTitle}</h2>
+                </div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <Button variant="secondary" fullWidth onClick={() => navigate('/reminder')}>
+                    {t.selfCheck.reminderCtaYes}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    fullWidth
+                    className="text-white hover:bg-white/15"
+                    onClick={() => setShowReminderCta(false)}
+                  >
+                    {t.selfCheck.reminderCtaNo}
+                  </Button>
+                </div>
+              </motion.div>
             )}
-          </form>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <Link to="/reminder"><Button fullWidth>{t.selfCheck.completeCta}</Button></Link>
-            <Button fullWidth variant="secondary" onClick={check.restart} leftIcon={<RotateCcw size={18} />}>{t.selfCheck.restart}</Button>
-          </div>
+          </AnimatePresence>
+
+          <Button className="mt-6" fullWidth variant="secondary" onClick={check.restart} leftIcon={<RotateCcw size={18} />}>
+            {t.selfCheck.restart}
+          </Button>
         </section>
       )}
     </PageTransition>

@@ -2,7 +2,7 @@ import { FormEvent, ReactNode, useMemo, useRef, useState } from 'react';
 import { Bot, Mic, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
-import { useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/toastStore';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { formatTime } from '@/utils/formatters';

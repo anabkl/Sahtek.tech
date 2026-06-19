@@ -1,12 +1,14 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { BottomNav } from './BottomNav';
 import { Navbar } from './Navbar';
+import { NavArrows } from './NavArrows';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export function Layout() {
-  const { dir, lang, fontClass } = useLanguage();
+  const { t, dir, lang, fontClass } = useLanguage();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -17,6 +19,29 @@ export function Layout() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location.pathname]);
 
+  // Sequential page flow shown as fixed corner arrows. The Learn page owns its
+  // own hybrid tab+page arrows, so the global ones step aside there.
+  const pageOrder = [
+    { path: '/', label: t.nav.home },
+    { path: '/learn', label: t.nav.learn },
+    { path: '/self-check', label: t.nav.selfCheck },
+    { path: '/risk', label: t.nav.risk },
+    { path: '/chat', label: t.nav.chat },
+    { path: '/reminder', label: t.nav.reminder },
+  ];
+  const currentIndex = pageOrder.findIndex((p) => p.path === location.pathname);
+  const isKnownPage = currentIndex !== -1;
+  const isLearn = location.pathname === '/learn';
+  const prevPage = currentIndex > 0 ? pageOrder[currentIndex - 1] : null;
+  const nextPage = currentIndex < pageOrder.length - 1 ? pageOrder[currentIndex + 1] : null;
+
+  const go = (path: string) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const showGlobalArrows = isKnownPage && !isLearn;
+
   return (
     <div className={`min-h-full overflow-x-hidden ${fontClass}`}>
       <div className="pointer-events-none fixed inset-0 -z-10">
@@ -25,6 +50,13 @@ export function Layout() {
       </div>
       <Navbar />
       <Outlet />
+      {showGlobalArrows && (
+        <NavArrows
+          transitionKey={location.pathname}
+          prev={prevPage ? { label: prevPage.label, aria: t.common.previous, onActivate: () => go(prevPage.path) } : null}
+          next={nextPage ? { label: nextPage.label, aria: t.common.next, onActivate: () => go(nextPage.path) } : null}
+        />
+      )}
       <BottomNav />
     </div>
   );

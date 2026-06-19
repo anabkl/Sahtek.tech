@@ -3,27 +3,98 @@ import type { SelfCheckStep } from '@/types/api';
 
 export type SelfCheckStage = 'intro' | 'active' | 'done';
 
+const STORAGE_KEY = 'sahtek_selfcheck';
+const MAX_AGE = 24 * 60 * 60 * 1000; // 24h
+
+export interface SelfCheckSnapshot {
+  currentStep: number;
+  timerSeconds: number;
+  timerState: 'idle' | 'running' | 'paused';
+  completedSteps: number[];
+  lastUpdated: number;
+}
+
+/** Read a recent (<24h) saved session, clearing it if stale or invalid. */
+function readSnapshot(): SelfCheckSnapshot | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as SelfCheckSnapshot;
+    if (!s || typeof s.lastUpdated !== 'number') return null;
+    if (Date.now() - s.lastUpdated > MAX_AGE) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return s;
+  } catch {
+    return null;
+  }
+}
+
+function clearSnapshot() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Wizard + per-step countdown timer for the guided self-check. */
 export function useSelfCheck(steps: SelfCheckStep[]) {
   const [stage, setStage] = useState<SelfCheckStage>('intro');
   const [index, setIndex] = useState(0);
   const [remaining, setRemaining] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   /** Slide direction for transitions (1 forward, -1 back). */
   const [direction, setDirection] = useState(1);
+
+  // A resumable session detected on mount (read once). The continue-prompt UI
+  // keys off this; restoring or discarding clears it.
+  const [savedSnapshot, setSavedSnapshot] = useState<SelfCheckSnapshot | null>(() => readSnapshot());
+  // When restoring, the step-change reset effect must NOT wipe the saved timer.
+  const restoringRef = useRef(false);
 
   const total = steps.length;
   const current = steps[index];
   const isLast = index === total - 1;
   const isFirst = index === 0;
 
-  // Reset the countdown whenever the active step changes.
+  // Reset the countdown whenever the active step changes (but not when we are
+  // restoring a saved session — that keeps its own remaining seconds).
   useEffect(() => {
     if (stage === 'active' && steps[index]) {
+      if (restoringRef.current) {
+        restoringRef.current = false;
+        return;
+      }
       setRemaining(steps[index].duration_seconds);
       setPaused(false);
     }
   }, [index, stage, steps]);
+
+  // Persist the live session on every change while active; clear it when done.
+  useEffect(() => {
+    if (stage !== 'active') return;
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          currentStep: index + 1,
+          timerSeconds: remaining,
+          timerState: paused ? 'paused' : 'running',
+          completedSteps,
+          lastUpdated: Date.now(),
+        } satisfies SelfCheckSnapshot),
+      );
+    } catch {
+      /* storage unavailable — keep in-memory state only */
+    }
+  }, [stage, index, remaining, paused, completedSteps]);
+
+  useEffect(() => {
+    if (stage === 'done') clearSnapshot();
+  }, [stage]);
 
   // Tick the countdown once per second while running. The interval is created
   // once per run/pause cycle (not re-created each second) — the functional
@@ -38,18 +109,24 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
 
   const start = useCallback(() => {
     setIndex(0);
+    setCompletedSteps([]);
     setDirection(1);
     setStage('active');
   }, []);
 
   const next = useCallback(() => {
+    if (current) {
+      setCompletedSteps((prev) =>
+        prev.includes(current.step_number) ? prev : [...prev, current.step_number],
+      );
+    }
     if (isLast) {
       setStage('done');
       return;
     }
     setDirection(1);
     setIndex((i) => i + 1);
-  }, [isLast]);
+  }, [isLast, current]);
 
   const prev = useCallback(() => {
     setDirection(-1);
@@ -63,6 +140,29 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     setStage('intro');
     setIndex(0);
     setPaused(false);
+    setCompletedSteps([]);
+    clearSnapshot();
+  }, []);
+
+  /** Resume the saved session detected on mount. */
+  const resumeSaved = useCallback(() => {
+    setSavedSnapshot((snap) => {
+      if (!snap) return null;
+      restoringRef.current = true;
+      setCompletedSteps(snap.completedSteps ?? []);
+      setIndex(Math.min(Math.max((snap.currentStep ?? 1) - 1, 0), Math.max(total - 1, 0)));
+      setRemaining(snap.timerSeconds ?? steps[0]?.duration_seconds ?? 0);
+      setPaused(snap.timerState === 'paused');
+      setDirection(1);
+      setStage('active');
+      return null;
+    });
+  }, [total, steps]);
+
+  /** Discard the saved session and start clean. */
+  const discardSaved = useCallback(() => {
+    setSavedSnapshot(null);
+    clearSnapshot();
   }, []);
 
   const goTo = useCallback(
@@ -101,6 +201,8 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     isFirst,
     isLast,
     stepProgress,
+    completedSteps,
+    savedSnapshot,
     start,
     next,
     prev,
@@ -108,5 +210,7 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     skipTimer,
     restart,
     goTo,
+    resumeSaved,
+    discardSaved,
   };
 }

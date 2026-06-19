@@ -106,11 +106,50 @@ export const en = {
       { value: '5 min', caption: 'a month is enough for a simple self-check habit.' },
       { value: '48', caption: 'average diagnosis age reported in Morocco awareness campaigns.' },
     ],
+    overviewStats: [
+      {
+        stat: '1 in 8',
+        text: 'An approximate lifetime cumulative risk, which is why prevention and early detection matter so much.',
+        statLabel: 'Approximate risk: one woman in eight over a lifetime',
+      },
+      {
+        stat: '+90%',
+        text: 'Better treatment outcomes when the disease is caught in its earliest stages.',
+        statLabel: 'Over ninety percent better chances with early detection',
+      },
+      {
+        stat: '30 days',
+        text: 'A regular monthly self-check helps you notice any change early.',
+        statLabel: 'A self-check roughly every thirty days',
+      },
+    ],
     symptoms: [
       { name: 'Lump or swelling', severity: 'high' },
       { name: 'Skin dimpling', severity: 'high' },
       { name: 'Nipple discharge', severity: 'high' },
       { name: 'New breast pain', severity: 'medium' },
+    ],
+    symptomCards: [
+      {
+        title: 'A new lump or swelling in the breast or under the arm',
+        points: ['If a lump stays for days and does not shrink, it needs follow-up.', 'Even a painless lump should be seen by a doctor.'],
+        severity: 'high',
+      },
+      {
+        title: 'A change in skin color or dimpling like orange peel',
+        points: ['The skin may turn red, bluish, or very tight.', 'Any sudden, persistent change should not be ignored.'],
+        severity: 'high',
+      },
+      {
+        title: 'Nipple discharge, especially if it is bloody',
+        points: ['Discharge without breastfeeding needs a prompt medical assessment.', 'If it comes from only one side, it needs examination.'],
+        severity: 'high',
+      },
+      {
+        title: 'Persistent localized pain or a clear change in breast shape',
+        points: ['Pain alone is usually not serious, but persistence is an important sign.', 'A sudden difference in size or shape needs diagnosis.'],
+        severity: 'medium',
+      },
     ],
     habits: [
       { key: 'selfExam', label: 'Monthly self-exam', tip: 'It takes just 5 minutes! Start this month.' },
@@ -215,6 +254,68 @@ export const en = {
         'Morocco offers free mammography programs for women aged 45 to 69.',
       ],
     },
+    bodyMap: {
+      title: 'Symptom body map',
+      intro: 'Tap a marked area to see the changes to watch for in that part of the body.',
+      defaultTitle: 'Explore the body map',
+      defaultMessage: 'Tap an area on the body to see the symptoms linked to it 👆',
+      whenToWorryLabel: 'When to worry',
+      severityLabels: { high: '🔴 High concern', medium: '🟠 Moderate', low: '🟡 Lower' },
+      ctaDoctor: 'See a doctor',
+      ctaCheck: 'Get it checked',
+      summaryBanner:
+        '⚠️ Most changes are not cancer, but every new change should be seen by a doctor. Early detection saves lives. 💗',
+      zones: {
+        breast: {
+          name: 'Breast',
+          severity: 'high',
+          symptoms: [
+            { title: 'A new lump or swelling in the breast', desc: 'Any new firm lump should be examined right away.' },
+            { title: 'A sudden change in breast size', desc: 'One breast becoming bigger or smaller than the other, suddenly.' },
+            { title: 'Unusual firmness in one area', desc: 'A hard area that was not there before.' },
+          ],
+          whenToWorry: 'If a lump stays for more than two weeks, see a doctor.',
+        },
+        underarm: {
+          name: 'Underarm',
+          severity: 'high',
+          symptoms: [
+            { title: 'Swelling under the arm', desc: 'Lymph nodes swollen with no clear reason.' },
+            { title: 'A lump under the arm', desc: 'Any new lump in this area matters.' },
+          ],
+          whenToWorry: 'Swelling that does not go away within two weeks needs a medical check.',
+        },
+        nipple: {
+          name: 'Nipple',
+          severity: 'high',
+          symptoms: [
+            { title: 'Nipple discharge', desc: 'Especially if it is bloody or without a clear cause.' },
+            { title: 'The nipple turning inward', desc: 'The nipple becoming retracted when it was not before.' },
+            { title: 'A change in nipple shape or color', desc: 'Redness or flaking around the nipple.' },
+          ],
+          whenToWorry: 'Any discharge without breastfeeding should be seen by a doctor right away.',
+        },
+        skin: {
+          name: 'Skin',
+          severity: 'medium',
+          symptoms: [
+            { title: 'A change in skin color', desc: 'Redness or a bluish tone.' },
+            { title: 'An orange-peel texture', desc: 'The breast skin showing small dimples like an orange.' },
+            { title: 'Persistent flaking or itching', desc: 'Skin that peels or itches with no clear reason.' },
+          ],
+          whenToWorry: 'Any skin change lasting more than a week needs follow-up.',
+        },
+        collarbone: {
+          name: 'Collarbone',
+          severity: 'medium',
+          symptoms: [
+            { title: 'Swelling above or below the collarbone', desc: 'May be a sign of spread to the lymph nodes.' },
+            { title: 'Persistent pain in the area', desc: 'Pain that does not go away in the upper chest.' },
+          ],
+          whenToWorry: 'Unexplained swelling in this area needs a prompt check.',
+        },
+      },
+    },
   },
   selfCheck: {
     title: 'Monthly self-check',
@@ -243,6 +344,10 @@ export const en = {
     reminderCtaTitle: '🔔 Want a reminder for next month?',
     reminderCtaYes: 'Yes, remind me',
     reminderCtaNo: 'No, thanks',
+    resumeTitle: 'You have an unfinished self-check',
+    resumeSubtitle: 'You were on step {step} of {total}',
+    resumeYes: 'Continue the check ▶️',
+    resumeNo: 'Start over 🔄',
   },
   risk: {
     title: 'Personal risk awareness',

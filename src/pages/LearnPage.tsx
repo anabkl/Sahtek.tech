@@ -1,92 +1,53 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Check, Heart, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Baby, Calendar, Cigarette, Clock, Heart, Pill, Scale, Users } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
+import { NavArrows } from '@/components/layout/NavArrows';
+import { PreventionTracker } from '@/components/learn/PreventionTracker';
+import { MythsWall } from '@/components/learn/MythsWall';
+import { BodyMap } from '@/components/learn/BodyMap';
 import { useLanguage } from '@/hooks/useLanguage';
+import { usePersistedState } from '@/hooks/usePersistedState';
 import { cn } from '@/utils/cn';
-
-const symptomCards = [
-  {
-    title: 'كورة ولا تنفاخ جديد فالثدي ولا تحت الإبط',
-    points: ['إلا بقات الكورة أيام وما نقصاتش، خاص المتابعة.', 'حتى الكورة اللي ما كتوجعش خاصها تتشاف عند طبيب.'],
-    severity: 'high' as const,
-  },
-  {
-    title: 'تبدل فلون الجلد ولا التجعيد بحال قشرة البرتقال',
-    points: ['الجلد يقدر يولي محمر، مزرق، ولا مشدود بزاف.', 'أي تبدل مفاجئ ومُستمر ما خاصوش يتهمّل.'],
-    severity: 'high' as const,
-  },
-  {
-    title: 'إفرازات من الحلمة خصوصاً إلا كانت دموية',
-    points: ['الإفرازات بلا رضاعة طبيعية خاصها تقييم طبي سريع.', 'إلا جات غير من جهة وحدة راه خاص الفحص.'],
-    severity: 'high' as const,
-  },
-  {
-    title: 'ألم موضعي مستمر ولا تغير واضح فشكل الثدي',
-    points: ['الألم بوحدو غالباً ماشي خطير، ولكن الاستمرار علامة مهمة.', 'الاختلاف المفاجئ فالحجم ولا الشكل خاصو تشخيص.'],
-    severity: 'medium' as const,
-  },
-];
-
-const preventionChecklist = [
-  {
-    title: 'الفحص الذاتي مرة فالشهر',
-    detail: 'ديريه نفس اليوم كل شهر، وركزي على أي تغيّر جديد.',
-  },
-  {
-    title: 'زيارة دورية للطبيب أو القابلة',
-    detail: 'الفحص السريري كيساعد يكشف التغيرات اللي ممكن ما تبانش بسهولة.',
-  },
-  {
-    title: '30 دقيقة نشاط بدني يومياً',
-    detail: 'المشي السريع، الرقص، ولا أي حركة منتظمة كتعاون على الوقاية.',
-  },
-  {
-    title: 'أكل متوازن غني بالخضر والفواكه',
-    detail: 'قللي المأكولات المصنعة والسكريات الزائدة قدر الإمكان.',
-  },
-  {
-    title: 'الابتعاد عن التدخين وتقليل الكحول',
-    detail: 'هاد العادات كترفع المخاطر الصحية بشكل عام.',
-  },
-  {
-    title: 'تنظيم النوم وتخفيف التوتر',
-    detail: 'الراحة النفسية والنوم الكافي كيعززو المناعة والتوازن الهرموني.',
-  },
-];
-
-const myths = [
-  {
-    myth: 'سرطان الثدي كيجي غير عند النساء الكبار فالسن.',
-    truth: 'ممكن يبان فمراحل عمرية مختلفة، لهذا الوعي لازم من بدري.',
-    details: 'الخطر كيرتفع مع السن، ولكن هاد الشي ما كيلغيش أهمية التوعية عند الشابات حتى هما.',
-  },
-  {
-    myth: 'إلا ما كاينش تاريخ عائلي، ما كاين حتى خطر.',
-    truth: 'أغلب الحالات كتوقع بلا تاريخ عائلي واضح.',
-    details: 'وجود تاريخ عائلي مهم، لكن غيابو ماشي ضمانة. المتابعة الدورية ضرورية للجميع.',
-  },
-  {
-    myth: 'أي كورة فالثدي معناها سرطان.',
-    truth: 'كاين بزاف ديال الكويرات الحميدة، ولكن التشخيص خاص يكون طبي.',
-    details: 'ما تخافيش بلا فائدة، وما تهمليش. الكشف المبكر كيبقى أحسن خطوة.',
-  },
-  {
-    myth: 'الفحص الذاتي كيبدل الفحص الطبي والماموغرافيا.',
-    truth: 'الفحص الذاتي مكمل فقط، ماشي بديل للمتابعة الطبية.',
-    details: 'المراقبة الذاتية كتعاونك تعرفي جسمك، والطبيب كيأكد التشخيص بخطوات أدق.',
-  },
-];
 
 export function LearnPage() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const tabs = useMemo(() => Object.entries(t.learn.tabs), [t.learn.tabs]);
-  const [tab, setTab] = useState(tabs[0][0]);
-  const [checked, setChecked] = useState<string[]>([]);
-  const [flipped, setFlipped] = useState<string[]>([]);
+  const [tab, setTab] = usePersistedState<string>('sahtek_learn', tabs[0][0]);
+
+  // Guard against a stale/invalid persisted tab key.
+  useEffect(() => {
+    if (!tabs.some(([key]) => key === tab)) setTab(tabs[0][0]);
+  }, [tabs, tab, setTab]);
+
+  const currentIndex = tabs.findIndex(([key]) => key === tab);
+  const prevTab = currentIndex > 0 ? tabs[currentIndex - 1] : null;
+  const nextTab = currentIndex < tabs.length - 1 ? tabs[currentIndex + 1] : null;
+
+  const switchTab = (key: string) => {
+    setTab(key);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goPage = (path: string) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Hybrid arrows: step through tabs, then spill over to the adjacent pages.
+  // First tab's "previous" goes Home; last tab's "next" goes to Self-Check.
+  const prevTarget = prevTab
+    ? { label: prevTab[1], aria: t.common.previous, onActivate: () => switchTab(prevTab[0]) }
+    : { label: t.nav.home, aria: t.common.previous, onActivate: () => goPage('/') };
+  const nextTarget = nextTab
+    ? { label: nextTab[1], aria: t.common.next, onActivate: () => switchTab(nextTab[0]) }
+    : { label: t.nav.selfCheck, aria: t.common.next, onActivate: () => goPage('/self-check') };
 
   return (
     <PageTransition>
+      <div className="pb-20">
       <div className="mb-6">
         <h1 className="text-4xl font-black text-ink">{t.learn.title}</h1>
         <p className="mt-2 max-w-2xl text-lg font-medium text-muted">{t.learn.subtitle}</p>
@@ -104,96 +65,111 @@ export function LearnPage() {
       </div>
 
       {tab === 'overview' && (
-        <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid gap-4 md:grid-cols-3">
-          {[
-            ['1 من كل 8', 'خطر تراكمي تقريبي عبر الحياة، وهاد الشي كيأكد أهمية الوقاية والكشف المبكر.', 'خطر تقريبي: امرأة واحدة من كل ثمانية عبر الحياة'],
-            ['+90%', 'فرص علاج أحسن إلا تكتاشف المرض فالمراحل الأولى.', 'أكثر من تسعين بالمئة فرص أفضل عند الكشف المبكر'],
-            ['30 يوم', 'الفحص الذاتي المنتظم مرة فالشهر كيعاونك تلاحظي أي تغير بكري.', 'فحص ذاتي كل ثلاثين يوم تقريباً'],
-          ].map(([stat, text, statLabel]) => (
-            <div key={stat} className="rounded-3xl border border-white/70 bg-card/80 p-6 shadow-petal">
-              <Heart className="mb-5 text-primary-500" size={28} />
-              <div className="text-3xl font-black text-gradient">
-                <span className="sr-only">{statLabel}: </span>
-                {stat}
-              </div>
-              <p className="mt-2 font-medium leading-7 text-muted">{text}</p>
-            </div>
-          ))}
-        </motion.section>
-      )}
-
-      {tab === 'symptoms' && (
-        <section className="space-y-4">
-          <p className="rounded-3xl border border-primary-100 bg-primary-50 p-5 font-bold leading-7 text-primary-800">{t.learn.symptomsIntro}</p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {symptomCards.map((symptom) => (
-              <div key={symptom.title} className="rounded-3xl border border-white/70 bg-card/80 p-5 shadow-petal">
-                <AlertCircle className={symptom.severity === 'high' ? 'text-risk-high' : 'text-risk-moderate'} />
-                <h3 className="mt-3 text-lg font-black leading-8 text-ink">{symptom.title}</h3>
-                <ul className="mt-2 list-inside list-disc space-y-1 text-sm font-bold leading-7 text-muted">
-                  {symptom.points.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-                <p className="mt-3 text-xs font-black text-primary-700">
-                  {symptom.severity === 'high' ? t.learn.severityHigh : t.learn.severityMedium}
-                </p>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+          <section className="grid gap-4 md:grid-cols-3">
+            {t.learn.overviewStats.map(({ stat, text, statLabel }) => (
+              <div key={stat} className="rounded-3xl border border-white/70 bg-card/80 p-6 shadow-petal">
+                <Heart className="mb-5 text-primary-500" size={28} />
+                <div className="text-3xl font-black text-gradient">
+                  <span className="sr-only">{statLabel}: </span>
+                  {stat}
+                </div>
+                <p className="mt-2 font-medium leading-7 text-muted">{text}</p>
               </div>
             ))}
-          </div>
-        </section>
+          </section>
+
+          {/* What is breast cancer? */}
+          <section className="rounded-3xl border border-white/70 bg-card/80 p-6 shadow-petal">
+            <h2 className="text-2xl font-black text-ink">{t.learn.overview.whatTitle}</h2>
+            <p className="mt-3 max-w-3xl font-medium leading-8 text-muted">{t.learn.overview.whatBody}</p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              {t.learn.overview.whatStats.map(({ value, label }) => (
+                <div key={label} className="rounded-2xl border border-primary-100 bg-primary-50 p-4 text-center">
+                  <div className="text-2xl font-black text-gradient">{value}</div>
+                  <p className="mt-1 text-xs font-bold leading-5 text-primary-800">{label}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Why early detection? */}
+          <section className="rounded-3xl border border-white/70 bg-card/80 p-6 shadow-petal">
+            <h2 className="text-2xl font-black text-ink">{t.learn.overview.earlyTitle}</h2>
+            <p className="mt-2 text-sm font-bold text-muted">{t.learn.overview.earlyNote}</p>
+            <div className="mt-5 space-y-4">
+              {t.learn.overview.earlyStages.map(({ label, percent }, i) => {
+                const colors = ['bg-emerald-500', 'bg-amber-400', 'bg-orange-500', 'bg-red-500'];
+                return (
+                  <div key={label}>
+                    <div className="mb-1 flex items-center justify-between text-sm font-black text-ink">
+                      <span>{label}</span>
+                      <span>{percent}%</span>
+                    </div>
+                    <div className="h-3 overflow-hidden rounded-full bg-line">
+                      <motion.div
+                        className={cn('h-full rounded-full', colors[i] ?? 'bg-primary-500')}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${percent}%` }}
+                        transition={{ duration: 0.8, delay: i * 0.1 }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-5 rounded-2xl border border-primary-100 bg-primary-50 p-4 font-bold leading-7 text-primary-800">
+              {t.learn.overview.earlyMessage}
+            </p>
+          </section>
+
+          {/* Who is at risk? */}
+          <section className="rounded-3xl border border-white/70 bg-card/80 p-6 shadow-petal">
+            <h2 className="text-2xl font-black text-ink">{t.learn.overview.riskTitle}</h2>
+            <p className="mt-2 max-w-3xl font-medium leading-7 text-muted">{t.learn.overview.riskIntro}</p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {t.learn.overview.riskFactors.map(({ title, desc }, i) => {
+                const icons = [Calendar, Users, Scale, Cigarette, Clock, Baby, Pill];
+                const Icon = icons[i] ?? Calendar;
+                return (
+                  <div key={title} className="rounded-2xl border border-white/70 bg-white/60 p-4 shadow-petal">
+                    <Icon className="mb-2 text-primary-500" size={22} />
+                    <h3 className="text-sm font-black leading-6 text-ink">{title}</h3>
+                    <p className="mt-1 text-xs font-medium leading-5 text-muted">{desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Your 3 lines of defense */}
+          <section className="rounded-3xl border border-white/70 bg-card/80 p-6 shadow-petal">
+            <h2 className="text-2xl font-black text-ink">{t.learn.overview.defenseTitle}</h2>
+            <p className="mt-2 max-w-3xl font-medium leading-7 text-muted">{t.learn.overview.defenseIntro}</p>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {t.learn.overview.defenseSteps.map(({ title, age, desc }, i) => (
+                <div key={title} className="relative rounded-2xl border border-primary-100 bg-primary-50 p-5">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-500 text-base font-black text-white shadow-petal">
+                    {i + 1}
+                  </span>
+                  <h3 className="mt-3 text-lg font-black leading-7 text-ink">{title}</h3>
+                  <p className="mt-1 text-xs font-black uppercase tracking-wide text-primary-700">{age}</p>
+                  <p className="mt-2 text-sm font-medium leading-6 text-muted">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </motion.div>
       )}
 
-      {tab === 'prevention' && (
-        <section className="rounded-[2rem] border border-white/70 bg-card/80 p-5 shadow-petal">
-          <p className="mb-5 font-medium leading-7 text-muted">{t.learn.preventionIntro}</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {preventionChecklist.map((habit) => {
-              const active = checked.includes(habit.title);
-              return (
-                <button
-                  key={habit.title}
-                  onClick={() =>
-                    setChecked((items) => (active ? items.filter((item) => item !== habit.title) : [...items, habit.title]))
-                  }
-                  className={cn('flex min-h-14 items-center gap-3 rounded-2xl border p-4 text-start font-bold transition', active ? 'border-accent-teal bg-accent-teal/10 text-ink' : 'border-line bg-white/50 text-muted')}
-                >
-                  <span className={cn('grid h-7 w-7 place-items-center rounded-full border', active && 'border-accent-teal bg-accent-teal text-white')}>
-                    {active && <Check size={16} />}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-black leading-6">{habit.title}</span>
-                    <span className="block text-xs font-semibold leading-6 text-muted">{habit.detail}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="mt-5 text-sm font-black text-primary-700">
-            {checked.length}/{preventionChecklist.length} {t.learn.checklistProgress}
-          </p>
-        </section>
-      )}
+      {tab === 'symptoms' && <BodyMap />}
 
-      {tab === 'myths' && (
-        <section className="grid gap-4 sm:grid-cols-2">
-          {myths.map((item) => {
-            const active = flipped.includes(item.myth);
-            return (
-              <button
-                key={item.myth}
-                onClick={() => setFlipped((items) => (active ? items.filter((myth) => myth !== item.myth) : [...items, item.myth]))}
-                className="min-h-44 rounded-3xl border border-white/70 bg-card/80 p-5 text-start shadow-petal transition hover:-translate-y-1"
-              >
-                <ShieldCheck className="text-primary-500" />
-                <p className="mt-3 text-xs font-black uppercase text-muted">{active ? t.learn.truthLabel : t.learn.mythLabel}</p>
-                <h3 className="mt-2 text-lg font-black leading-8 text-ink">{active ? item.truth : item.myth}</h3>
-                {active && <p className="mt-3 text-sm font-bold leading-7 text-muted">{item.details}</p>}
-              </button>
-            );
-          })}
-        </section>
-      )}
+      {tab === 'prevention' && <PreventionTracker />}
+
+      {tab === 'myths' && <MythsWall />}
+      </div>
+
+      <NavArrows transitionKey={`learn-${tab}`} prev={prevTarget} next={nextTarget} />
     </PageTransition>
   );
 }

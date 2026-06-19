@@ -5,7 +5,7 @@ import { BellRing, CheckCircle2, Clock, Pause, Play, RotateCcw, TimerReset } fro
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { Confetti } from '@/components/ui/Confetti';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { useSelfCheck } from '@/hooks/useSelfCheck';
 import { formatDuration } from '@/utils/formatters';
 import type { SelfCheckStep } from '@/types/api';
@@ -135,6 +135,36 @@ export function SelfCheckPage() {
 
   return (
     <PageTransition>
+      {/* Continue prompt — a recent unfinished session was found */}
+      <AnimatePresence>
+        {check.savedSnapshot && check.stage === 'intro' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] grid place-items-center bg-black/40 p-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="w-full max-w-sm rounded-3xl border border-white/70 bg-gradient-to-b from-primary-100 to-white p-6 text-center shadow-petal-xl"
+            >
+              <div className="text-5xl" aria-hidden>🩺</div>
+              <h2 className="mt-3 text-2xl font-black text-ink">{t.selfCheck.resumeTitle}</h2>
+              <p className="mt-2 font-bold text-primary-800">
+                {interpolate(t.selfCheck.resumeSubtitle, { step: check.savedSnapshot.currentStep, total: check.total })}
+              </p>
+              <div className="mt-6 grid gap-2">
+                <Button fullWidth onClick={check.resumeSaved}>{t.selfCheck.resumeYes}</Button>
+                <Button fullWidth variant="secondary" onClick={check.discardSaved}>{t.selfCheck.resumeNo}</Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {check.stage === 'intro' && (
         <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>

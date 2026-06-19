@@ -76,6 +76,10 @@ export default {
           '0%': { transform: 'scale(0.85)', opacity: '0.7' },
           '70%, 100%': { transform: 'scale(1.6)', opacity: '0' },
         },
+        'pulse-dot': {
+          '0%': { transform: 'scale(1)', opacity: '0.9' },
+          '70%, 100%': { transform: 'scale(2)', opacity: '0' },
+        },
         'gradient-pan': {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
@@ -86,6 +90,7 @@ export default {
         shimmer: 'shimmer 1.6s infinite',
         'bounce-dot': 'bounce-dot 1.4s infinite ease-in-out',
         'pulse-ring': 'pulse-ring 2s cubic-bezier(0.4,0,0.2,1) infinite',
+        'pulse-dot': 'pulse-dot 1.8s cubic-bezier(0.4,0,0.6,1) infinite',
         'gradient-pan': 'gradient-pan 8s ease infinite',
       },
     },

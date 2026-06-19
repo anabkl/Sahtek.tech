@@ -65,11 +65,50 @@ export const fr: Translation = {
       { value: '5 min', caption: 'par mois suffisent pour un auto-examen regulier.' },
       { value: '48', caption: 'age moyen de diagnostic rapporte par les campagnes au Maroc.' },
     ],
+    overviewStats: [
+      {
+        stat: '1 sur 8',
+        text: 'Un risque cumule approximatif au cours de la vie, d ou l importance de la prevention et du depistage precoce.',
+        statLabel: 'Risque approximatif : une femme sur huit au cours de la vie',
+      },
+      {
+        stat: '+90%',
+        text: 'De meilleures chances de traitement lorsque la maladie est detectee a un stade precoce.',
+        statLabel: 'Plus de quatre-vingt-dix pour cent de meilleures chances avec un depistage precoce',
+      },
+      {
+        stat: '30 jours',
+        text: 'Un auto-examen mensuel regulier vous aide a remarquer tout changement tot.',
+        statLabel: 'Un auto-examen environ tous les trente jours',
+      },
+    ],
     symptoms: [
       { name: 'Grosseur ou gonflement', severity: 'high' },
       { name: 'Peau qui se creuse', severity: 'high' },
       { name: 'Ecoulement du mamelon', severity: 'high' },
       { name: 'Nouvelle douleur au sein', severity: 'medium' },
+    ],
+    symptomCards: [
+      {
+        title: 'Une nouvelle boule ou un gonflement dans le sein ou sous le bras',
+        points: ['Si une boule persiste plusieurs jours sans diminuer, elle necessite un suivi.', 'Meme une boule indolore doit etre examinee par un medecin.'],
+        severity: 'high',
+      },
+      {
+        title: 'Un changement de couleur de la peau ou des capitons comme une peau d orange',
+        points: ['La peau peut devenir rouge, bleutee ou tres tendue.', 'Tout changement soudain et persistant ne doit pas etre ignore.'],
+        severity: 'high',
+      },
+      {
+        title: 'Un ecoulement du mamelon, surtout s il est sanglant',
+        points: ['Un ecoulement sans allaitement necessite une evaluation medicale rapide.', 'S il provient d un seul cote, il necessite un examen.'],
+        severity: 'high',
+      },
+      {
+        title: 'Une douleur localisee persistante ou un changement net de la forme du sein',
+        points: ['La douleur seule n est generalement pas grave, mais sa persistance est un signe important.', 'Une difference soudaine de taille ou de forme necessite un diagnostic.'],
+        severity: 'medium',
+      },
     ],
     habits: [
       { key: 'selfExam', label: 'Auto-examen mensuel', tip: 'Cela prend juste 5 minutes ! Commencez ce mois-ci.' },
@@ -174,6 +213,68 @@ export const fr: Translation = {
         'Le Maroc propose des programmes de mammographie gratuits pour les femmes de 45 a 69 ans.',
       ],
     },
+    bodyMap: {
+      title: 'Carte des symptomes',
+      intro: 'Touchez une zone marquee pour voir les changements a surveiller dans cette partie du corps.',
+      defaultTitle: 'Explorez la carte du corps',
+      defaultMessage: 'Touchez une zone du corps pour voir les symptomes qui y sont lies 👆',
+      whenToWorryLabel: 'Quand s inquieter ?',
+      severityLabels: { high: '🔴 Forte vigilance', medium: '🟠 Moderee', low: '🟡 Plus faible' },
+      ctaDoctor: 'Voir un medecin',
+      ctaCheck: 'A faire examiner',
+      summaryBanner:
+        '⚠️ La plupart des changements ne sont pas un cancer, mais chaque nouveau changement doit etre vu par un medecin. La detection precoce sauve des vies. 💗',
+      zones: {
+        breast: {
+          name: 'Sein',
+          severity: 'high',
+          symptoms: [
+            { title: 'Une nouvelle boule ou un gonflement dans le sein', desc: 'Toute nouvelle boule dure doit etre examinee tout de suite.' },
+            { title: 'Un changement soudain de la taille du sein', desc: 'Un sein devenu plus gros ou plus petit que l autre, soudainement.' },
+            { title: 'Une fermete inhabituelle dans une zone', desc: 'Une zone dure qui n etait pas la avant.' },
+          ],
+          whenToWorry: 'Si une boule persiste plus de deux semaines, consultez un medecin.',
+        },
+        underarm: {
+          name: 'Aisselle',
+          severity: 'high',
+          symptoms: [
+            { title: 'Un gonflement sous le bras', desc: 'Des ganglions enfles sans raison claire.' },
+            { title: 'Une boule sous le bras', desc: 'Toute nouvelle boule dans cette zone compte.' },
+          ],
+          whenToWorry: 'Un gonflement qui ne disparait pas en deux semaines necessite un examen medical.',
+        },
+        nipple: {
+          name: 'Mamelon',
+          severity: 'high',
+          symptoms: [
+            { title: 'Un ecoulement du mamelon', desc: 'Surtout s il est sanglant ou sans cause claire.' },
+            { title: 'Le mamelon qui se retracte', desc: 'Le mamelon devenu rentre alors qu il ne l etait pas.' },
+            { title: 'Un changement de forme ou de couleur du mamelon', desc: 'Rougeur ou desquamation autour du mamelon.' },
+          ],
+          whenToWorry: 'Tout ecoulement hors allaitement doit etre vu par un medecin sans tarder.',
+        },
+        skin: {
+          name: 'Peau',
+          severity: 'medium',
+          symptoms: [
+            { title: 'Un changement de couleur de la peau', desc: 'Rougeur ou teinte bleutee.' },
+            { title: 'Une texture en peau d orange', desc: 'La peau du sein montre de petits capitons comme une orange.' },
+            { title: 'Desquamation ou demangeaison persistante', desc: 'Une peau qui pele ou demange sans raison.' },
+          ],
+          whenToWorry: 'Tout changement de peau qui dure plus d une semaine necessite un suivi.',
+        },
+        collarbone: {
+          name: 'Clavicule',
+          severity: 'medium',
+          symptoms: [
+            { title: 'Un gonflement au-dessus ou sous la clavicule', desc: 'Peut etre un signe d extension aux ganglions.' },
+            { title: 'Une douleur persistante dans la zone', desc: 'Une douleur qui ne part pas dans le haut de la poitrine.' },
+          ],
+          whenToWorry: 'Un gonflement inexplique dans cette zone necessite un examen rapide.',
+        },
+      },
+    },
   },
   selfCheck: {
     title: 'Auto-examen mensuel', subtitle: 'Cinq etapes calmes, guidees avec soin.', bestTime: 'Meilleur moment',
@@ -187,6 +288,10 @@ export const fr: Translation = {
     reminderCtaTitle: '🔔 Un rappel pour le mois prochain ?',
     reminderCtaYes: 'Oui, rappelez-moi',
     reminderCtaNo: 'Non, merci',
+    resumeTitle: 'Vous avez un auto-examen non termine',
+    resumeSubtitle: 'Vous etiez a l etape {step} sur {total}',
+    resumeYes: 'Continuer l examen ▶️',
+    resumeNo: 'Recommencer 🔄',
   },
   risk: {
     title: 'Sensibilisation au risque', subtitle: 'Dix questions privees et un score educatif simple.',

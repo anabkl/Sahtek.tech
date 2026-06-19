@@ -1,9 +1,10 @@
-import { FormEvent, ReactNode, useMemo, useRef, useState } from 'react';
+import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { Bot, Mic, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastStore';
 import { useLanguage } from '@/hooks/useLanguage';
+import { usePersistedState } from '@/hooks/usePersistedState';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { formatTime } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
@@ -68,15 +69,25 @@ function answerFor(text: string, lang: string): string {
       : 'I can help with educational breast-health information, signs, self-checks and prevention. I cannot diagnose; a clinician is the right person for medical decisions.';
 }
 
+const MAX_MESSAGES = 50;
+const CHAT_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 export function ChatPage() {
   const { t, lang } = useLanguage();
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: t.chat.disclaimer, timestamp: Date.now() },
-  ]);
+  const [messages, setMessages] = usePersistedState<Message[]>(
+    'sahtek_chat',
+    [{ role: 'assistant', content: t.chat.disclaimer, timestamp: Date.now() }],
+    CHAT_MAX_AGE,
+  );
   const [text, setText] = useState('');
   const [typing, setTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const quickReplies = useMemo(() => t.chat.quickReplies, [t.chat.quickReplies]);
+
+  // On mount, jump to the latest message of the restored history.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'auto' });
+  }, []);
 
   // ── Voice input — browser Web Speech API, frontend only ──────────
   const toast = useToast();
@@ -108,11 +119,11 @@ export function ChatPage() {
     const trimmed = value.trim();
     if (!trimmed || typing) return;
     if (voice.listening) voice.stop();
-    setMessages((prev) => [...prev, { role: 'user', content: trimmed, timestamp: Date.now() }]);
+    setMessages((prev) => [...prev, { role: 'user' as const, content: trimmed, timestamp: Date.now() }].slice(-MAX_MESSAGES));
     setText('');
     setTyping(true);
     window.setTimeout(() => {
-      setMessages((prev) => [...prev, { role: 'assistant', content: answerFor(trimmed, lang), timestamp: Date.now() }]);
+      setMessages((prev) => [...prev, { role: 'assistant' as const, content: answerFor(trimmed, lang), timestamp: Date.now() }].slice(-MAX_MESSAGES));
       setTyping(false);
       window.setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
     }, 650);

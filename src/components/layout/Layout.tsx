@@ -27,6 +27,7 @@ export function Layout() {
     { path: '/self-check', label: t.nav.selfCheck },
     { path: '/risk', label: t.nav.risk },
     { path: '/chat', label: t.nav.chat },
+    { path: '/doctors', label: t.nav.doctors },
     { path: '/reminder', label: t.nav.reminder },
   ];
   const currentIndex = pageOrder.findIndex((p) => p.path === location.pathname);

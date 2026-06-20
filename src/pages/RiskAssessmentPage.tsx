@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Download, Gauge, Share2 } from 'lucide-react';
+import { CheckCircle2, Download, Gauge, MapPin, Share2 } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
@@ -9,6 +10,7 @@ import { cn } from '@/utils/cn';
 
 export function RiskAssessmentPage() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const risk = useRiskAssessment();
   const [copied, setCopied] = useState(false);
   const pct = risk.result?.risk_percentage ?? 0;
@@ -141,6 +143,19 @@ export function RiskAssessmentPage() {
                 </div>
               ))}
             </div>
+            {(risk.result.risk_level === 'high' || risk.result.risk_level === 'moderate') && (
+              <div className="mt-5 rounded-2xl border border-primary-200 bg-rose-soft p-4">
+                <p className="font-black text-primary-800">{t.risk.doctorsCtaTitle}</p>
+                <Button
+                  className="mt-3"
+                  fullWidth
+                  onClick={() => navigate('/doctors')}
+                  leftIcon={<MapPin size={18} />}
+                >
+                  {t.risk.doctorsCtaBtn}
+                </Button>
+              </div>
+            )}
             <p className="mt-5 rounded-2xl bg-white/60 p-4 text-sm font-bold leading-6 text-muted">{t.disclaimer.short}</p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <Button onClick={copy} leftIcon={<Share2 size={18} />}>{copied ? t.risk.shared : t.risk.shareBtn}</Button>

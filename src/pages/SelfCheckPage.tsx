@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BellRing, CheckCircle2, Clock, Pause, Play, RotateCcw, TimerReset } from 'lucide-react';
+import { BellRing, CheckCircle2, Clock, MapPin, Pause, Play, RotateCcw, TimerReset } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { Confetti } from '@/components/ui/Confetti';
@@ -224,6 +224,19 @@ export function SelfCheckPage() {
           <h1 className="mt-4 text-3xl font-black text-ink sm:text-4xl">{t.selfCheck.celebrateTitle}</h1>
           <p className="mt-3 font-medium leading-7 text-muted">{t.selfCheck.completeText}</p>
           <p className="mt-4 rounded-2xl bg-primary-50 p-4 text-sm font-bold text-primary-800">{t.selfCheck.importantNote}</p>
+
+          <div className="mt-6 rounded-[1.75rem] border border-accent-blue/20 bg-blue-50/60 p-5 text-start dark:bg-accent-blue/10">
+            <h2 className="text-lg font-black text-ink">{t.selfCheck.doctorsCtaTitle}</h2>
+            <Button
+              className="mt-3"
+              fullWidth
+              variant="secondary"
+              onClick={() => navigate('/doctors')}
+              leftIcon={<MapPin size={18} className="text-accent-blue" />}
+            >
+              {t.selfCheck.doctorsCtaBtn}
+            </Button>
+          </div>
 
           <AnimatePresence>
             {showReminderCta && (

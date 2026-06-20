@@ -10,6 +10,7 @@ const navItems = [
   { to: '/self-check', key: 'selfCheck' },
   { to: '/risk', key: 'risk' },
   { to: '/chat', key: 'chat' },
+  { to: '/doctors', key: 'doctors' },
 ] as const;
 
 export function Navbar() {

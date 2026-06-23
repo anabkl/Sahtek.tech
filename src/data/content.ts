@@ -38,6 +38,38 @@ export const overviewFacts: Record<Language, OverviewFact[]> = {
     { icon: '⏰', stat: '60%', title: 'Late diagnosis', text: '60% of cases in Morocco are diagnosed late. Regular checks change everything.' },
     { icon: '🩺', stat: '5 min', title: 'A simple exam', text: 'A self-check takes 5 minutes a month. A small habit, a big protection.' },
   ],
+  es: [
+    { icon: '🎀', stat: '#1', title: 'El más frecuente', text: 'El cáncer de mama es el cáncer más común entre las mujeres, en el mundo y en Marruecos.' },
+    { icon: '💪', stat: '99%', title: 'Muy tratable', text: 'Detectado a tiempo, la tasa de supervivencia llega al 99%. La detección temprana salva vidas.' },
+    { icon: '🧬', stat: '85%', title: 'Sin antecedentes', text: 'El 85% de las mujeres afectadas no tienen antecedentes familiares. La prevención es para todas.' },
+    { icon: '👩', stat: '48', title: 'Edad media', text: 'En Marruecos la edad media de diagnóstico es de 48 años, pero puede ocurrir a cualquier edad.' },
+    { icon: '⏰', stat: '60%', title: 'Diagnóstico tardío', text: 'El 60% de los casos en Marruecos se diagnostican tarde. Un seguimiento regular lo cambia todo.' },
+    { icon: '🩺', stat: '5 min', title: 'Un examen sencillo', text: 'Un autoexamen lleva 5 minutos al mes. Un pequeño hábito, una gran protección.' },
+  ],
+  de: [
+    { icon: '🎀', stat: '#1', title: 'Am häufigsten', text: 'Brustkrebs ist die häufigste Krebsart bei Frauen, weltweit und in Marokko.' },
+    { icon: '💪', stat: '99%', title: 'Gut behandelbar', text: 'Früh erkannt erreicht die Überlebensrate 99%. Früherkennung rettet Leben.' },
+    { icon: '🧬', stat: '85%', title: 'Keine Familiengeschichte', text: '85% der betroffenen Frauen haben keine Familiengeschichte. Vorbeugung ist für alle da.' },
+    { icon: '👩', stat: '48', title: 'Durchschnittsalter', text: 'In Marokko liegt das durchschnittliche Diagnosealter bei 48 Jahren, doch er kann in jedem Alter auftreten.' },
+    { icon: '⏰', stat: '60%', title: 'Späte Diagnose', text: '60% der Fälle in Marokko werden spät diagnostiziert. Regelmäßige Kontrollen verändern alles.' },
+    { icon: '🩺', stat: '5 Min', title: 'Eine einfache Untersuchung', text: 'Eine Selbstuntersuchung dauert 5 Minuten im Monat. Eine kleine Gewohnheit, ein großer Schutz.' },
+  ],
+  ru: [
+    { icon: '🎀', stat: '#1', title: 'Самый частый', text: 'Рак груди — самый частый рак среди женщин в мире и в Марокко.' },
+    { icon: '💪', stat: '99%', title: 'Хорошо лечится', text: 'При раннем выявлении выживаемость достигает 99%. Раннее выявление спасает жизни.' },
+    { icon: '🧬', stat: '85%', title: 'Без семейной истории', text: '85% заболевших женщин не имеют семейной истории. Профилактика нужна всем.' },
+    { icon: '👩', stat: '48', title: 'Средний возраст', text: 'В Марокко средний возраст диагноза — 48 лет, но он может возникнуть в любом возрасте.' },
+    { icon: '⏰', stat: '60%', title: 'Поздний диагноз', text: '60% случаев в Марокко диагностируются поздно. Регулярные проверки меняют всё.' },
+    { icon: '🩺', stat: '5 мин', title: 'Простой осмотр', text: 'Самообследование занимает 5 минут в месяц. Маленькая привычка, большая защита.' },
+  ],
+  pt: [
+    { icon: '🎀', stat: '#1', title: 'O mais frequente', text: 'O câncer de mama é o câncer mais comum entre as mulheres, no mundo e em Marrocos.' },
+    { icon: '💪', stat: '99%', title: 'Muito tratável', text: 'Detectado cedo, a taxa de sobrevivência chega a 99%. A detecção precoce salva vidas.' },
+    { icon: '🧬', stat: '85%', title: 'Sem histórico', text: '85% das mulheres afetadas não têm histórico familiar. A prevenção é para todas.' },
+    { icon: '👩', stat: '48', title: 'Idade média', text: 'Em Marrocos a idade média de diagnóstico é 48 anos, mas pode ocorrer em qualquer idade.' },
+    { icon: '⏰', stat: '60%', title: 'Diagnóstico tardio', text: '60% dos casos em Marrocos são diagnosticados tarde. O acompanhamento regular muda tudo.' },
+    { icon: '🩺', stat: '5 min', title: 'Um exame simples', text: 'Um autoexame leva 5 minutos por mês. Um pequeno hábito, uma grande proteção.' },
+  ],
 };
 
 // ── Symptoms content (mirrors GET /content/symptoms) ────────────────
@@ -177,6 +209,186 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       ],
     },
   },
+  es: {
+    topic: 'symptoms',
+    title: 'Las señales a vigilar',
+    last_updated: '2026-05-18',
+    content: {
+      introduction:
+        'El cáncer de mama puede presentar varias señales. Conocerlas permite actuar rápido. La mayoría de los cambios no son cáncer, pero todo cambio nuevo merece un examen.',
+      call_to_action:
+        'Si notas alguna de estas señales, no te asustes, pero consulta a un médico lo antes posible.',
+      sections: [
+        {
+          title: 'Señales visibles',
+          icon: '👁️',
+          items: [
+            { symptom: 'Bulto o hinchazón', description: 'Todo bulto nuevo en la mama debe ser examinado por un médico.', severity: 'high' },
+            { symptom: 'Cambio de forma o tamaño', description: 'Un cambio repentino en la forma o el volumen de una mama.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Señales cutáneas',
+          icon: '🔍',
+          items: [
+            { symptom: 'Enrojecimiento o descamación', description: 'Un cambio en el color o la textura de la piel de la mama.', severity: 'medium' },
+            { symptom: 'Piel con hoyuelos (piel de naranja)', description: 'La piel adquiere un aspecto rugoso, como una piel de naranja.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Señales del pezón',
+          icon: '⚠️',
+          items: [
+            { symptom: 'Secreción inusual', description: 'Secreción espontánea del pezón, sobre todo si contiene sangre.', severity: 'high' },
+            { symptom: 'Retracción del pezón', description: 'El pezón se retrae hacia dentro de forma nueva.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Sensaciones',
+          icon: '🤚',
+          items: [
+            { symptom: 'Bulto bajo el brazo', description: 'Hinchazón o bulto en la zona de la axila.', severity: 'high' },
+            { symptom: 'Dolor localizado persistente', description: 'Un dolor que no desaparece, concentrado en un punto.', severity: 'medium' },
+          ],
+        },
+      ],
+    },
+  },
+  de: {
+    topic: 'symptoms',
+    title: 'Die Anzeichen, auf die zu achten ist',
+    last_updated: '2026-05-18',
+    content: {
+      introduction:
+        'Brustkrebs kann mehrere Anzeichen zeigen. Sie zu kennen hilft, schnell zu handeln. Die meisten Veränderungen sind kein Krebs, aber jede neue Veränderung verdient eine Untersuchung.',
+      call_to_action:
+        'Wenn du eines dieser Anzeichen bemerkst, keine Panik — aber geh so bald wie möglich zur Ärztin.',
+      sections: [
+        {
+          title: 'Sichtbare Anzeichen',
+          icon: '👁️',
+          items: [
+            { symptom: 'Knoten oder Schwellung', description: 'Jeder neue Knoten in der Brust sollte von einer Ärztin untersucht werden.', severity: 'high' },
+            { symptom: 'Veränderung von Form oder Größe', description: 'Eine plötzliche Veränderung der Form oder des Volumens einer Brust.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Hautanzeichen',
+          icon: '🔍',
+          items: [
+            { symptom: 'Rötung oder Schuppung', description: 'Eine Veränderung der Farbe oder Textur der Brusthaut.', severity: 'medium' },
+            { symptom: 'Grübchenhaut (Orangenhaut)', description: 'Die Haut nimmt ein narbiges Aussehen an, wie eine Orangenschale.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Anzeichen an der Brustwarze',
+          icon: '⚠️',
+          items: [
+            { symptom: 'Ungewöhnlicher Austritt', description: 'Spontaner Austritt aus der Brustwarze, besonders wenn er Blut enthält.', severity: 'high' },
+            { symptom: 'Einziehung der Brustwarze', description: 'Die Brustwarze zieht sich neu nach innen.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Empfindungen',
+          icon: '🤚',
+          items: [
+            { symptom: 'Knoten unter dem Arm', description: 'Schwellung oder Knoten im Bereich der Achsel.', severity: 'high' },
+            { symptom: 'Anhaltender lokaler Schmerz', description: 'Ein Schmerz, der nicht verschwindet und auf einen Punkt konzentriert ist.', severity: 'medium' },
+          ],
+        },
+      ],
+    },
+  },
+  ru: {
+    topic: 'symptoms',
+    title: 'Признаки, на которые стоит обратить внимание',
+    last_updated: '2026-05-18',
+    content: {
+      introduction:
+        'Рак груди может проявляться несколькими признаками. Знание их помогает действовать быстро. Большинство изменений — не рак, но каждое новое изменение заслуживает осмотра.',
+      call_to_action:
+        'Если вы заметили любой из этих признаков, не паникуйте — но как можно скорее обратитесь к врачу.',
+      sections: [
+        {
+          title: 'Видимые признаки',
+          icon: '👁️',
+          items: [
+            { symptom: 'Уплотнение или припухлость', description: 'Любое новое уплотнение в груди должен осмотреть врач.', severity: 'high' },
+            { symptom: 'Изменение формы или размера', description: 'Внезапное изменение формы или объёма одной груди.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Кожные признаки',
+          icon: '🔍',
+          items: [
+            { symptom: 'Покраснение или шелушение', description: 'Изменение цвета или текстуры кожи груди.', severity: 'medium' },
+            { symptom: 'Втяжения (апельсиновая корка)', description: 'Кожа приобретает бугристый вид, как апельсиновая корка.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Признаки соска',
+          icon: '⚠️',
+          items: [
+            { symptom: 'Необычные выделения', description: 'Самопроизвольные выделения из соска, особенно с кровью.', severity: 'high' },
+            { symptom: 'Втяжение соска', description: 'Сосок по-новому втягивается внутрь.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Ощущения',
+          icon: '🤚',
+          items: [
+            { symptom: 'Уплотнение под рукой', description: 'Припухлость или уплотнение в области подмышки.', severity: 'high' },
+            { symptom: 'Стойкая локальная боль', description: 'Боль, которая не проходит, сосредоточенная в одной точке.', severity: 'medium' },
+          ],
+        },
+      ],
+    },
+  },
+  pt: {
+    topic: 'symptoms',
+    title: 'Os sinais a observar',
+    last_updated: '2026-05-18',
+    content: {
+      introduction:
+        'O câncer de mama pode apresentar vários sinais. Conhecê-los permite agir rápido. A maioria das mudanças não é câncer, mas toda mudança nova merece um exame.',
+      call_to_action:
+        'Se você notar algum desses sinais, não entre em pânico — mas procure um médico o quanto antes.',
+      sections: [
+        {
+          title: 'Sinais visíveis',
+          icon: '👁️',
+          items: [
+            { symptom: 'Nódulo ou inchaço', description: 'Todo novo nódulo na mama deve ser examinado por um médico.', severity: 'high' },
+            { symptom: 'Mudança de forma ou tamanho', description: 'Uma mudança repentina na forma ou no volume de uma mama.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Sinais na pele',
+          icon: '🔍',
+          items: [
+            { symptom: 'Vermelhidão ou descamação', description: 'Uma mudança na cor ou na textura da pele da mama.', severity: 'medium' },
+            { symptom: 'Pele com covinhas (casca de laranja)', description: 'A pele ganha um aspecto enrugado, como uma casca de laranja.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Sinais do mamilo',
+          icon: '⚠️',
+          items: [
+            { symptom: 'Secreção incomum', description: 'Secreção espontânea do mamilo, especialmente se tiver sangue.', severity: 'high' },
+            { symptom: 'Retração do mamilo', description: 'O mamilo se retrai para dentro de forma nova.', severity: 'high' },
+          ],
+        },
+        {
+          title: 'Sensações',
+          icon: '🤚',
+          items: [
+            { symptom: 'Nódulo sob o braço', description: 'Inchaço ou nódulo na região da axila.', severity: 'high' },
+            { symptom: 'Dor localizada persistente', description: 'Uma dor que não passa, concentrada num ponto.', severity: 'medium' },
+          ],
+        },
+      ],
+    },
+  },
 };
 
 // ── Prevention checklist (Learn → Prevention tab) ───────────────────
@@ -217,6 +429,46 @@ export const preventionItems: Record<Language, PreventionItem[]> = {
     { id: 'breastfeed', icon: '🤱', text: 'Breastfeed when possible' },
     { id: 'sleep', icon: '😴', text: 'Sleep well and reduce stress' },
   ],
+  es: [
+    { id: 'self_exam', icon: '🩺', text: 'Hacer un autoexamen cada mes' },
+    { id: 'doctor', icon: '👩‍⚕️', text: 'Visitar a un médico una vez al año' },
+    { id: 'exercise', icon: '🏃‍♀️', text: '30 minutos de actividad física al día' },
+    { id: 'diet', icon: '🥗', text: 'Comer mucha fruta y verdura' },
+    { id: 'weight', icon: '⚖️', text: 'Mantener un peso saludable' },
+    { id: 'no_smoke', icon: '🚭', text: 'Evitar el tabaco y el alcohol' },
+    { id: 'breastfeed', icon: '🤱', text: 'Dar el pecho si es posible' },
+    { id: 'sleep', icon: '😴', text: 'Dormir bien y reducir el estrés' },
+  ],
+  de: [
+    { id: 'self_exam', icon: '🩺', text: 'Jeden Monat eine Selbstuntersuchung machen' },
+    { id: 'doctor', icon: '👩‍⚕️', text: 'Einmal im Jahr zur Ärztin gehen' },
+    { id: 'exercise', icon: '🏃‍♀️', text: '30 Minuten körperliche Aktivität am Tag' },
+    { id: 'diet', icon: '🥗', text: 'Viel Obst und Gemüse essen' },
+    { id: 'weight', icon: '⚖️', text: 'Ein gesundes Gewicht halten' },
+    { id: 'no_smoke', icon: '🚭', text: 'Tabak und Alkohol vermeiden' },
+    { id: 'breastfeed', icon: '🤱', text: 'Wenn möglich stillen' },
+    { id: 'sleep', icon: '😴', text: 'Gut schlafen und Stress reduzieren' },
+  ],
+  ru: [
+    { id: 'self_exam', icon: '🩺', text: 'Делать самообследование каждый месяц' },
+    { id: 'doctor', icon: '👩‍⚕️', text: 'Посещать врача раз в год' },
+    { id: 'exercise', icon: '🏃‍♀️', text: '30 минут физической активности в день' },
+    { id: 'diet', icon: '🥗', text: 'Есть много фруктов и овощей' },
+    { id: 'weight', icon: '⚖️', text: 'Поддерживать здоровый вес' },
+    { id: 'no_smoke', icon: '🚭', text: 'Избегать курения и алкоголя' },
+    { id: 'breastfeed', icon: '🤱', text: 'Кормить грудью, если возможно' },
+    { id: 'sleep', icon: '😴', text: 'Хорошо спать и снижать стресс' },
+  ],
+  pt: [
+    { id: 'self_exam', icon: '🩺', text: 'Fazer um autoexame todo mês' },
+    { id: 'doctor', icon: '👩‍⚕️', text: 'Consultar um médico uma vez por ano' },
+    { id: 'exercise', icon: '🏃‍♀️', text: '30 minutos de atividade física por dia' },
+    { id: 'diet', icon: '🥗', text: 'Comer bastante fruta e verdura' },
+    { id: 'weight', icon: '⚖️', text: 'Manter um peso saudável' },
+    { id: 'no_smoke', icon: '🚭', text: 'Evitar tabaco e álcool' },
+    { id: 'breastfeed', icon: '🤱', text: 'Amamentar quando possível' },
+    { id: 'sleep', icon: '😴', text: 'Dormir bem e reduzir o estresse' },
+  ],
 };
 
 // ── Myths (Learn → Myths tab) ───────────────────────────────────────
@@ -256,6 +508,46 @@ export const myths: Record<Language, MythItem[]> = {
     { id: 'm6', myth: 'Breast cancer is always fatal.', truth: 'With early detection, the survival rate reaches 99%.' },
     { id: 'm7', myth: 'Deodorant causes breast cancer.', truth: 'No scientific evidence links deodorant to breast cancer.' },
     { id: 'm8', myth: 'Breastfeeding has nothing to do with prevention.', truth: 'Breastfeeding lowers the risk of breast cancer.' },
+  ],
+  es: [
+    { id: 'm1', myth: 'El cáncer de mama solo afecta a las mujeres mayores.', truth: 'Puede aparecer a cualquier edad, incluso en mujeres jóvenes.' },
+    { id: 'm2', myth: 'Sin antecedentes familiares, estoy totalmente a salvo.', truth: 'El 85% de los casos no tienen ningún antecedente familiar. El cribado es para todas.' },
+    { id: 'm3', myth: 'Cualquier bulto en la mama es cáncer.', truth: 'La mayoría de los bultos son benignos, pero siempre deben examinarse.' },
+    { id: 'm4', myth: 'El autoexamen sustituye la visita al médico.', truth: 'El autoexamen es complementario e importante, pero no sustituye el examen médico.' },
+    { id: 'm5', myth: 'La mamografía provoca cáncer.', truth: 'La dosis de radiación es muy baja y segura; el beneficio del cribado es enorme.' },
+    { id: 'm6', myth: 'El cáncer de mama siempre es mortal.', truth: 'Con la detección temprana, la tasa de supervivencia llega al 99%.' },
+    { id: 'm7', myth: 'El desodorante causa cáncer de mama.', truth: 'Ninguna prueba científica relaciona el desodorante con el cáncer de mama.' },
+    { id: 'm8', myth: 'La lactancia no tiene nada que ver con la prevención.', truth: 'La lactancia reduce el riesgo de cáncer de mama.' },
+  ],
+  de: [
+    { id: 'm1', myth: 'Brustkrebs betrifft nur ältere Frauen.', truth: 'Er kann in jedem Alter auftreten, auch bei jungen Frauen.' },
+    { id: 'm2', myth: 'Ohne Familiengeschichte bin ich völlig sicher.', truth: '85% der Fälle haben keine Familiengeschichte. Vorsorge ist für alle da.' },
+    { id: 'm3', myth: 'Jeder Knoten in der Brust ist Krebs.', truth: 'Die meisten Knoten sind gutartig, sollten aber immer untersucht werden.' },
+    { id: 'm4', myth: 'Die Selbstuntersuchung ersetzt den Arztbesuch.', truth: 'Die Selbstuntersuchung ist wichtig und ergänzend, aber kein Ersatz für die ärztliche Untersuchung.' },
+    { id: 'm5', myth: 'Die Mammografie verursacht Krebs.', truth: 'Die Strahlendosis ist sehr gering und sicher; der Nutzen der Vorsorge ist groß.' },
+    { id: 'm6', myth: 'Brustkrebs ist immer tödlich.', truth: 'Mit Früherkennung erreicht die Überlebensrate 99%.' },
+    { id: 'm7', myth: 'Deodorant verursacht Brustkrebs.', truth: 'Kein wissenschaftlicher Beweis verbindet Deodorant mit Brustkrebs.' },
+    { id: 'm8', myth: 'Stillen hat nichts mit Vorbeugung zu tun.', truth: 'Stillen senkt das Brustkrebsrisiko.' },
+  ],
+  ru: [
+    { id: 'm1', myth: 'Рак груди бывает только у пожилых женщин.', truth: 'Он может возникнуть в любом возрасте, в том числе у молодых женщин.' },
+    { id: 'm2', myth: 'Без семейной истории я в полной безопасности.', truth: '85% случаев не имеют семейной истории. Обследование нужно всем.' },
+    { id: 'm3', myth: 'Любое уплотнение в груди — это рак.', truth: 'Большинство уплотнений доброкачественные, но их всегда должен осматривать врач.' },
+    { id: 'm4', myth: 'Самообследование заменяет визит к врачу.', truth: 'Самообследование важно и дополняет, но не заменяет медицинский осмотр.' },
+    { id: 'm5', myth: 'Маммография вызывает рак.', truth: 'Доза облучения очень мала и безопасна; польза скрининга огромна.' },
+    { id: 'm6', myth: 'Рак груди всегда смертелен.', truth: 'При раннем выявлении выживаемость достигает 99%.' },
+    { id: 'm7', myth: 'Дезодорант вызывает рак груди.', truth: 'Нет научных доказательств связи дезодоранта с раком груди.' },
+    { id: 'm8', myth: 'Грудное вскармливание не связано с профилактикой.', truth: 'Грудное вскармливание снижает риск рака груди.' },
+  ],
+  pt: [
+    { id: 'm1', myth: 'O câncer de mama só afeta mulheres mais velhas.', truth: 'Pode ocorrer em qualquer idade, inclusive em mulheres jovens.' },
+    { id: 'm2', myth: 'Sem histórico familiar, estou totalmente segura.', truth: '85% dos casos não têm nenhum histórico familiar. O rastreamento é para todas.' },
+    { id: 'm3', myth: 'Qualquer nódulo na mama é câncer.', truth: 'A maioria dos nódulos é benigna, mas deve sempre ser examinada.' },
+    { id: 'm4', myth: 'O autoexame substitui a visita ao médico.', truth: 'O autoexame é importante e complementar, mas não substitui o exame médico.' },
+    { id: 'm5', myth: 'A mamografia provoca câncer.', truth: 'A dose de radiação é muito baixa e segura; o benefício do rastreamento é enorme.' },
+    { id: 'm6', myth: 'O câncer de mama é sempre fatal.', truth: 'Com a detecção precoce, a taxa de sobrevivência chega a 99%.' },
+    { id: 'm7', myth: 'O desodorante causa câncer de mama.', truth: 'Nenhuma evidência científica liga o desodorante ao câncer de mama.' },
+    { id: 'm8', myth: 'A amamentação não tem nada a ver com prevenção.', truth: 'A amamentação reduz o risco de câncer de mama.' },
   ],
 };
 
@@ -423,6 +715,222 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
       },
     ],
   },
+  es: {
+    title: 'Guía de autoexamen',
+    best_time: '3 a 5 días después del final de la regla',
+    total_duration_minutes: 5,
+    important_note: 'El autoexamen no sustituye un examen médico. Si notas un cambio, no te asustes y consulta a un médico.',
+    disclaimer: 'Esta guía es solo para concienciación, no una consulta médica.',
+    steps: [
+      {
+        step_number: 1,
+        title: 'Observar en el espejo',
+        icon: '🪞',
+        duration_seconds: 60,
+        instruction: 'Ponte frente al espejo, con las manos en las caderas. Busca cualquier cambio de forma, tamaño o color de la piel.',
+        what_to_look_for: ['Cambio de tamaño o forma', 'Hinchazón o retracción', 'Cambio de color de la piel'],
+        image_url: '/assets/steps/step1.svg',
+      },
+      {
+        step_number: 2,
+        title: 'Levantar los brazos',
+        icon: '🙌',
+        duration_seconds: 45,
+        instruction: 'Levanta los brazos por encima de la cabeza y observa los mismos cambios desde un nuevo ángulo.',
+        what_to_look_for: ['Hinchazón', 'Retracción del pezón', 'Cambios cutáneos'],
+        image_url: '/assets/steps/step2.svg',
+      },
+      {
+        step_number: 3,
+        title: 'Examen de pie',
+        icon: '🤚',
+        duration_seconds: 90,
+        instruction: 'Usa la mano derecha para examinar la mama izquierda, y al revés. Haz movimientos circulares, con presión ligera, luego media y luego firme.',
+        what_to_look_for: ['Bulto o induración', 'Dolor en un punto concreto', 'Cambio de textura'],
+        image_url: '/assets/steps/step3.svg',
+      },
+      {
+        step_number: 4,
+        title: 'Examen tumbada',
+        icon: '🛏️',
+        duration_seconds: 90,
+        instruction: 'Túmbate con un cojín bajo el hombro. Repite los mismos movimientos circulares en cada mama.',
+        what_to_look_for: ['Bultos en distintas zonas', 'Diferencia entre las dos mamas'],
+        image_url: '/assets/steps/step4.svg',
+      },
+      {
+        step_number: 5,
+        title: 'Examen del pezón',
+        icon: '⚠️',
+        duration_seconds: 30,
+        instruction: 'Presiona suavemente el pezón y comprueba que no haya secreción inusual.',
+        what_to_look_for: ['Secreción inusual', 'Presencia de sangre', 'Cambio de forma del pezón'],
+        image_url: '/assets/steps/step5.svg',
+      },
+    ],
+  },
+  de: {
+    title: 'Anleitung zur Selbstuntersuchung',
+    best_time: '3 bis 5 Tage nach dem Ende der Periode',
+    total_duration_minutes: 5,
+    important_note: 'Die Selbstuntersuchung ersetzt keine ärztliche Untersuchung. Wenn du eine Veränderung bemerkst, keine Panik — geh zur Ärztin.',
+    disclaimer: 'Diese Anleitung dient nur der Aufklärung, nicht der medizinischen Beratung.',
+    steps: [
+      {
+        step_number: 1,
+        title: 'Im Spiegel betrachten',
+        icon: '🪞',
+        duration_seconds: 60,
+        instruction: 'Stell dich vor den Spiegel, die Hände in die Hüften. Achte auf jede Veränderung von Form, Größe oder Hautfarbe.',
+        what_to_look_for: ['Veränderung von Größe oder Form', 'Schwellung oder Einziehung', 'Veränderung der Hautfarbe'],
+        image_url: '/assets/steps/step1.svg',
+      },
+      {
+        step_number: 2,
+        title: 'Arme heben',
+        icon: '🙌',
+        duration_seconds: 45,
+        instruction: 'Heb die Arme über den Kopf und beobachte dieselben Veränderungen aus einem neuen Winkel.',
+        what_to_look_for: ['Schwellung', 'Einziehung der Brustwarze', 'Hautveränderungen'],
+        image_url: '/assets/steps/step2.svg',
+      },
+      {
+        step_number: 3,
+        title: 'Untersuchung im Stehen',
+        icon: '🤚',
+        duration_seconds: 90,
+        instruction: 'Untersuche mit der rechten Hand die linke Brust und umgekehrt. Mach kreisende Bewegungen mit leichtem, dann mittlerem, dann festem Druck.',
+        what_to_look_for: ['Knoten oder Verhärtung', 'Schmerz an einer bestimmten Stelle', 'Veränderung der Textur'],
+        image_url: '/assets/steps/step3.svg',
+      },
+      {
+        step_number: 4,
+        title: 'Untersuchung im Liegen',
+        icon: '🛏️',
+        duration_seconds: 90,
+        instruction: 'Leg dich hin, ein Kissen unter der Schulter. Wiederhole dieselben kreisenden Bewegungen an jeder Brust.',
+        what_to_look_for: ['Knoten in verschiedenen Bereichen', 'Unterschied zwischen beiden Brüsten'],
+        image_url: '/assets/steps/step4.svg',
+      },
+      {
+        step_number: 5,
+        title: 'Brustwarze prüfen',
+        icon: '⚠️',
+        duration_seconds: 30,
+        instruction: 'Drücke die Brustwarze sanft und prüfe auf ungewöhnlichen Austritt.',
+        what_to_look_for: ['Ungewöhnlicher Austritt', 'Blut', 'Veränderung der Form der Brustwarze'],
+        image_url: '/assets/steps/step5.svg',
+      },
+    ],
+  },
+  ru: {
+    title: 'Руководство по самообследованию',
+    best_time: 'С 3 по 5 день после окончания месячных',
+    total_duration_minutes: 5,
+    important_note: 'Самообследование не заменяет медицинский осмотр. Если вы заметили изменение, не паникуйте — обратитесь к врачу.',
+    disclaimer: 'Это руководство только для информирования, а не медицинская консультация.',
+    steps: [
+      {
+        step_number: 1,
+        title: 'Осмотр в зеркале',
+        icon: '🪞',
+        duration_seconds: 60,
+        instruction: 'Встаньте перед зеркалом, руки на бёдрах. Ищите любые изменения формы, размера или цвета кожи.',
+        what_to_look_for: ['Изменение размера или формы', 'Припухлость или втяжение', 'Изменение цвета кожи'],
+        image_url: '/assets/steps/step1.svg',
+      },
+      {
+        step_number: 2,
+        title: 'Поднимите руки',
+        icon: '🙌',
+        duration_seconds: 45,
+        instruction: 'Поднимите руки над головой и осмотрите те же изменения под новым углом.',
+        what_to_look_for: ['Припухлость', 'Втяжение соска', 'Изменения кожи'],
+        image_url: '/assets/steps/step2.svg',
+      },
+      {
+        step_number: 3,
+        title: 'Осмотр стоя',
+        icon: '🤚',
+        duration_seconds: 90,
+        instruction: 'Правой рукой обследуйте левую грудь и наоборот. Двигайте пальцами по кругу с лёгким, затем средним, затем сильным нажимом.',
+        what_to_look_for: ['Уплотнение или твёрдость', 'Боль в определённой точке', 'Изменение текстуры'],
+        image_url: '/assets/steps/step3.svg',
+      },
+      {
+        step_number: 4,
+        title: 'Осмотр лёжа',
+        icon: '🛏️',
+        duration_seconds: 90,
+        instruction: 'Лягте, подложив подушку под плечо. Повторите те же круговые движения на каждой груди.',
+        what_to_look_for: ['Уплотнения в разных областях', 'Разница между двумя грудями'],
+        image_url: '/assets/steps/step4.svg',
+      },
+      {
+        step_number: 5,
+        title: 'Осмотр соска',
+        icon: '⚠️',
+        duration_seconds: 30,
+        instruction: 'Аккуратно сожмите сосок и проверьте, нет ли необычных выделений.',
+        what_to_look_for: ['Необычные выделения', 'Кровь', 'Изменение формы соска'],
+        image_url: '/assets/steps/step5.svg',
+      },
+    ],
+  },
+  pt: {
+    title: 'Guia de autoexame',
+    best_time: '3 a 5 dias após o fim da menstruação',
+    total_duration_minutes: 5,
+    important_note: 'O autoexame não substitui um exame médico. Se você notar uma mudança, não entre em pânico e procure um médico.',
+    disclaimer: 'Este guia é apenas para conscientização, não uma consulta médica.',
+    steps: [
+      {
+        step_number: 1,
+        title: 'Observar no espelho',
+        icon: '🪞',
+        duration_seconds: 60,
+        instruction: 'Fique em frente ao espelho, mãos nos quadris. Procure qualquer mudança de forma, tamanho ou cor da pele.',
+        what_to_look_for: ['Mudança de tamanho ou forma', 'Inchaço ou retração', 'Mudança de cor da pele'],
+        image_url: '/assets/steps/step1.svg',
+      },
+      {
+        step_number: 2,
+        title: 'Levantar os braços',
+        icon: '🙌',
+        duration_seconds: 45,
+        instruction: 'Levante os braços acima da cabeça e observe as mesmas mudanças de um novo ângulo.',
+        what_to_look_for: ['Inchaço', 'Retração do mamilo', 'Mudanças na pele'],
+        image_url: '/assets/steps/step2.svg',
+      },
+      {
+        step_number: 3,
+        title: 'Exame em pé',
+        icon: '🤚',
+        duration_seconds: 90,
+        instruction: 'Use a mão direita para examinar a mama esquerda e vice-versa. Faça movimentos circulares, com pressão leve, depois média e depois firme.',
+        what_to_look_for: ['Nódulo ou endurecimento', 'Dor num ponto específico', 'Mudança de textura'],
+        image_url: '/assets/steps/step3.svg',
+      },
+      {
+        step_number: 4,
+        title: 'Exame deitada',
+        icon: '🛏️',
+        duration_seconds: 90,
+        instruction: 'Deite-se com um travesseiro sob o ombro. Repita os mesmos movimentos circulares em cada mama.',
+        what_to_look_for: ['Nódulos em diferentes áreas', 'Diferença entre as duas mamas'],
+        image_url: '/assets/steps/step4.svg',
+      },
+      {
+        step_number: 5,
+        title: 'Exame do mamilo',
+        icon: '⚠️',
+        duration_seconds: 30,
+        instruction: 'Pressione suavemente o mamilo e verifique se há secreção incomum.',
+        what_to_look_for: ['Secreção incomum', 'Presença de sangue', 'Mudança na forma do mamilo'],
+        image_url: '/assets/steps/step5.svg',
+      },
+    ],
+  },
 };
 
 // ── Statistics (mirrors GET /statistics) ────────────────────────────
@@ -467,6 +975,62 @@ export const statistics: Record<Language, Statistics> = {
       { stat: '85%', description: 'of affected women have no family history' },
       { stat: '5 min', description: 'is the time a self-check takes each month' },
       { stat: '99%', description: 'survival rate with early detection' },
+    ],
+  },
+  es: {
+    global: { affected_ratio: '1 / 8', early_detection_survival: '99%', most_common_cancer_women: true, new_cases_yearly: '2,3 millones' },
+    morocco: {
+      new_cases_yearly: '~12.000',
+      average_diagnosis_age: 48,
+      late_diagnosis_percentage: 60,
+      awareness_note: 'El 60% de los casos en Marruecos se diagnostican tarde. La detección temprana salva vidas.',
+    },
+    key_facts: [
+      { stat: '85%', description: 'de las mujeres afectadas no tienen antecedentes familiares' },
+      { stat: '5 min', description: 'es el tiempo que lleva un autoexamen cada mes' },
+      { stat: '99%', description: 'tasa de supervivencia con detección temprana' },
+    ],
+  },
+  de: {
+    global: { affected_ratio: '1 / 8', early_detection_survival: '99%', most_common_cancer_women: true, new_cases_yearly: '2,3 Millionen' },
+    morocco: {
+      new_cases_yearly: '~12.000',
+      average_diagnosis_age: 48,
+      late_diagnosis_percentage: 60,
+      awareness_note: '60% der Fälle in Marokko werden spät diagnostiziert. Früherkennung rettet Leben.',
+    },
+    key_facts: [
+      { stat: '85%', description: 'der betroffenen Frauen haben keine Familiengeschichte' },
+      { stat: '5 Min', description: 'ist die Zeit, die eine Selbstuntersuchung pro Monat braucht' },
+      { stat: '99%', description: 'Überlebensrate bei Früherkennung' },
+    ],
+  },
+  ru: {
+    global: { affected_ratio: '1 / 8', early_detection_survival: '99%', most_common_cancer_women: true, new_cases_yearly: '2,3 миллиона' },
+    morocco: {
+      new_cases_yearly: '~12 000',
+      average_diagnosis_age: 48,
+      late_diagnosis_percentage: 60,
+      awareness_note: '60% случаев в Марокко диагностируются поздно. Раннее выявление спасает жизни.',
+    },
+    key_facts: [
+      { stat: '85%', description: 'заболевших женщин не имеют семейной истории' },
+      { stat: '5 мин', description: 'столько времени занимает самообследование в месяц' },
+      { stat: '99%', description: 'выживаемость при раннем выявлении' },
+    ],
+  },
+  pt: {
+    global: { affected_ratio: '1 / 8', early_detection_survival: '99%', most_common_cancer_women: true, new_cases_yearly: '2,3 milhões' },
+    morocco: {
+      new_cases_yearly: '~12.000',
+      average_diagnosis_age: 48,
+      late_diagnosis_percentage: 60,
+      awareness_note: '60% dos casos em Marrocos são diagnosticados tarde. A detecção precoce salva vidas.',
+    },
+    key_facts: [
+      { stat: '85%', description: 'das mulheres afetadas não têm histórico familiar' },
+      { stat: '5 min', description: 'é o tempo que um autoexame leva por mês' },
+      { stat: '99%', description: 'taxa de sobrevivência com detecção precoce' },
     ],
   },
 };

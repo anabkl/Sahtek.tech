@@ -42,7 +42,7 @@ body {
   margin: 0;
   background-color: rgb(var(--canvas));
   color: rgb(var(--ink));
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Noto Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   /* Soft rose blooms for atmospheric depth. */

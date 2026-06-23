@@ -6,6 +6,10 @@ const SPEECH_LOCALE: Record<Language, string> = {
   ar: 'ar-MA',
   fr: 'fr-FR',
   en: 'en-US',
+  es: 'es-ES',
+  de: 'de-DE',
+  ru: 'ru-RU',
+  pt: 'pt-BR',
 };
 
 /** Returns the browser's SpeechRecognition constructor, if it exists. */

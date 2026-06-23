@@ -7,7 +7,7 @@ export const APP = {
   email: 'hello@sahtek.ma',
 } as const;
 
-export const SUPPORTED_LANGUAGES: Language[] = ['ar', 'fr', 'en'];
+export const SUPPORTED_LANGUAGES: Language[] = ['ar', 'fr', 'en', 'es', 'de', 'ru', 'pt'];
 export const DEFAULT_LANGUAGE: Language = 'ar';
 
 export const STORAGE_KEYS = {
@@ -26,4 +26,8 @@ export const LANGUAGE_META: Record<Language, { label: string; native: string; fl
   ar: { label: 'Darija', native: 'الدارجة', flag: 'MA' },
   fr: { label: 'Francais', native: 'Francais', flag: 'FR' },
   en: { label: 'English', native: 'English', flag: 'EN' },
+  es: { label: 'Spanish', native: 'Espanol', flag: 'ES' },
+  de: { label: 'German', native: 'Deutsch', flag: 'DE' },
+  ru: { label: 'Russian', native: 'Русский', flag: 'RU' },
+  pt: { label: 'Portuguese', native: 'Portugues', flag: 'BR' },
 };

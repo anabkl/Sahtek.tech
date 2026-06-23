@@ -1,6 +1,6 @@
 // ── Shared API types — mirror of CONTRAT_API_SAHTEK.md ──────────────
 
-export type Language = 'ar' | 'fr' | 'en';
+export type Language = 'ar' | 'fr' | 'en' | 'es' | 'de' | 'ru' | 'pt';
 
 export type Severity = 'high' | 'medium' | 'low';
 

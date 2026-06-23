@@ -4,6 +4,10 @@ const LOCALES: Record<Language, string> = {
   ar: 'ar-MA',
   fr: 'fr-FR',
   en: 'en-US',
+  es: 'es-ES',
+  de: 'de-DE',
+  ru: 'ru-RU',
+  pt: 'pt-BR',
 };
 
 /** Format a Date as a long, localized date string. */

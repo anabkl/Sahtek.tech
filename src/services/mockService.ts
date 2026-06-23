@@ -144,6 +144,10 @@ const REMINDER_MESSAGE: Record<ChatRequest['language'], string> = {
   ar: 'التذكير مفعّل! غادي نذكّروك بالفحص الذاتي كل شهر. 💗',
   fr: 'Rappel activé ! Nous vous rappellerons votre auto-examen chaque mois. 💗',
   en: 'Reminder activated! We will remind you of your self-check every month. 💗',
+  es: '¡Recordatorio activado! Te recordaremos tu autoexamen cada mes. 💗',
+  de: 'Erinnerung aktiviert! Wir erinnern dich jeden Monat an deine Selbstuntersuchung. 💗',
+  ru: 'Напоминание включено! Мы будем напоминать вам о самообследовании каждый месяц. 💗',
+  pt: 'Lembrete ativado! Vamos lembrá-la do seu autoexame todos os meses. 💗',
 };
 
 export function mockCreateReminder(req: ReminderRequest): Promise<ReminderConfirmation> {

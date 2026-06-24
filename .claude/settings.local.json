@@ -13,7 +13,9 @@
       "Read(//tmp/**)",
       "Bash(git checkout *)",
       "Bash(git add *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "mcp__ide__getDiagnostics",
+      "PowerShell(npm run *)"
     ]
   }
 }

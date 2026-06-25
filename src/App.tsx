@@ -1,7 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
+import { REMINDER_STORAGE_KEY, scheduleNotificationCheck } from '@/utils/notificationScheduler';
 import { HomePage } from '@/pages/HomePage';
 import { LearnPage } from '@/pages/LearnPage';
 import { SelfCheckPage } from '@/pages/SelfCheckPage';
@@ -25,6 +26,19 @@ function RouteFallback() {
 }
 
 export default function App() {
+  // Resume a saved monthly reminder on load so an open tab can still fire it.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(REMINDER_STORAGE_KEY);
+      if (saved) {
+        const reminder = JSON.parse(saved);
+        if (reminder?.isActive) scheduleNotificationCheck(reminder);
+      }
+    } catch {
+      /* ignore corrupt/unavailable storage */
+    }
+  }, []);
+
   return (
     <AnimatePresence mode="wait">
       <Routes>

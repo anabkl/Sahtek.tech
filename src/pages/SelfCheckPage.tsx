@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Confetti } from '@/components/ui/Confetti';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { useSelfCheck } from '@/hooks/useSelfCheck';
+import { useSpeech } from '@/hooks/useSpeech';
 import { formatDuration } from '@/utils/formatters';
 import type { SelfCheckStep } from '@/types/api';
 
@@ -35,12 +36,26 @@ export function SelfCheckPage() {
   // otherwise the timer's reset effect refires every render and freezes the countdown.
   const guide = useMemo(() => stepsFor(lang), [lang]);
   const check = useSelfCheck(guide);
+  const { speak, activeId, stop } = useSpeech();
   const navigate = useNavigate();
   const [showReminderCta, setShowReminderCta] = useState(false);
   const ctaTimer = useRef<number | null>(null);
   const radius = 72;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - check.stepProgress);
+
+  // Narration (text-to-speech) for the active step. Read check.current into a
+  // string here so the click handler doesn't depend on TS narrowing the
+  // possibly-undefined current step inside a closure.
+  const speechId = `step-${check.index}`;
+  const isNarrating = activeId === speechId;
+  const narrationText = check.current ? check.current.instruction || check.current.title : '';
+  const listenLabel =
+    lang === 'ar' ? 'سمعي' : lang === 'fr' ? 'Écouter' : lang === 'es' ? 'Escuchar' :
+    lang === 'de' ? 'Anhören' : lang === 'ru' ? 'Слушать' : lang === 'pt' ? 'Ouvir' : 'Listen';
+  const pauseLabel =
+    lang === 'ar' ? 'وقفي' : lang === 'fr' ? 'Pause' : lang === 'es' ? 'Pausa' :
+    lang === 'de' ? 'Pause' : lang === 'ru' ? 'Пауза' : lang === 'pt' ? 'Pausa' : 'Pause';
 
   // Reveal the reminder nudge ~2s after the user finishes the guide.
   useEffect(() => {
@@ -53,6 +68,11 @@ export function SelfCheckPage() {
       if (ctaTimer.current) window.clearTimeout(ctaTimer.current);
     };
   }, [check.stage]);
+
+  // Stop any narration when the active step changes.
+  useEffect(() => {
+    stop();
+  }, [check.index, stop]);
 
   return (
     <PageTransition>
@@ -124,6 +144,33 @@ export function SelfCheckPage() {
               <div className="absolute inset-0 grid place-items-center text-4xl font-black text-ink">{formatDuration(check.remaining)}</div>
             </div>
             <p className="text-lg font-medium leading-8 text-muted">{check.current.instruction}</p>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  speak(narrationText, lang, speechId);
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: isNarrating ? '#D63384' : 'white',
+                  color: isNarrating ? 'white' : '#D63384',
+                  border: '2px solid #D63384',
+                  borderRadius: 999,
+                  padding: '6px 14px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontFamily: 'inherit',
+                }}
+              >
+                <span style={{ fontSize: 16 }}>{isNarrating ? '⏸️' : '🔊'}</span>
+                {isNarrating ? pauseLabel : listenLabel}
+              </button>
+            </div>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               {check.current.what_to_look_for.map((item) => <span key={item} className="rounded-full bg-primary-50 px-3 py-2 text-sm font-bold text-primary-700">{item}</span>)}
             </div>

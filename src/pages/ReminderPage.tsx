@@ -9,6 +9,7 @@ import { USE_MOCK } from '@/config/api';
 import { useToast } from '@/components/ui/toastStore';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { formatDate, nextReminderDate } from '@/utils/formatters';
+import { REMINDER_STORAGE_KEY, scheduleNotificationCheck, showNotification } from '@/utils/notificationScheduler';
 import { cn } from '@/utils/cn';
 
 type ReminderTime = 'morning' | 'afternoon' | 'evening';
@@ -26,7 +27,54 @@ const METHOD_META: { key: Method; emoji: string }[] = [
   { key: 'whatsapp', emoji: '💬' },
 ];
 
-const STORAGE_KEY = 'sahtek.reminder';
+const STORAGE_KEY = REMINDER_STORAGE_KEY;
+
+// Notification UI strings, kept inline (not in the i18n files) for all 7 languages.
+const NOTIF_BADGE: Record<'granted' | 'denied' | 'unsupported', Record<string, string>> = {
+  granted: {
+    ar: '🔔 الإشعارات مفعّلة — غادي نذكّروك',
+    fr: '🔔 Notifications activées — nous vous rappellerons',
+    en: '🔔 Notifications on — we will remind you',
+    es: '🔔 Notificaciones activadas — te recordaremos',
+    de: '🔔 Benachrichtigungen aktiv — wir erinnern dich',
+    ru: '🔔 Уведомления включены — мы напомним вам',
+    pt: '🔔 Notificações ativadas — vamos lembrá-la',
+  },
+  denied: {
+    ar: '⚠️ خاصك تفعّلي الإشعارات من إعدادات المتصفح',
+    fr: '⚠️ Activez les notifications dans les réglages du navigateur',
+    en: '⚠️ Enable notifications in your browser settings',
+    es: '⚠️ Activa las notificaciones en los ajustes del navegador',
+    de: '⚠️ Aktiviere Benachrichtigungen in den Browser-Einstellungen',
+    ru: '⚠️ Включите уведомления в настройках браузера',
+    pt: '⚠️ Ative as notificações nas configurações do navegador',
+  },
+  unsupported: {
+    ar: '📱 المتصفح ديالك ما كيدعمش الإشعارات',
+    fr: '📱 Votre navigateur ne supporte pas les notifications',
+    en: '📱 Your browser does not support notifications',
+    es: '📱 Tu navegador no admite notificaciones',
+    de: '📱 Dein Browser unterstützt keine Benachrichtigungen',
+    ru: '📱 Ваш браузер не поддерживает уведомления',
+    pt: '📱 Seu navegador não suporta notificações',
+  },
+};
+
+const NOTIF_BADGE_STYLE: Record<'granted' | 'denied' | 'unsupported', { bg: string; fg: string; border: string }> = {
+  granted: { bg: '#ECFDF5', fg: '#16A34A', border: '#BBF7D0' },
+  denied: { bg: '#FFF7ED', fg: '#EA580C', border: '#FED7AA' },
+  unsupported: { bg: '#F3F4F6', fg: '#6B7280', border: '#E5E7EB' },
+};
+
+const TEST_BTN_LABEL: Record<string, string> = {
+  ar: '🔔 جربي الإشعار',
+  fr: '🔔 Tester la notification',
+  en: '🔔 Test notification',
+  es: '🔔 Probar notificación',
+  de: '🔔 Benachrichtigung testen',
+  ru: '🔔 Тест уведомления',
+  pt: '🔔 Testar notificação',
+};
 
 interface ReminderSettings {
   reminderDay: number;
@@ -104,6 +152,9 @@ export function ReminderPage() {
   const [email, setEmail] = useState(existing?.email ?? '');
   const [phone, setPhone] = useState(existing?.phone ?? '');
   const [confetti, setConfetti] = useState(false);
+  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission | 'unsupported'>(
+    typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported',
+  );
 
   const toast = useToast();
   const selectedDate = day != null ? new Date(new Date().getFullYear(), new Date().getMonth(), day) : null;
@@ -132,8 +183,23 @@ export function ReminderPage() {
   const phoneOk = !methods.includes('whatsapp') || isPhone(phone);
   const canActivate = day != null && time != null && methods.length > 0 && emailOk && phoneOk;
 
-  const activate = () => {
+  const activate = async () => {
     if (!canActivate || day == null || time == null) return;
+
+    // Request notification permission up front when push is among the methods.
+    if (methods.includes('push')) {
+      if (!('Notification' in window)) {
+        setPermissionStatus('unsupported');
+      } else {
+        const perm =
+          Notification.permission === 'default'
+            ? await Notification.requestPermission()
+            : Notification.permission;
+        setPermissionStatus(perm);
+        if (perm !== 'granted') toast(r.pushBlockedToast, 'error');
+      }
+    }
+
     const settings: ReminderSettings = {
       reminderDay: day,
       reminderTime: time,
@@ -148,6 +214,8 @@ export function ReminderPage() {
     } catch {
       /* storage unavailable */
     }
+    // Start the in-app reminder check (fires while a tab is open).
+    scheduleNotificationCheck({ reminderDay: day, reminderTime: time, isActive: true });
     setConfetti(true);
     setMode('confirmed');
     window.setTimeout(() => setConfetti(false), 1600);
@@ -184,6 +252,46 @@ export function ReminderPage() {
               ))}
             </div>
           </div>
+
+          {methods.includes('push') && permissionStatus !== 'default' && (
+            <div className="mt-4">
+              <span
+                style={{
+                  display: 'inline-block',
+                  borderRadius: 999,
+                  padding: '8px 16px',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  background: NOTIF_BADGE_STYLE[permissionStatus].bg,
+                  color: NOTIF_BADGE_STYLE[permissionStatus].fg,
+                  border: `1px solid ${NOTIF_BADGE_STYLE[permissionStatus].border}`,
+                }}
+              >
+                {NOTIF_BADGE[permissionStatus][lang] || NOTIF_BADGE[permissionStatus].en}
+              </span>
+            </div>
+          )}
+
+          {methods.includes('push') && permissionStatus === 'granted' && (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => showNotification(lang)}
+                style={{
+                  background: 'none',
+                  border: '1px solid #D63384',
+                  color: '#D63384',
+                  borderRadius: 999,
+                  padding: '6px 16px',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {TEST_BTN_LABEL[lang] || TEST_BTN_LABEL.en}
+              </button>
+            </div>
+          )}
 
           <div className="mt-5">
             <GlassCalendar

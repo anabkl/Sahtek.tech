@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { InfiniteSlider } from '@/components/ui/infinite-slider';
 import { useLanguage } from '@/hooks/useLanguage';
 
 /* ── Flip Card ── */
-function MythCard({ myth, truth, mythLabel, truthLabel, cardId, onFlip }: {
+function MythCard({ myth, truth, mythLabel, truthLabel, cardId, onFlip, isMobile, initialFlipped }: {
   myth: string; truth: string; mythLabel: string; truthLabel: string;
   cardId: string; onFlip: (id: string, flipped: boolean) => void;
+  isMobile: boolean; initialFlipped: boolean;
 }) {
-  const [flipped, setFlipped] = useState(false);
+  const [flipped, setFlipped] = useState(initialFlipped);
   // Report the card's *new* state (not a blind toggle): the marquee renders
   // every card twice with the same cardId, so the parent must add/remove based
   // on actual orientation rather than toggling, or the two copies desync.
@@ -22,9 +23,9 @@ function MythCard({ myth, truth, mythLabel, truthLabel, cardId, onFlip }: {
       onClick={handleClick}
       style={{
         perspective: 1000,
-        width: 280,
-        minWidth: 280,
-        height: 160,
+        width: isMobile ? 220 : 280,
+        minWidth: isMobile ? 220 : 280,
+        height: isMobile ? 130 : 160,
         flexShrink: 0,
         cursor: 'pointer',
       }}
@@ -42,12 +43,12 @@ function MythCard({ myth, truth, mythLabel, truthLabel, cardId, onFlip }: {
           backfaceVisibility: 'hidden',
           borderRadius: 16, background: '#FFF0F6', border: '1px solid #FFD0E8',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 20, textAlign: 'center',
+          padding: isMobile ? 14 : 20, textAlign: 'center',
         }}>
-          <span style={{ position: 'absolute', top: 8, right: 12, fontSize: 11, color: '#DC2626', fontWeight: 700 }}>
+          <span style={{ position: 'absolute', top: 8, right: 12, fontSize: isMobile ? 9 : 11, color: '#DC2626', fontWeight: 700 }}>
             ❌ {mythLabel}
           </span>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#2D1F2D', lineHeight: 1.6, margin: 0 }}>{myth}</p>
+          <p style={{ fontSize: isMobile ? 11 : 13, fontWeight: 600, color: '#2D1F2D', lineHeight: 1.6, margin: 0 }}>{myth}</p>
         </div>
         {/* Back — Truth */}
         <div style={{
@@ -55,13 +56,13 @@ function MythCard({ myth, truth, mythLabel, truthLabel, cardId, onFlip }: {
           backfaceVisibility: 'hidden',
           borderRadius: 16, background: '#F0FFF4', border: '1px solid #BBF7D0',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 20, textAlign: 'center',
+          padding: isMobile ? 14 : 20, textAlign: 'center',
           transform: 'rotateY(180deg)',
         }}>
-          <span style={{ position: 'absolute', top: 8, right: 12, fontSize: 11, color: '#16A34A', fontWeight: 700 }}>
+          <span style={{ position: 'absolute', top: 8, right: 12, fontSize: isMobile ? 9 : 11, color: '#16A34A', fontWeight: 700 }}>
             ✅ {truthLabel}
           </span>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#2D1F2D', lineHeight: 1.6, margin: 0 }}>{truth}</p>
+          <p style={{ fontSize: isMobile ? 11 : 13, fontWeight: 600, color: '#2D1F2D', lineHeight: 1.6, margin: 0 }}>{truth}</p>
         </div>
       </div>
     </div>
@@ -361,9 +362,33 @@ export function MythsWall() {
   // Speed: 75s = 3x slower than default 25s
   // durationOnHover: 9999 = effectively pauses on hover
 
+  // Shrink cards on narrow viewports. Read width in an effect (not during
+  // render) so the value stays stable on the initial paint.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   // Track which unique myths have been revealed. Membership reflects the actual
   // flip state reported by MythCard, so flipping a card back removes it again.
-  const [flippedSet, setFlippedSet] = useState<Set<string>>(new Set());
+  // Seeded from localStorage so progress survives tab switches (which unmount
+  // this component) and reloads.
+  const [flippedSet, setFlippedSet] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('sahtek_myths_flipped');
+      if (saved) return new Set<string>(JSON.parse(saved));
+    } catch { /* ignore unavailable/corrupt storage */ }
+    return new Set();
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('sahtek_myths_flipped', JSON.stringify([...flippedSet]));
+    } catch { /* ignore unavailable storage */ }
+  }, [flippedSet]);
+
   const handleFlip = (cardId: string, flipped: boolean) => {
     setFlippedSet((prev) => {
       const next = new Set(prev);
@@ -447,24 +472,33 @@ export function MythsWall() {
       {/* 3 Rows */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {/* Row 1: scrolls left ← (default) */}
-        <InfiniteSlider gap={16} duration={75} durationOnHover={9999}>
-          {d.row1.map((item, i) => (
-            <MythCard key={`r1-${i}`} cardId={`r1-${i}`} myth={item.m} truth={item.t} mythLabel={d.mythLabel} truthLabel={d.truthLabel} onFlip={handleFlip} />
-          ))}
+        <InfiniteSlider gap={16} duration={isMobile ? 120 : 75} durationOnHover={9999}>
+          {d.row1.map((item, i) => {
+            const id = `r1-${i}`;
+            return (
+              <MythCard key={`r1-${i}`} cardId={id} initialFlipped={flippedSet.has(id)} isMobile={isMobile} myth={item.m} truth={item.t} mythLabel={d.mythLabel} truthLabel={d.truthLabel} onFlip={handleFlip} />
+            );
+          })}
         </InfiniteSlider>
 
         {/* Row 2: scrolls right → (reverse) */}
-        <InfiniteSlider gap={16} duration={75} durationOnHover={9999} reverse>
-          {d.row2.map((item, i) => (
-            <MythCard key={`r2-${i}`} cardId={`r2-${i}`} myth={item.m} truth={item.t} mythLabel={d.mythLabel} truthLabel={d.truthLabel} onFlip={handleFlip} />
-          ))}
+        <InfiniteSlider gap={16} duration={isMobile ? 120 : 75} durationOnHover={9999} reverse>
+          {d.row2.map((item, i) => {
+            const id = `r2-${i}`;
+            return (
+              <MythCard key={`r2-${i}`} cardId={id} initialFlipped={flippedSet.has(id)} isMobile={isMobile} myth={item.m} truth={item.t} mythLabel={d.mythLabel} truthLabel={d.truthLabel} onFlip={handleFlip} />
+            );
+          })}
         </InfiniteSlider>
 
         {/* Row 3: scrolls left ← (default) */}
-        <InfiniteSlider gap={16} duration={75} durationOnHover={9999}>
-          {d.row3.map((item, i) => (
-            <MythCard key={`r3-${i}`} cardId={`r3-${i}`} myth={item.m} truth={item.t} mythLabel={d.mythLabel} truthLabel={d.truthLabel} onFlip={handleFlip} />
-          ))}
+        <InfiniteSlider gap={16} duration={isMobile ? 120 : 75} durationOnHover={9999}>
+          {d.row3.map((item, i) => {
+            const id = `r3-${i}`;
+            return (
+              <MythCard key={`r3-${i}`} cardId={id} initialFlipped={flippedSet.has(id)} isMobile={isMobile} myth={item.m} truth={item.t} mythLabel={d.mythLabel} truthLabel={d.truthLabel} onFlip={handleFlip} />
+            );
+          })}
         </InfiniteSlider>
       </div>
     </div>

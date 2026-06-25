@@ -19,9 +19,6 @@ Sahtek aims to make life-saving awareness tools easy to access, culturally relev
 - 🤖 **AI Chat in Moroccan Darija**  
   Breast cancer awareness assistant focused on educational guidance and emotional support.
 
-- 📸 **Edge-computed camera verification**  
-  Frontend-powered self-check experience with camera-assisted guidance and privacy-first UX.
-
 - 📲 **SMS reminder mock flow**  
   Simulated monthly reminder workflow to encourage consistent self-check habits.
 

@@ -188,46 +188,6 @@ h3 {
   }
 }
 
-.ai-camera-frame {
-  position: relative;
-  height: 14rem;
-  overflow: hidden;
-  border-radius: 1.5rem;
-  background: #101018;
-}
-
-.ai-camera-frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.35;
-}
-
-.ai-scan-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #34d399, #d63384, transparent);
-  box-shadow: 0 0 18px rgba(52, 211, 153, 0.85);
-  animation: ai-scan 1.25s ease-in-out infinite;
-}
-
-@keyframes ai-scan {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(14rem);
-  }
-}
-
 /* -- Honour reduced-motion preference ------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   *,

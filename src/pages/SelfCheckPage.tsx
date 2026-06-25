@@ -18,7 +18,6 @@ function stepsFor(lang: string): SelfCheckStep[] {
       { step_number: 3, title: 'فحصي وانتي واقفة', icon: 'touch', duration_seconds: 90, instruction: 'استعملي أصابعك بحركات دائرية وضغط خفيف ثم متوسط.', what_to_look_for: ['كتلة', 'ألم فبلاصة وحدة'], image_url: '' },
       { step_number: 4, title: 'فحصي وانتي مستلقية', icon: 'rest', duration_seconds: 90, instruction: 'حطي وسادة تحت الكتف وكرري الحركات على كل ثدي.', what_to_look_for: ['فرق بين الثديين', 'صلابة'], image_url: '' },
       { step_number: 5, title: 'راقبي الحلمة', icon: 'alert', duration_seconds: 30, instruction: 'ضغطي بلطف وشوفي واش كاين إفراز غير عادي.', what_to_look_for: ['إفرازات', 'دم', 'تغيير فالشكل'], image_url: '' },
-      { step_number: 6, title: 'تحقق بالكاميرا AI', icon: 'camera', duration_seconds: 30, instruction: 'فعّلي الكاميرا باش يتأكد المساعد من الوضعية فقط. ما كاين حتى تصوير ولا إرسال للصور.', what_to_look_for: ['الوضعية صحيحة', 'الكتفين واضحين', 'الخصوصية محفوظة'], image_url: '' },
     ];
   }
   return [
@@ -27,85 +26,7 @@ function stepsFor(lang: string): SelfCheckStep[] {
     { step_number: 3, title: lang === 'fr' ? 'Examiner debout' : 'Examine standing', icon: 'touch', duration_seconds: 90, instruction: lang === 'fr' ? 'Faites des cercles avec les doigts, doucement.' : 'Use circular finger motions with gentle pressure.', what_to_look_for: ['Lump', 'Hardness', 'Pain'], image_url: '' },
     { step_number: 4, title: lang === 'fr' ? 'Examiner allongee' : 'Examine lying down', icon: 'rest', duration_seconds: 90, instruction: lang === 'fr' ? 'Allongez-vous et repetez sur chaque sein.' : 'Lie down and repeat the same pattern on each breast.', what_to_look_for: ['Differences', 'Texture'], image_url: '' },
     { step_number: 5, title: lang === 'fr' ? 'Verifier le mamelon' : 'Check the nipple', icon: 'alert', duration_seconds: 30, instruction: lang === 'fr' ? 'Pressez doucement et observez.' : 'Gently squeeze and check for unusual discharge.', what_to_look_for: ['Discharge', 'Blood', 'Shape'], image_url: '' },
-    { step_number: 6, title: lang === 'fr' ? 'Verification camera IA' : 'AI Camera Verification', icon: 'camera', duration_seconds: 30, instruction: lang === 'fr' ? 'Activez la camera pour verifier seulement votre posture. Aucune image n est envoyee.' : 'Turn on the camera to verify posture only. No image is uploaded.', what_to_look_for: ['Correct posture', 'Shoulders visible', 'Private on-device preview'], image_url: '' },
   ];
-}
-
-function AICameraVerification() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [status, setStatus] = useState<'starting' | 'scanning' | 'success' | 'blocked'>('starting');
-  const [scanStep, setScanStep] = useState(0);
-
-  const scanMessages = [
-    'جاري تحليل الصورة...',
-    'البحث عن عدم تماثل...',
-    'لم يتم اكتشاف أي كتل ظاهرة. يرجى إكمال الفحص اليدوي.',
-  ];
-
-  useEffect(() => {
-    let stream: MediaStream | null = null;
-    let stepTimer: number | undefined;
-    let doneTimer: number | undefined;
-    let cancelled = false;
-
-    const startCamera = async () => {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        setStatus('blocked');
-        return;
-      }
-
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (cancelled) {
-          stream.getTracks().forEach((track) => track.stop());
-          return;
-        }
-
-        if (videoRef.current) videoRef.current.srcObject = stream;
-
-        setStatus('scanning');
-        setScanStep(0);
-
-        stepTimer = window.setInterval(() => {
-          setScanStep((step) => Math.min(step + 1, 2));
-        }, 1000);
-
-        doneTimer = window.setTimeout(() => {
-          if (stepTimer) window.clearInterval(stepTimer);
-          setScanStep(2);
-          setStatus('success');
-        }, 3000);
-      } catch {
-        setStatus('blocked');
-      }
-    };
-
-    void startCamera();
-
-    return () => {
-      cancelled = true;
-      if (stepTimer) window.clearInterval(stepTimer);
-      if (doneTimer) window.clearTimeout(doneTimer);
-      stream?.getTracks().forEach((track) => track.stop());
-    };
-  }, []);
-
-  return (
-    <div className="mt-6 rounded-3xl border border-primary-100 bg-white/70 p-3 shadow-inner">
-      <div className="ai-camera-frame">
-        <video ref={videoRef} autoPlay muted playsInline className="h-full w-full object-cover" />
-        {status === 'scanning' && <span className="ai-scan-line" />}
-        <div className="absolute left-3 top-3 rounded-full bg-black/45 px-3 py-1 text-xs font-black text-white">
-          {status === 'success' ? 'AI Verified' : 'AI Scanner'}
-        </div>
-      </div>
-      <div className="mt-3 rounded-2xl bg-primary-50 p-3 text-sm font-black text-primary-800">
-        {status === 'blocked'
-          ? 'Camera preview unavailable. Privacy-safe verification mode is ready; no image is uploaded.'
-          : scanMessages[scanStep]}
-      </div>
-    </div>
-  );
 }
 
 export function SelfCheckPage() {
@@ -203,7 +124,6 @@ export function SelfCheckPage() {
               <div className="absolute inset-0 grid place-items-center text-4xl font-black text-ink">{formatDuration(check.remaining)}</div>
             </div>
             <p className="text-lg font-medium leading-8 text-muted">{check.current.instruction}</p>
-            {check.current.icon === 'camera' && <AICameraVerification />}
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               {check.current.what_to_look_for.map((item) => <span key={item} className="rounded-full bg-primary-50 px-3 py-2 text-sm font-bold text-primary-700">{item}</span>)}
             </div>

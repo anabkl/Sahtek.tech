@@ -22,7 +22,8 @@ const TIME_META: { key: ReminderTime; emoji: string; ring: string }[] = [
   { key: 'afternoon', emoji: '🌤️', ring: 'border-orange-200' },
   { key: 'evening', emoji: '🌙', ring: 'border-indigo-200' },
 ];
-const METHOD_META: { key: Method; emoji: string }[] = [
+// Push + email render in the top row; WhatsApp is a full-width card below them.
+const METHOD_META: { key: Exclude<Method, 'whatsapp'>; emoji: string }[] = [
   { key: 'push', emoji: '🔔' },
   { key: 'email', emoji: '📧' },
 ];
@@ -76,20 +77,72 @@ const TEST_BTN_LABEL: Record<string, string> = {
   pt: '🔔 Testar notificação',
 };
 
+// WhatsApp card label — Arabic localizes it; everyone else keeps the brand name.
+const WA_LABEL: Record<string, string> = {
+  ar: 'بالواتساب', fr: 'WhatsApp', en: 'WhatsApp', es: 'WhatsApp', de: 'WhatsApp', ru: 'WhatsApp', pt: 'WhatsApp',
+};
+const WA_UNAVAILABLE: Record<string, string> = {
+  ar: 'غير متوفر حالياً',
+  fr: 'Non disponible actuellement',
+  en: 'Not available currently',
+  es: 'No disponible actualmente',
+  de: 'Derzeit nicht verfügbar',
+  ru: 'Сейчас недоступно',
+  pt: 'Indisponível no momento',
+};
+const WA_SEND_FAIL: Record<string, string> = {
+  ar: 'ما قدرناش نوجدو رسالة الواتساب.',
+  fr: "Échec de l'envoi du message WhatsApp.",
+  en: 'Could not send the WhatsApp message.',
+  es: 'No se pudo enviar el mensaje de WhatsApp.',
+  de: 'WhatsApp-Nachricht konnte nicht gesendet werden.',
+  ru: 'Не удалось отправить сообщение WhatsApp.',
+  pt: 'Não foi possível enviar a mensagem do WhatsApp.',
+};
+const EDIT_LABEL: Record<string, string> = {
+  ar: 'تعديل', fr: 'Modifier', en: 'Edit', es: 'Editar', de: 'Bearbeiten', ru: 'Изменить', pt: 'Editar',
+};
+const SAVE_LABEL: Record<string, string> = {
+  ar: 'حفظ', fr: 'Enregistrer', en: 'Save', es: 'Guardar', de: 'Speichern', ru: 'Сохранить', pt: 'Salvar',
+};
+const CANCEL_LABEL: Record<string, string> = {
+  ar: 'إلغاء', fr: 'Annuler', en: 'Cancel', es: 'Cancelar', de: 'Abbrechen', ru: 'Отмена', pt: 'Cancelar',
+};
+const ENABLED_LABEL: Record<string, string> = {
+  ar: '✅ مفعّل', fr: '✅ Activé', en: '✅ Enabled', es: '✅ Activado', de: '✅ Aktiviert', ru: '✅ Включено', pt: '✅ Ativado',
+};
+
+const tr = (rec: Record<string, string>, lang: string) => rec[lang] || rec.en;
+
 interface ReminderSettings {
   reminderDay: number;
   reminderTime: ReminderTime;
-  notificationMethods: Method[];
+  methods: Method[];
   email: string;
-  phone: string;
+  whatsappNumber: string;
+  lang: string;
   isActive: boolean;
-  createdAt: string;
 }
 
+/** Read saved settings, migrating the older `notificationMethods`/`phone` keys. */
 function loadSettings(): ReminderSettings | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as ReminderSettings) : null;
+    if (!raw) return null;
+    const s = JSON.parse(raw) as Partial<ReminderSettings> & {
+      notificationMethods?: Method[];
+      phone?: string;
+    };
+    if (s.reminderDay == null || s.reminderTime == null) return null;
+    return {
+      reminderDay: s.reminderDay,
+      reminderTime: s.reminderTime as ReminderTime,
+      methods: s.methods ?? s.notificationMethods ?? [],
+      email: s.email ?? '',
+      whatsappNumber: s.whatsappNumber ?? s.phone ?? '',
+      lang: s.lang ?? 'ar',
+      isActive: !!s.isActive,
+    };
   } catch {
     return null;
   }
@@ -147,21 +200,21 @@ export function ReminderPage() {
   const [mode, setMode] = useState<'setup' | 'confirmed'>(existing?.isActive ? 'confirmed' : 'setup');
   const [day, setDay] = useState<number | null>(existing?.reminderDay ?? null);
   const [time, setTime] = useState<ReminderTime | null>(existing?.reminderTime ?? null);
-  const [methods, setMethods] = useState<Method[]>(existing?.notificationMethods ?? []);
+  const [methods, setMethods] = useState<Method[]>(existing?.methods ?? []);
   const [email, setEmail] = useState(existing?.email ?? '');
-  // Retained from saved settings for backward-compat; WhatsApp now goes through
-  // the OpenWA section below, not this reminder method.
-  const [phone] = useState(existing?.phone ?? '');
+  const [whatsappNumber, setWhatsappNumber] = useState(existing?.whatsappNumber ?? '');
   const [confetti, setConfetti] = useState(false);
+  const [activating, setActivating] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission | 'unsupported'>(
     typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported',
   );
 
+  // Whether the local OpenWA service is reachable (checked on mount).
   const [whatsappAvailable, setWhatsappAvailable] = useState(false);
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [whatsappSending, setWhatsappSending] = useState(false);
-  const [whatsappSent, setWhatsappSent] = useState(false);
-  const [whatsappError, setWhatsappError] = useState('');
+
+  // Inline edit state for the confirmed view (email / whatsapp number).
+  const [editingField, setEditingField] = useState<null | 'email' | 'whatsapp'>(null);
+  const [draft, setDraft] = useState('');
 
   useEffect(() => {
     checkWhatsAppAvailable().then(setWhatsappAvailable);
@@ -191,12 +244,34 @@ export function ReminderPage() {
   };
 
   const emailOk = !methods.includes('email') || isEmail(email);
-  const canActivate = day != null && time != null && methods.length > 0 && emailOk;
+  const whatsappOk = !methods.includes('whatsapp') || whatsappNumber.length >= 9;
+  const canActivate = day != null && time != null && methods.length > 0 && emailOk && whatsappOk;
+
+  /** Persist the current settings (optionally with field overrides) under the shared key. */
+  const writeSettings = (overrides?: Partial<ReminderSettings>) => {
+    if (day == null || time == null) return;
+    const settings: ReminderSettings = {
+      reminderDay: day,
+      reminderTime: time,
+      methods,
+      email,
+      whatsappNumber,
+      lang,
+      isActive: true,
+      ...overrides,
+    };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch {
+      /* storage unavailable */
+    }
+  };
 
   const activate = async () => {
     if (!canActivate || day == null || time == null) return;
+    setActivating(true);
 
-    // Request notification permission up front when push is among the methods.
+    // Browser push — request permission up front when selected.
     if (methods.includes('push')) {
       if (!('Notification' in window)) {
         setPermissionStatus('unsupported');
@@ -210,25 +285,35 @@ export function ReminderPage() {
       }
     }
 
-    const settings: ReminderSettings = {
-      reminderDay: day,
-      reminderTime: time,
-      notificationMethods: methods,
-      email,
-      phone,
-      isActive: true,
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch {
-      /* storage unavailable */
+    // WhatsApp — fire the confirmation message immediately via the local OpenWA API.
+    if (methods.includes('whatsapp') && whatsappAvailable) {
+      const result = await sendWhatsAppConfirmation(whatsappNumber, lang, day, time);
+      if (!result.success) toast(tr(WA_SEND_FAIL, lang), 'error');
     }
-    // Start the in-app reminder check (fires while a tab is open).
+
+    writeSettings();
     scheduleNotificationCheck({ reminderDay: day, reminderTime: time, isActive: true });
+    setActivating(false);
     setConfetti(true);
     setMode('confirmed');
     window.setTimeout(() => setConfetti(false), 1600);
+  };
+
+  const startEdit = (field: 'email' | 'whatsapp') => {
+    setDraft(field === 'email' ? email : whatsappNumber);
+    setEditingField(field);
+  };
+  const cancelEdit = () => setEditingField(null);
+  const saveEdit = () => {
+    if (editingField === 'email') {
+      setEmail(draft);
+      writeSettings({ email: draft });
+    } else if (editingField === 'whatsapp') {
+      const digits = draft.replace(/[^0-9]/g, '');
+      setWhatsappNumber(digits);
+      writeSettings({ whatsappNumber: digits });
+    }
+    setEditingField(null);
   };
 
   const timeLabel = time ? `${r.times[time].label} — ${TIME_CLOCK[time]}` : '';
@@ -250,15 +335,113 @@ export function ReminderPage() {
             <p className="mt-1 text-xl font-black text-primary-800">{formatDate(nextReminderDate(day), lang)}</p>
           </div>
 
+          {/* Active notification methods, with inline edit for email + WhatsApp. */}
           <div className="mt-4 text-start">
             <p className="text-sm font-black text-muted">{r.viaLabel}</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {methods.map((m) => (
-                <span key={m} className="rounded-full bg-primary-100 px-3 py-1.5 text-sm font-bold text-primary-700">
-                  {METHOD_META.find((x) => x.key === m)?.emoji} {r.methods[m].label}
-                  {m === 'email' && email ? ` · ${email}` : ''}
-                </span>
-              ))}
+            <div className="mt-2 space-y-2">
+              {methods.includes('push') && (
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-primary-50 px-4 py-3">
+                  <span className="font-bold text-primary-800">🔔 {r.methods.push.label}</span>
+                  <span className="shrink-0 text-sm font-black text-green-600">{tr(ENABLED_LABEL, lang)}</span>
+                </div>
+              )}
+
+              {methods.includes('email') && (
+                <div className="rounded-2xl bg-primary-50 px-4 py-3">
+                  {editingField === 'email' ? (
+                    <div>
+                      <input
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        placeholder={r.emailPlaceholder}
+                        className="min-h-11 w-full rounded-xl border border-line bg-white px-3 font-bold text-ink outline-none focus:border-primary-300"
+                      />
+                      <div className="mt-2 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={saveEdit}
+                          disabled={!isEmail(draft)}
+                          className="rounded-full bg-primary-500 px-4 py-1.5 text-sm font-black text-white disabled:opacity-50"
+                        >
+                          {tr(SAVE_LABEL, lang)}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="rounded-full border border-line px-4 py-1.5 text-sm font-black text-muted"
+                        >
+                          {tr(CANCEL_LABEL, lang)}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 truncate font-bold text-primary-800">📧 {email || r.methods.email.label}</span>
+                      <button
+                        type="button"
+                        onClick={() => startEdit('email')}
+                        className="shrink-0 rounded-full border border-primary-200 px-3 py-1 text-xs font-black text-primary-700"
+                      >
+                        ✏️ {tr(EDIT_LABEL, lang)}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {methods.includes('whatsapp') && (
+                <div className="rounded-2xl bg-primary-50 px-4 py-3">
+                  {editingField === 'whatsapp' ? (
+                    <div>
+                      <div className="flex min-h-11 items-center overflow-hidden rounded-xl border border-line bg-white focus-within:border-primary-300" dir="ltr">
+                        <span className="grid h-11 place-items-center bg-primary-100 px-3 font-black text-primary-700">+212</span>
+                        <input
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          value={draft}
+                          onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ''))}
+                          placeholder="6 00 00 00 00"
+                          className="min-w-0 flex-1 bg-transparent px-3 font-bold text-ink outline-none"
+                        />
+                      </div>
+                      <div className="mt-2 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={saveEdit}
+                          disabled={draft.length < 9}
+                          className="rounded-full bg-primary-500 px-4 py-1.5 text-sm font-black text-white disabled:opacity-50"
+                        >
+                          {tr(SAVE_LABEL, lang)}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="rounded-full border border-line px-4 py-1.5 text-sm font-black text-muted"
+                        >
+                          {tr(CANCEL_LABEL, lang)}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 truncate font-bold text-primary-800" dir="ltr">
+                        💬 +212 {whatsappNumber}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => startEdit('whatsapp')}
+                        className="shrink-0 rounded-full border border-primary-200 px-3 py-1 text-xs font-black text-primary-700"
+                      >
+                        ✏️ {tr(EDIT_LABEL, lang)}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -311,176 +494,6 @@ export function ReminderPage() {
               weekdays={r.calendar.weekdays}
               readOnly
             />
-          </div>
-
-          {/* ── WhatsApp Reminder ── */}
-          <div style={{
-            marginTop: 20,
-            padding: 24,
-            background: 'white',
-            borderRadius: 20,
-            border: whatsappAvailable ? '2px solid #25D366' : '2px solid #E0E0E0',
-            boxShadow: '0 4px 20px rgba(37,211,102,0.1)',
-            opacity: whatsappAvailable ? 1 : 0.6,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <span style={{ fontSize: 28 }}>💬</span>
-              <div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#2D1F2D', margin: 0 }}>
-                  {lang === 'ar' ? 'تذكير بالواتساب' :
-                   lang === 'fr' ? 'Rappel WhatsApp' :
-                   lang === 'es' ? 'Recordatorio WhatsApp' :
-                   lang === 'de' ? 'WhatsApp-Erinnerung' :
-                   lang === 'ru' ? 'Напоминание WhatsApp' :
-                   lang === 'pt' ? 'Lembrete WhatsApp' :
-                   'WhatsApp Reminder'}
-                </h3>
-                <p style={{ fontSize: 12, color: whatsappAvailable ? '#25D366' : '#999', margin: 0, marginTop: 2 }}>
-                  {whatsappAvailable
-                    ? (lang === 'ar' ? '✅ الخدمة متوفرة' :
-                       lang === 'fr' ? '✅ Service disponible' :
-                       lang === 'es' ? '✅ Servicio disponible' :
-                       lang === 'de' ? '✅ Dienst verfügbar' :
-                       lang === 'ru' ? '✅ Сервис доступен' :
-                       lang === 'pt' ? '✅ Serviço disponível' :
-                       '✅ Service available')
-                    : (lang === 'ar' ? '⚪ غير متوفر حالياً' :
-                       lang === 'fr' ? '⚪ Non disponible' :
-                       lang === 'es' ? '⚪ No disponible' :
-                       lang === 'de' ? '⚪ Nicht verfügbar' :
-                       lang === 'ru' ? '⚪ Недоступно' :
-                       lang === 'pt' ? '⚪ Indisponível' :
-                       '⚪ Not available')}
-                </p>
-              </div>
-            </div>
-
-            {whatsappAvailable && !whatsappSent && (
-              <>
-                <p style={{ fontSize: 13, color: '#666', marginBottom: 12 }}>
-                  {lang === 'ar' ? 'دخلي رقم الواتساب ديالك باش نوجدو ليك تأكيد و تذكير شهري:' :
-                   lang === 'fr' ? 'Entrez votre numéro WhatsApp pour recevoir une confirmation et un rappel mensuel :' :
-                   lang === 'es' ? 'Ingrese su número de WhatsApp para recibir confirmación y recordatorio mensual:' :
-                   lang === 'de' ? 'Geben Sie Ihre WhatsApp-Nummer ein für Bestätigung und monatliche Erinnerung:' :
-                   lang === 'ru' ? 'Введите номер WhatsApp для подтверждения и ежемесячного напоминания:' :
-                   lang === 'pt' ? 'Digite seu número do WhatsApp para confirmação e lembrete mensal:' :
-                   'Enter your WhatsApp number for confirmation and monthly reminder:'}
-                </p>
-                <div style={{ display: 'flex', gap: 0, marginBottom: 12 }} dir="ltr">
-                  <span style={{
-                    background: '#F0F0F0', borderRadius: '12px 0 0 12px',
-                    padding: '12px 14px', fontSize: 14, color: '#666',
-                    border: '2px solid #E0E0E0', borderRight: 'none',
-                    fontWeight: 600,
-                  }}>+212</span>
-                  <input
-                    type="tel"
-                    value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value.replace(/[^0-9]/g, ''))}
-                    placeholder="6XXXXXXXX"
-                    style={{
-                      flex: 1, padding: '12px 16px', borderRadius: '0 12px 12px 0',
-                      border: '2px solid #E0E0E0', fontSize: 14, outline: 'none',
-                      fontFamily: 'inherit',
-                    }}
-                  />
-                </div>
-
-                <button
-                  onClick={async () => {
-                    if (!whatsappNumber || whatsappNumber.length < 9) return;
-                    setWhatsappSending(true);
-                    setWhatsappError('');
-
-                    const result = await sendWhatsAppConfirmation(
-                      whatsappNumber,
-                      lang,
-                      day,
-                      time,
-                    );
-                    setWhatsappSending(false);
-                    if (result.success) {
-                      setWhatsappSent(true);
-                    } else {
-                      setWhatsappError(
-                        lang === 'ar' ? 'ما قدرناش نوجدو الرسالة. عاودي مرة أخرى.' :
-                        lang === 'fr' ? 'Impossible d\'envoyer. Réessayez.' :
-                        lang === 'es' ? 'No se pudo enviar. Inténtelo de nuevo.' :
-                        lang === 'de' ? 'Senden fehlgeschlagen. Versuchen Sie es erneut.' :
-                        lang === 'ru' ? 'Не удалось отправить. Попробуйте снова.' :
-                        lang === 'pt' ? 'Não foi possível enviar. Tente novamente.' :
-                        'Could not send. Please try again.'
-                      );
-                    }
-                  }}
-                  disabled={whatsappSending || !whatsappNumber || whatsappNumber.length < 9}
-                  style={{
-                    width: '100%', padding: '14px', borderRadius: 12,
-                    background: whatsappSending ? '#ccc' : '#25D366',
-                    color: 'white', border: 'none', fontSize: 15,
-                    fontWeight: 700, cursor: whatsappSending ? 'wait' : 'pointer',
-                    fontFamily: 'inherit',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  }}
-                >
-                  {whatsappSending
-                    ? (lang === 'ar' ? '⏳ كنوجد...' :
-                       lang === 'fr' ? '⏳ Envoi...' :
-                       lang === 'es' ? '⏳ Enviando...' :
-                       lang === 'de' ? '⏳ Wird gesendet...' :
-                       lang === 'ru' ? '⏳ Отправка...' :
-                       lang === 'pt' ? '⏳ Enviando...' :
-                       '⏳ Sending...')
-                    : (lang === 'ar' ? '💬 فعّلي التذكير بالواتساب' :
-                       lang === 'fr' ? '💬 Activer le rappel WhatsApp' :
-                       lang === 'es' ? '💬 Activar recordatorio WhatsApp' :
-                       lang === 'de' ? '💬 WhatsApp-Erinnerung aktivieren' :
-                       lang === 'ru' ? '💬 Активировать напоминание WhatsApp' :
-                       lang === 'pt' ? '💬 Ativar lembrete WhatsApp' :
-                       '💬 Activate WhatsApp Reminder')}
-                </button>
-
-                {whatsappError && (
-                  <p style={{ color: '#DC2626', fontSize: 12, marginTop: 8, textAlign: 'center' }}>{whatsappError}</p>
-                )}
-              </>
-            )}
-
-            {whatsappSent && (
-              <div style={{ textAlign: 'center', padding: 16 }}>
-                <span style={{ fontSize: 48 }}>✅</span>
-                <p style={{ fontSize: 16, fontWeight: 700, color: '#25D366', marginTop: 8 }}>
-                  {lang === 'ar' ? 'التذكير مفعّل! شوفي الواتساب 💬' :
-                   lang === 'fr' ? 'Rappel activé ! Vérifiez WhatsApp 💬' :
-                   lang === 'es' ? '¡Recordatorio activado! Revise WhatsApp 💬' :
-                   lang === 'de' ? 'Erinnerung aktiviert! Prüfen Sie WhatsApp 💬' :
-                   lang === 'ru' ? 'Напоминание активировано! Проверьте WhatsApp 💬' :
-                   lang === 'pt' ? 'Lembrete ativado! Verifique o WhatsApp 💬' :
-                   'Reminder activated! Check WhatsApp 💬'}
-                </p>
-                <p style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
-                  {lang === 'ar' ? 'توصلك رسالة تأكيد + تذكير كل شهر' :
-                   lang === 'fr' ? 'Vous recevrez une confirmation + rappel mensuel' :
-                   lang === 'es' ? 'Recibirá confirmación + recordatorio mensual' :
-                   lang === 'de' ? 'Sie erhalten Bestätigung + monatliche Erinnerung' :
-                   lang === 'ru' ? 'Вы получите подтверждение + ежемесячное напоминание' :
-                   lang === 'pt' ? 'Você receberá confirmação + lembrete mensal' :
-                   'You will receive confirmation + monthly reminder'}
-                </p>
-              </div>
-            )}
-
-            {!whatsappAvailable && (
-              <p style={{ fontSize: 12, color: '#999', textAlign: 'center' }}>
-                {lang === 'ar' ? 'خدمة الواتساب غير متوفرة حالياً. جربي الإشعارات 🔔' :
-                 lang === 'fr' ? 'Service WhatsApp non disponible. Essayez les notifications 🔔' :
-                 lang === 'es' ? 'Servicio WhatsApp no disponible. Pruebe notificaciones 🔔' :
-                 lang === 'de' ? 'WhatsApp-Dienst nicht verfügbar. Versuchen Sie Benachrichtigungen 🔔' :
-                 lang === 'ru' ? 'WhatsApp недоступен. Попробуйте уведомления 🔔' :
-                 lang === 'pt' ? 'Serviço WhatsApp indisponível. Tente notificações 🔔' :
-                 'WhatsApp service not available. Try notifications 🔔'}
-              </p>
-            )}
           </div>
 
           {USE_MOCK && <p className="mt-3 text-sm font-semibold leading-6 text-muted">{r.demoNote}</p>}
@@ -556,6 +569,8 @@ export function ReminderPage() {
           {day != null && time != null && (
             <StepCard>
               <h2 className="text-xl font-black text-ink">{r.stepMethodTitle}</h2>
+
+              {/* Top row: Browser Push + Email (equal width) */}
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {METHOD_META.map(({ key, emoji }) => {
                   const selected = methods.includes(key);
@@ -566,10 +581,11 @@ export function ReminderPage() {
                       onClick={() => toggleMethod(key)}
                       aria-pressed={selected}
                       className={cn(
-                        'flex min-h-[88px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 p-3 text-center text-sm font-black transition',
+                        'relative flex min-h-[88px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 p-3 text-center text-sm font-black transition',
                         selected ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-line bg-white/55 text-muted',
                       )}
                     >
+                      {selected && <CheckCircle2 className="absolute end-2 top-2 text-primary-500" size={18} />}
                       <span className="text-2xl" aria-hidden>{emoji}</span>
                       {r.methods[key].label}
                     </button>
@@ -577,6 +593,32 @@ export function ReminderPage() {
                 })}
               </div>
 
+              {/* Bottom row: WhatsApp (full width, slightly bigger). Disabled when unavailable. */}
+              <button
+                type="button"
+                onClick={() => whatsappAvailable && toggleMethod('whatsapp')}
+                disabled={!whatsappAvailable}
+                aria-pressed={methods.includes('whatsapp')}
+                className={cn(
+                  'relative mt-2 flex min-h-[104px] w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 p-4 text-center text-base font-black transition',
+                  !whatsappAvailable
+                    ? 'cursor-not-allowed border-line bg-gray-100 text-gray-400 opacity-60'
+                    : methods.includes('whatsapp')
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-line bg-white/55 text-muted',
+                )}
+              >
+                {whatsappAvailable && methods.includes('whatsapp') && (
+                  <CheckCircle2 className="absolute end-2 top-2 text-primary-500" size={20} />
+                )}
+                <span className="text-3xl" aria-hidden>💬</span>
+                {tr(WA_LABEL, lang)}
+                {!whatsappAvailable && (
+                  <span className="text-xs font-bold text-gray-400">{tr(WA_UNAVAILABLE, lang)}</span>
+                )}
+              </button>
+
+              {/* Email input — below the cards, only when Email is selected. */}
               <AnimatePresence>
                 {methods.includes('email') && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
@@ -598,6 +640,30 @@ export function ReminderPage() {
                 )}
               </AnimatePresence>
 
+              {/* WhatsApp number — below the cards, only when WhatsApp is selected. */}
+              <AnimatePresence>
+                {methods.includes('whatsapp') && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <div className="mt-4">
+                      <label htmlFor="reminder-wa" className="text-sm font-black text-muted">{r.phoneLabel}</label>
+                      <div className="mt-2 flex min-h-12 items-center overflow-hidden rounded-2xl border border-line bg-white/70 focus-within:border-primary-300" dir="ltr">
+                        <span className="grid h-12 place-items-center bg-primary-50 px-3 font-black text-primary-700">+212</span>
+                        <input
+                          id="reminder-wa"
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          value={whatsappNumber}
+                          onChange={(e) => setWhatsappNumber(e.target.value.replace(/[^0-9]/g, ''))}
+                          placeholder="6 00 00 00 00"
+                          className="min-w-0 flex-1 bg-transparent px-3 font-bold text-ink outline-none"
+                        />
+                      </div>
+                      {!whatsappOk && whatsappNumber.length > 0 && <p className="mt-1.5 text-sm font-bold text-risk-high">{r.phoneInvalid}</p>}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </StepCard>
           )}
         </AnimatePresence>
@@ -606,7 +672,7 @@ export function ReminderPage() {
         <AnimatePresence>
           {day != null && time != null && methods.length > 0 && (
             <StepCard>
-              <Button fullWidth size="lg" leftIcon={<Bell size={18} />} disabled={!canActivate} onClick={activate}>
+              <Button fullWidth size="lg" leftIcon={<Bell size={18} />} disabled={!canActivate || activating} onClick={activate}>
                 {r.activateBtn}
               </Button>
             </StepCard>

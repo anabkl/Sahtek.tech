@@ -7,6 +7,9 @@ const STORAGE_KEY = 'sahtek_selfcheck';
 const MAX_AGE = 24 * 60 * 60 * 1000; // 24h
 
 export interface SelfCheckSnapshot {
+  /** Which phase the user was in — 'active' (mid-steps) or 'done' (completed,
+   * reminder CTA showing). 'intro' is never persisted. */
+  stage: SelfCheckStage;
   currentStep: number;
   timerSeconds: number;
   timerState: 'idle' | 'running' | 'paused';
@@ -25,6 +28,8 @@ function readSnapshot(): SelfCheckSnapshot | null {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
+    // Older snapshots predate `stage` — they were only ever written mid-session.
+    if (s.stage !== 'active' && s.stage !== 'done') s.stage = 'active';
     return s;
   } catch {
     return null;
@@ -52,7 +57,7 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
   // is stored, in which case we start clean at the intro.
   const [restored] = useState(() => readSnapshot());
 
-  const [stage, setStage] = useState<SelfCheckStage>(restored ? 'active' : 'intro');
+  const [stage, setStage] = useState<SelfCheckStage>(restored?.stage ?? 'intro');
   const [index, setIndex] = useState(() =>
     restored ? clampIndex((restored.currentStep ?? 1) - 1, steps.length) : 0,
   );
@@ -63,7 +68,8 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
   const [direction, setDirection] = useState(1);
 
   // Skip the first step-change reset so a restored countdown isn't overwritten.
-  const restoringRef = useRef(!!restored);
+  // Only matters when resuming an active session — a restored 'done' has no timer.
+  const restoringRef = useRef(restored?.stage === 'active');
 
   const total = steps.length;
   const current = steps[index];
@@ -83,13 +89,17 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     }
   }, [index, stage, steps]);
 
-  // Persist the live session on every change while active; clear it when done.
+  // Persist the session on every change once started (active steps OR the
+  // completed 'done' phase), so navigating away and back lands the user exactly
+  // where she left off — including on the post-completion reminder screen. Only
+  // the untouched intro is left unsaved. Cleared explicitly on restart / expiry.
   useEffect(() => {
-    if (stage !== 'active') return;
+    if (stage === 'intro') return;
     try {
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
+          stage,
           currentStep: index + 1,
           timerSeconds: remaining,
           timerState: paused ? 'paused' : 'running',
@@ -101,10 +111,6 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
       /* storage unavailable — keep in-memory state only */
     }
   }, [stage, index, remaining, paused, completedSteps]);
-
-  useEffect(() => {
-    if (stage === 'done') clearSnapshot();
-  }, [stage]);
 
   // Tick the countdown once per second while running. The interval is created
   // once per run/pause cycle (not re-created each second) — the functional

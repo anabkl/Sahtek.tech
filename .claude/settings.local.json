@@ -17,7 +17,8 @@
       "mcp__ide__getDiagnostics",
       "PowerShell(npm run *)",
       "mcp__gbrain__search",
-      "mcp__gbrain__code_def"
+      "mcp__gbrain__code_def",
+      "Bash(node *)"
     ]
   }
 }

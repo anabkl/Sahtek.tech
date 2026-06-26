@@ -1,571 +1,720 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Crosshair, MapPin, Phone, Search, Stethoscope } from 'lucide-react';
-import 'leaflet/dist/leaflet.css';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import { PageTransition } from '@/components/layout/PageTransition';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { useLanguage, interpolate } from '@/hooks/useLanguage';
-import { cn } from '@/utils/cn';
+// Full rebuild — no Leaflet, pure MapLibre (mapcn pattern)
 
-// --- Leaflet default-marker fix (broken bundler asset paths in Vite) ----------
-delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
+import { Map as MlMap, Marker, Popup, NavigationControl } from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
-// --- Types --------------------------------------------------------------------
-type Specialty = 'oncologist' | 'radiologist' | 'gynecologist' | 'general';
-type Filter = 'all' | 'oncologist' | 'radiologist' | 'gynecologist';
-
-interface Doctor {
-  id: string;
+// ── Types ──
+interface MedicalFacility {
+  id: number;
   name: string;
-  specialty: Specialty;
+  type: 'hospital' | 'clinic' | 'doctor' | 'pharmacy' | 'laboratory';
+  specialty: string;
+  lat: number;
+  lng: number;
   address: string;
   phone: string;
-  lat: number;
-  lng: number;
-  distanceKm: number;
+  distance: number; // km
 }
 
-interface LatLng {
-  lat: number;
-  lng: number;
-}
-
-// --- Constants ----------------------------------------------------------------
-const DEFAULT_LOCATION: LatLng = { lat: 32.8811, lng: -6.9063 }; // Khouribga
-const RADIUS_STEPS = [5000, 10000, 20000];
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-const CACHE_PREFIX = 'sahtek:doctors';
-
-const SPECIALTY_COLOR: Record<Specialty, string> = {
-  oncologist: '#DC2626',
-  radiologist: '#3B82F6',
-  gynecologist: '#D63384',
-  general: '#14B8A6',
+// ── Translations ──
+const T: Record<string, Record<string, string>> = {
+  title: {
+    ar: 'لقاي طبيب قريب منك', fr: 'Trouvez un médecin près de chez vous',
+    en: 'Find a doctor near you', es: 'Encuentra un médico cerca de ti',
+    de: 'Finden Sie einen Arzt in Ihrer Nähe', ru: 'Найдите врача рядом',
+    pt: 'Encontre um médico perto de você',
+  },
+  subtitle: {
+    ar: 'أطباء ومستشفيات ومراكز صحية قريبين منك',
+    fr: 'Médecins, hôpitaux et centres de santé à proximité',
+    en: 'Doctors, hospitals and health centers nearby',
+    es: 'Médicos, hospitales y centros de salud cercanos',
+    de: 'Ärzte, Krankenhäuser und Gesundheitszentren in der Nähe',
+    ru: 'Врачи, больницы и медцентры поблизости',
+    pt: 'Médicos, hospitais e centros de saúde próximos',
+  },
+  searchPlaceholder: {
+    ar: 'ابحثي عن مدينة...', fr: 'Rechercher une ville...',
+    en: 'Search for a city...', es: 'Buscar una ciudad...',
+    de: 'Stadt suchen...', ru: 'Поиск города...', pt: 'Pesquisar cidade...',
+  },
+  detectLocation: {
+    ar: '📍 حددي موقعك', fr: '📍 Détecter ma position',
+    en: '📍 Detect my location', es: '📍 Detectar ubicación',
+    de: '📍 Standort erkennen', ru: '📍 Определить местоположение',
+    pt: '📍 Detectar localização',
+  },
+  loading: {
+    ar: '⏳ كنقلّبو على أطباء قريبين...', fr: '⏳ Recherche en cours...',
+    en: '⏳ Searching for nearby doctors...', es: '⏳ Buscando médicos cercanos...',
+    de: '⏳ Suche nach Ärzten...', ru: '⏳ Поиск ближайших врачей...',
+    pt: '⏳ Procurando médicos próximos...',
+  },
+  noResults: {
+    ar: 'ما لقيناش مرافق طبية. زيدي المسافة أو بدّلي المدينة.',
+    fr: 'Aucun résultat. Élargissez la zone ou changez de ville.',
+    en: 'No results found. Try expanding the radius or changing city.',
+    es: 'Sin resultados. Amplíe el radio o cambie de ciudad.',
+    de: 'Keine Ergebnisse. Erweitern Sie den Radius oder ändern Sie die Stadt.',
+    ru: 'Ничего не найдено. Расширьте радиус или смените город.',
+    pt: 'Nenhum resultado. Amplie o raio ou mude de cidade.',
+  },
+  km: {
+    ar: 'كم', fr: 'km', en: 'km', es: 'km', de: 'km', ru: 'км', pt: 'km',
+  },
+  call: {
+    ar: '📞 اتصلي', fr: '📞 Appeler', en: '📞 Call',
+    es: '📞 Llamar', de: '📞 Anrufen', ru: '📞 Позвонить', pt: '📞 Ligar',
+  },
+  filterAll: { ar: 'الكل', fr: 'Tous', en: 'All', es: 'Todos', de: 'Alle', ru: 'Все', pt: 'Todos' },
+  filterHospital: { ar: 'مستشفيات', fr: 'Hôpitaux', en: 'Hospitals', es: 'Hospitales', de: 'Krankenhäuser', ru: 'Больницы', pt: 'Hospitais' },
+  filterClinic: { ar: 'عيادات', fr: 'Cliniques', en: 'Clinics', es: 'Clínicas', de: 'Kliniken', ru: 'Клиники', pt: 'Clínicas' },
+  filterDoctor: { ar: 'أطباء', fr: 'Médecins', en: 'Doctors', es: 'Médicos', de: 'Ärzte', ru: 'Врачи', pt: 'Médicos' },
+  filterPharmacy: { ar: 'صيدليات', fr: 'Pharmacies', en: 'Pharmacies', es: 'Farmacias', de: 'Apotheken', ru: 'Аптеки', pt: 'Farmácias' },
+  radius: { ar: 'المسافة', fr: 'Rayon', en: 'Radius', es: 'Radio', de: 'Radius', ru: 'Радиус', pt: 'Raio' },
+  found: { ar: 'مرفق طبي', fr: 'établissements trouvés', en: 'facilities found', es: 'centros encontrados', de: 'Einrichtungen gefunden', ru: 'учреждений найдено', pt: 'estabelecimentos encontrados' },
+  geoUnsupported: {
+    ar: 'المتصفح ما كيدعمش تحديد الموقع',
+    fr: "La géolocalisation n'est pas prise en charge",
+    en: 'Geolocation is not supported',
+    es: 'La geolocalización no es compatible',
+    de: 'Geolokalisierung wird nicht unterstützt',
+    ru: 'Геолокация не поддерживается',
+    pt: 'A geolocalização não é suportada',
+  },
+  geoFailed: {
+    ar: 'ما قدرناش نحددو موقعك. دخلي اسم المدينة.',
+    fr: 'Impossible de détecter votre position. Saisissez une ville.',
+    en: 'Could not detect your location. Enter a city name.',
+    es: 'No se pudo detectar su ubicación. Ingrese una ciudad.',
+    de: 'Standort konnte nicht erkannt werden. Geben Sie eine Stadt ein.',
+    ru: 'Не удалось определить местоположение. Введите город.',
+    pt: 'Não foi possível detectar sua localização. Digite uma cidade.',
+  },
+  cityNotFound: {
+    ar: 'ما لقيناش هاد المدينة',
+    fr: 'Ville introuvable',
+    en: 'City not found',
+    es: 'Ciudad no encontrada',
+    de: 'Stadt nicht gefunden',
+    ru: 'Город не найден',
+    pt: 'Cidade não encontrada',
+  },
 };
 
-const SPECIALTY_BADGE: Record<Specialty, 'high' | 'info' | 'primary' | 'neutral'> = {
-  oncologist: 'high',
-  radiologist: 'info',
-  gynecologist: 'primary',
-  general: 'neutral',
+// ── Facility type colors ──
+const TYPE_COLORS: Record<string, string> = {
+  hospital: '#DC2626',
+  clinic: '#D63384',
+  doctor: '#3B82F6',
+  pharmacy: '#16A34A',
+  laboratory: '#8B5CF6',
 };
 
-// Major Moroccan cancer / care centers — used to supplement sparse OSM data.
-const MOROCCAN_CENTERS: Omit<Doctor, 'distanceKm'>[] = [
-  { id: 'mc-ino', name: "Institut National d'Oncologie", lat: 33.9716, lng: -6.8498, specialty: 'oncologist', address: 'Rabat', phone: '0537712747' },
-  { id: 'mc-lalla-salma', name: "Centre d'Oncologie Lalla Salma", lat: 33.5731, lng: -7.5898, specialty: 'oncologist', address: 'Casablanca', phone: '0522202020' },
-  { id: 'mc-chu-marrakech', name: 'CHU Mohammed VI - Oncologie', lat: 31.6295, lng: -7.9811, specialty: 'oncologist', address: 'Marrakech', phone: '0524434813' },
-  { id: 'mc-hassan2-fes', name: "Centre Regional d'Oncologie Hassan II", lat: 34.0331, lng: -5.0003, specialty: 'oncologist', address: 'Fes', phone: '0535619153' },
-  { id: 'mc-khouribga', name: 'Hopital Provincial de Khouribga', lat: 32.8811, lng: -6.9063, specialty: 'gynecologist', address: 'Khouribga', phone: '0523492110' },
-  { id: 'mc-beni-mellal', name: 'Centre Hospitalier Regional Beni Mellal', lat: 32.3373, lng: -6.3498, specialty: 'oncologist', address: 'Beni Mellal', phone: '0523483821' },
-];
+const TYPE_ICONS: Record<string, string> = {
+  hospital: '🏥',
+  clinic: '🩺',
+  doctor: '👩‍⚕️',
+  pharmacy: '💊',
+  laboratory: '🔬',
+};
 
-// --- Helpers ------------------------------------------------------------------
-function haversineKm(a: LatLng, b: LatLng): number {
-  const R = 6371;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const lat1 = (a.lat * Math.PI) / 180;
-  const lat2 = (b.lat * Math.PI) / 180;
-  const h = Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-
-function classifySpecialty(tags: Record<string, string> | undefined): Specialty {
-  const raw = `${tags?.['healthcare:speciality'] ?? ''} ${tags?.healthcare ?? ''} ${tags?.name ?? ''}`.toLowerCase();
-  if (/oncolog|cancer|tumour|tumor/.test(raw)) return 'oncologist';
-  if (/radiolog|imaging|imagerie|scanner|mammograph/.test(raw)) return 'radiologist';
-  if (/gyn|gynaecolog|gynecolog|obstetric|maternit/.test(raw)) return 'gynecologist';
-  return 'general';
-}
-
-interface OverpassElement {
-  id: number;
-  lat?: number;
-  lon?: number;
-  tags?: Record<string, string>;
-}
-
-function readCache(key: string): Omit<Doctor, 'distanceKm'>[] | null {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { ts: number; data: Omit<Doctor, 'distanceKm'>[] };
-    if (Date.now() - parsed.ts > CACHE_TTL_MS) return null;
-    return parsed.data;
-  } catch {
-    return null;
-  }
-}
-
-function writeCache(key: string, data: Omit<Doctor, 'distanceKm'>[]) {
-  try {
-    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
-  } catch {
-    /* storage full or unavailable — ignore */
-  }
-}
-
-async function fetchOverpass(loc: LatLng, radius: number, fallbackName: string): Promise<Omit<Doctor, 'distanceKm'>[]> {
-  const cacheKey = `${CACHE_PREFIX}:${loc.lat.toFixed(2)}:${loc.lng.toFixed(2)}:${radius}`;
-  const cached = readCache(cacheKey);
-  if (cached) return cached;
-
-  const query = `[out:json][timeout:15];(
-    node["amenity"="doctors"](around:${radius},${loc.lat},${loc.lng});
-    node["amenity"="hospital"](around:${radius},${loc.lat},${loc.lng});
-    node["amenity"="clinic"](around:${radius},${loc.lat},${loc.lng});
-    node["healthcare"="doctor"](around:${radius},${loc.lat},${loc.lng});
-    node["healthcare"="centre"](around:${radius},${loc.lat},${loc.lng});
-  );out body 60;`;
+// ── Overpass API: find medical facilities ──
+async function searchMedicalFacilities(
+  lat: number, lng: number, radiusKm: number,
+): Promise<MedicalFacility[]> {
+  const radiusM = radiusKm * 1000;
+  const query = `
+    [out:json][timeout:15];
+    (
+      node["amenity"="hospital"](around:${radiusM},${lat},${lng});
+      node["amenity"="clinic"](around:${radiusM},${lat},${lng});
+      node["amenity"="doctors"](around:${radiusM},${lat},${lng});
+      node["amenity"="pharmacy"](around:${radiusM},${lat},${lng});
+      node["healthcare"="doctor"](around:${radiusM},${lat},${lng});
+      node["healthcare"="clinic"](around:${radiusM},${lat},${lng});
+      node["healthcare"="hospital"](around:${radiusM},${lat},${lng});
+      node["healthcare"="centre"](around:${radiusM},${lat},${lng});
+      node["healthcare"="laboratory"](around:${radiusM},${lat},${lng});
+      way["amenity"="hospital"](around:${radiusM},${lat},${lng});
+      way["amenity"="clinic"](around:${radiusM},${lat},${lng});
+    );
+    out body center;
+  `;
 
   const res = await fetch('https://overpass-api.de/api/interpreter', {
     method: 'POST',
     body: `data=${encodeURIComponent(query)}`,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
-  if (!res.ok) throw new Error(`Overpass ${res.status}`);
-  const data = (await res.json()) as { elements: OverpassElement[] };
 
-  const doctors = data.elements
-    .filter((el) => typeof el.lat === 'number' && typeof el.lon === 'number')
-    .map((el) => ({
-      id: `osm-${el.id}`,
-      name: el.tags?.name || fallbackName,
-      specialty: classifySpecialty(el.tags),
-      address: el.tags?.['addr:street'] || el.tags?.['addr:city'] || '',
-      phone: el.tags?.phone || el.tags?.['contact:phone'] || '',
-      lat: el.lat as number,
-      lng: el.lon as number,
-    }));
+  const data = await res.json();
 
-  writeCache(cacheKey, doctors);
-  return doctors;
+  return (data.elements ?? [])
+    .filter((el: any) => (el.lat && el.lon) || el.center)
+    .map((el: any) => {
+      const elLat = el.lat || el.center?.lat;
+      const elLng = el.lon || el.center?.lon;
+      const amenity = el.tags?.amenity || el.tags?.healthcare || 'doctor';
+
+      let type: MedicalFacility['type'] = 'doctor';
+      if (amenity === 'hospital') type = 'hospital';
+      else if (amenity === 'clinic' || amenity === 'centre') type = 'clinic';
+      else if (amenity === 'pharmacy') type = 'pharmacy';
+      else if (amenity === 'laboratory') type = 'laboratory';
+
+      const specialty = el.tags?.['healthcare:speciality'] ||
+                        el.tags?.['medical_system:specialty'] || '';
+
+      const dist = haversineDistance(lat, lng, elLat, elLng);
+
+      return {
+        id: el.id,
+        name: el.tags?.name || el.tags?.['name:ar'] || el.tags?.['name:fr'] ||
+              (type === 'hospital' ? 'Hospital' : type === 'pharmacy' ? 'Pharmacy' : 'Medical Facility'),
+        type,
+        specialty,
+        lat: elLat,
+        lng: elLng,
+        address: [el.tags?.['addr:street'], el.tags?.['addr:city']].filter(Boolean).join(', ') || '',
+        phone: el.tags?.phone || el.tags?.['contact:phone'] || '',
+        distance: Math.round(dist * 10) / 10,
+      } as MedicalFacility;
+    })
+    .sort((a: MedicalFacility, b: MedicalFacility) => a.distance - b.distance);
 }
 
-// --- Map controller: flies to a target when `view` changes --------------------
-function MapController({ view }: { view: { lat: number; lng: number; zoom: number; nonce: number } }) {
-  const map = useMap();
+function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ── Geocoding with Nominatim (free) ──
+async function geocodeCity(query: string): Promise<{ lat: number; lng: number; name: string } | null> {
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+  const data = await res.json();
+  if (data.length === 0) return null;
+  return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), name: data[0].display_name.split(',')[0] };
+}
+
+// ── Main Component ──
+export default function DoctorsPage() {
+  const { lang } = useLanguage();
+  const t = (key: string) => T[key]?.[lang] || T[key]?.en || key;
+
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<MlMap | null>(null);
+  const markersRef = useRef<Marker[]>([]);
+  const userMarkerRef = useRef<Marker | null>(null);
+
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [cityName, setCityName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [facilities, setFacilities] = useState<MedicalFacility[]>([]);
+  const [filteredFacilities, setFilteredFacilities] = useState<MedicalFacility[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [radius, setRadius] = useState(5);
+  const [selectedFacility, setSelectedFacility] = useState<MedicalFacility | null>(null);
+  const [locationError, setLocationError] = useState('');
+
+  // Autocomplete suggestions (Nominatim), nearest-first when location is known.
+  const [suggestions, setSuggestions] = useState<Array<{ display_name: string; lat: string; lon: string; type: string }>>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Drop / move the "you are here" marker (single instance) ──
+  const setUserMarker = useCallback((loc: { lat: number; lng: number }) => {
+    if (!mapRef.current) return;
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setLngLat([loc.lng, loc.lat]);
+      return;
+    }
+    const el = document.createElement('div');
+    el.innerHTML = '📍';
+    el.style.fontSize = '28px';
+    el.style.cursor = 'pointer';
+    el.setAttribute('aria-label', 'Your location');
+    userMarkerRef.current = new Marker({ element: el }).setLngLat([loc.lng, loc.lat]).addTo(mapRef.current);
+  }, []);
+
+  // ── Search nearby facilities ──
+  const searchNearby = useCallback(async (lat: number, lng: number, rad: number) => {
+    setLoading(true);
+    try {
+      const results = await searchMedicalFacilities(lat, lng, rad);
+      setFacilities(results);
+      setFilteredFacilities(results);
+    } catch {
+      setFacilities([]);
+      setFilteredFacilities([]);
+    }
+    setLoading(false);
+  }, []);
+
+  // ── Initialize map ──
   useEffect(() => {
-    map.flyTo([view.lat, view.lng], view.zoom, { duration: 0.8 });
-  }, [view.nonce, map, view.lat, view.lng, view.zoom]);
-  return null;
-}
+    if (!mapContainer.current || mapRef.current) return;
 
-// --- Marker icons -------------------------------------------------------------
-const doctorIcon = (color: string) =>
-  L.divIcon({
-    className: '',
-    html: `<span style="display:block;width:22px;height:22px;border-radius:9999px;background:${color};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35)"></span>`,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-    popupAnchor: [0, -12],
-  });
+    const map = new MlMap({
+      container: mapContainer.current,
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
+      zoom: 2,
+    });
 
-const userIcon = L.divIcon({
-  className: '',
-  html: `<span class="sahtek-user-pin"><span class="sahtek-user-core"></span></span>`,
-  iconSize: [22, 22],
-  iconAnchor: [11, 11],
-});
+    map.addControl(new NavigationControl(), 'top-left');
+    mapRef.current = map;
 
-// --- Skeleton card ------------------------------------------------------------
-function SkeletonCard() {
-  return (
-    <div className="animate-pulse rounded-3xl border border-line bg-card p-4 shadow-petal">
-      <div className="h-4 w-2/3 rounded-full bg-line" />
-      <div className="mt-3 h-3 w-1/3 rounded-full bg-line" />
-      <div className="mt-4 h-9 w-24 rounded-full bg-line" />
-    </div>
-  );
-}
+    return () => { map.remove(); mapRef.current = null; userMarkerRef.current = null; };
+  }, []);
 
-// --- Page ---------------------------------------------------------------------
-export function DoctorsPage() {
-  const { t } = useLanguage();
+  // ── Detect user location ──
+  const detectLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationError(t('geoUnsupported'));
+      return;
+    }
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setUserLocation(loc);
+        setLocationError('');
 
-  const [location, setLocation] = useState<LatLng>(DEFAULT_LOCATION);
-  const [locationLabel, setLocationLabel] = useState<string>('');
-  const [radiusIndex, setRadiusIndex] = useState(0);
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [usedFallback, setUsedFallback] = useState(false);
-  const [filter, setFilter] = useState<Filter>('all');
-  const [city, setCity] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [detecting, setDetecting] = useState(false);
-  const [geocoding, setGeocoding] = useState(false);
-  const [notice, setNotice] = useState('');
-  const [view, setView] = useState({ ...DEFAULT_LOCATION, zoom: 12, nonce: 0 });
-
-  const markerRefs = useRef<Map<string, L.Marker>>(new Map());
-  const requestToken = useRef(0);
-
-  const radius = RADIUS_STEPS[radiusIndex];
-
-  // Load doctors around a location for the current radius.
-  const loadDoctors = useCallback(
-    async (loc: LatLng, radiusMeters: number) => {
-      const token = ++requestToken.current;
-      setLoading(true);
-      setNotice('');
-
-      let osm: Omit<Doctor, 'distanceKm'>[] = [];
-      try {
-        osm = await fetchOverpass(loc, radiusMeters, t.doctors.specialties.general);
-      } catch {
-        osm = [];
-      }
-      if (token !== requestToken.current) return; // a newer request superseded this one
-
-      const radiusKm = radiusMeters / 1000;
-      const withinStatic = MOROCCAN_CENTERS.filter((c) => haversineKm(loc, c) <= radiusKm);
-
-      // Merge + dedupe by rounded coordinate.
-      const seen = new Set<string>();
-      const merged: Omit<Doctor, 'distanceKm'>[] = [];
-      for (const item of [...osm, ...withinStatic]) {
-        const key = `${item.lat.toFixed(4)},${item.lng.toFixed(4)}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        merged.push(item);
-      }
-
-      let fallback = false;
-      if (merged.length < 3) {
-        // Sparse area — supplement with the national centers (nearest first).
-        fallback = true;
-        for (const c of MOROCCAN_CENTERS) {
-          const key = `${c.lat.toFixed(4)},${c.lng.toFixed(4)}`;
-          if (seen.has(key)) continue;
-          seen.add(key);
-          merged.push(c);
+        // Reverse geocode to a precise label (zoom 18 = building/street level).
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${loc.lat}&lon=${loc.lng}&format=json&zoom=18&addressdetails=1`,
+            { headers: { 'Accept-Language': lang } },
+          );
+          const data = await res.json();
+          const city = data.address?.city || data.address?.town ||
+                       data.address?.village || data.address?.suburb ||
+                       data.address?.municipality || '';
+          const street = data.address?.road || '';
+          setCityName(street ? `${street}, ${city}` : city);
+        } catch {
+          /* reverse geocode is best-effort */
         }
-      }
 
-      const ranked = merged
-        .map((d) => ({ ...d, distanceKm: haversineKm(loc, d) }))
-        .sort((a, b) => a.distanceKm - b.distanceKm);
+        // Closer view. Distances stay based on the RAW GPS fix (loc), never the city center.
+        mapRef.current?.flyTo({ center: [loc.lng, loc.lat], zoom: 14 });
+        setUserMarker(loc);
+        await searchNearby(loc.lat, loc.lng, radius);
+      },
+      () => {
+        setLoading(false);
+        setLocationError(t('geoFailed'));
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, radius, searchNearby, setUserMarker]);
 
-      setDoctors(ranked);
-      setUsedFallback(fallback);
-      setLoading(false);
-    },
-    [t.doctors.specialties.general],
-  );
-
-  // Initial load.
+  // ── Auto-detect location on mount ──
   useEffect(() => {
-    void loadDoctors(DEFAULT_LOCATION, RADIUS_STEPS[0]);
+    detectLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const recenter = (loc: LatLng, zoom = 13) => {
-    setLocation(loc);
-    setView({ ...loc, zoom, nonce: Date.now() });
-  };
-
-  // Reverse-geocode for a friendly city label (best-effort).
-  const reverseLabel = useCallback(async (loc: LatLng) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${loc.lat}&lon=${loc.lng}&format=json&accept-language=ar`,
-      );
-      const data = (await res.json()) as { address?: Record<string, string> };
-      const a = data.address ?? {};
-      setLocationLabel(a.city || a.town || a.village || a.county || a.state || '');
-    } catch {
-      setLocationLabel('');
-    }
+  // ── Close the autocomplete dropdown on any outside click ──
+  useEffect(() => {
+    const close = () => setShowSuggestions(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
   }, []);
 
-  const detectLocation = () => {
-    if (!navigator.geolocation) {
-      setNotice(t.doctors.locationError);
+  // ── City search (search button / Enter) ──
+  const handleCitySearch = async () => {
+    if (!searchQuery.trim()) return;
+    setShowSuggestions(false);
+    setLoading(true);
+    const geo = await geocodeCity(searchQuery);
+    if (geo) {
+      const loc = { lat: geo.lat, lng: geo.lng };
+      setUserLocation(loc);
+      setCityName(geo.name);
+      setLocationError('');
+      mapRef.current?.flyTo({ center: [geo.lng, geo.lat], zoom: 14 });
+      setUserMarker(loc);
+      await searchNearby(geo.lat, geo.lng, radius);
+    } else {
+      setLocationError(t('cityNotFound'));
+      setLoading(false);
+    }
+  };
+
+  // ── Smart autocomplete: debounced Nominatim lookup, nearest-first ──
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (value.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
       return;
     }
-    setDetecting(true);
-    setNotice('');
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setDetecting(false);
-        setRadiusIndex(0);
-        recenter(loc);
-        void reverseLabel(loc);
-        void loadDoctors(loc, RADIUS_STEPS[0]);
-      },
-      () => {
-        setDetecting(false);
-        setNotice(t.doctors.locationDenied);
-      },
-      { enableHighAccuracy: true, timeout: 8000 },
-    );
+    searchTimeout.current = setTimeout(async () => {
+      try {
+        // Bias toward the user's area (does not exclude far results — bounded=0).
+        const bias = userLocation
+          ? `&viewbox=${userLocation.lng - 2},${userLocation.lat - 2},${userLocation.lng + 2},${userLocation.lat + 2}&bounded=0`
+          : '';
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=8&addressdetails=1${bias}`,
+          { headers: { 'Accept-Language': lang } },
+        );
+        const data = await res.json();
+        const sorted = userLocation
+          ? [...data].sort(
+              (a: any, b: any) =>
+                haversineDistance(userLocation.lat, userLocation.lng, parseFloat(a.lat), parseFloat(a.lon)) -
+                haversineDistance(userLocation.lat, userLocation.lng, parseFloat(b.lat), parseFloat(b.lon)),
+            )
+          : data;
+        setSuggestions(sorted);
+        setShowSuggestions(true);
+      } catch {
+        setSuggestions([]);
+      }
+    }, 300);
   };
 
-  const searchCity = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const q = city.trim();
-    if (!q) return;
-    setGeocoding(true);
-    setNotice('');
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&countrycodes=ma&limit=1`,
-      );
-      const data = (await res.json()) as { lat: string; lon: string; display_name: string }[];
-      if (!data.length) {
-        setNotice(t.doctors.geocodeError);
-        return;
-      }
-      const loc = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-      setLocationLabel(data[0].display_name.split(',')[0]);
-      setRadiusIndex(0);
-      recenter(loc);
-      void loadDoctors(loc, RADIUS_STEPS[0]);
-    } catch {
-      setNotice(t.doctors.geocodeError);
-    } finally {
-      setGeocoding(false);
+  const selectSuggestion = async (s: { display_name: string; lat: string; lon: string }) => {
+    const lat = parseFloat(s.lat);
+    const lng = parseFloat(s.lon);
+    const label = s.display_name.split(',').slice(0, 2).join(',').trim();
+    setUserLocation({ lat, lng });
+    setCityName(label);
+    setSearchQuery(label);
+    setShowSuggestions(false);
+    setLocationError('');
+    mapRef.current?.flyTo({ center: [lng, lat], zoom: 14 });
+    setUserMarker({ lat, lng });
+    await searchNearby(lat, lng, radius);
+  };
+
+  // ── Update map markers ──
+  const updateMapMarkers = useCallback((facs: MedicalFacility[]) => {
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current = [];
+    if (!mapRef.current) return;
+
+    facs.forEach((fac) => {
+      const el = document.createElement('div');
+      el.style.width = '32px';
+      el.style.height = '32px';
+      el.style.borderRadius = '50%';
+      el.style.background = TYPE_COLORS[fac.type] || '#D63384';
+      el.style.border = '3px solid white';
+      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.justifyContent = 'center';
+      el.style.fontSize = '16px';
+      el.style.cursor = 'pointer';
+      el.textContent = TYPE_ICONS[fac.type] || '🩺';
+      el.setAttribute('aria-label', fac.name);
+
+      const popup = new Popup({ offset: 20, closeButton: false }).setHTML(`
+        <div style="padding:8px;font-family:inherit;min-width:180px">
+          <strong style="font-size:14px;color:#2D1F2D">${fac.name}</strong><br/>
+          <span style="font-size:11px;color:${TYPE_COLORS[fac.type]};font-weight:600">${TYPE_ICONS[fac.type]} ${fac.type}${fac.specialty ? ' — ' + fac.specialty : ''}</span><br/>
+          <span style="font-size:11px;color:#888">${fac.distance} ${t('km')}</span>
+          ${fac.address ? `<br/><span style="font-size:11px;color:#666">📍 ${fac.address}</span>` : ''}
+          ${fac.phone ? `<br/><a href="tel:${fac.phone}" style="font-size:12px;color:#D63384;font-weight:600">📞 ${fac.phone}</a>` : ''}
+        </div>
+      `);
+
+      const marker = new Marker({ element: el })
+        .setLngLat([fac.lng, fac.lat])
+        .setPopup(popup)
+        .addTo(mapRef.current!);
+
+      el.addEventListener('click', () => setSelectedFacility(fac));
+      markersRef.current.push(marker);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  // ── Filter ──
+  useEffect(() => {
+    if (activeFilter === 'all') {
+      setFilteredFacilities(facilities);
+    } else {
+      setFilteredFacilities(facilities.filter((f) => f.type === activeFilter));
+    }
+  }, [activeFilter, facilities]);
+
+  useEffect(() => {
+    updateMapMarkers(filteredFacilities);
+  }, [filteredFacilities, updateMapMarkers]);
+
+  // ── Radius change ──
+  const handleRadiusChange = async (newRadius: number) => {
+    setRadius(newRadius);
+    if (userLocation) {
+      await searchNearby(userLocation.lat, userLocation.lng, newRadius);
     }
   };
 
-  const expandRadius = () => {
-    const next = Math.min(radiusIndex + 1, RADIUS_STEPS.length - 1);
-    setRadiusIndex(next);
-    void loadDoctors(location, RADIUS_STEPS[next]);
-  };
-
-  const focusDoctor = (doc: Doctor) => {
-    setView({ lat: doc.lat, lng: doc.lng, zoom: 15, nonce: Date.now() });
-    const marker = markerRefs.current.get(doc.id);
-    if (marker) window.setTimeout(() => marker.openPopup(), 350);
-  };
-
-  const filtered = useMemo(
-    () => (filter === 'all' ? doctors : doctors.filter((d) => d.specialty === filter)),
-    [doctors, filter],
-  );
-
-  const filterOptions: { key: Filter; label: string; emoji: string }[] = [
-    { key: 'all', label: t.doctors.filters.all, emoji: '🩺' },
-    { key: 'oncologist', label: t.doctors.filters.oncologist, emoji: '🔬' },
-    { key: 'radiologist', label: t.doctors.filters.radiologist, emoji: '📡' },
-    { key: 'gynecologist', label: t.doctors.filters.gynecologist, emoji: '👩‍⚕️' },
+  const filters = [
+    { key: 'all', label: t('filterAll'), icon: '🏥' },
+    { key: 'hospital', label: t('filterHospital'), icon: '🏥' },
+    { key: 'clinic', label: t('filterClinic'), icon: '🩺' },
+    { key: 'doctor', label: t('filterDoctor'), icon: '👩‍⚕️' },
+    { key: 'pharmacy', label: t('filterPharmacy'), icon: '💊' },
   ];
 
-  const canExpand = radiusIndex < RADIUS_STEPS.length - 1;
-
   return (
-    <PageTransition>
-      <header className="mx-auto max-w-3xl text-center">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-rose-gradient text-white shadow-petal-lg">
-          <Stethoscope size={26} />
-        </div>
-        <h1 className="mt-4 text-4xl font-black text-ink">{t.doctors.title}</h1>
-        <p className="mt-2 text-lg font-medium leading-8 text-muted">{t.doctors.subtitle}</p>
-      </header>
+    <div style={{ padding: '24px 16px 100px', maxWidth: 1200, margin: '0 auto' }}>
+      {/* Header */}
+      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#D63384', textAlign: 'center', marginBottom: 4 }}>
+        🩺 {t('title')}
+      </h1>
+      <p style={{ textAlign: 'center', color: '#888', marginBottom: 20, fontSize: 14 }}>
+        {t('subtitle')}
+      </p>
 
       {/* Location bar */}
-      <section className="mx-auto mt-6 max-w-3xl rounded-[2rem] border border-white/70 bg-card/85 p-4 shadow-petal-xl sm:p-5">
-        <div className="grid gap-3 sm:grid-cols-[auto_1fr]">
-          <Button
-            variant="secondary"
-            onClick={detectLocation}
-            loading={detecting}
-            leftIcon={!detecting ? <Crosshair size={18} className="text-primary-500" /> : undefined}
-          >
-            {detecting ? t.doctors.detecting : t.doctors.detectBtn}
-          </Button>
-          <form onSubmit={searchCity} className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-              <input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder={t.doctors.searchPlaceholder}
-                aria-label={t.doctors.searchPlaceholder}
-                className="h-12 w-full rounded-full border border-line bg-card ps-9 pe-4 text-[15px] font-bold text-ink shadow-petal outline-none transition focus:border-primary-300"
-              />
-            </div>
-            <Button type="submit" loading={geocoding} className="shrink-0">
-              {t.doctors.searchBtn}
-            </Button>
-          </form>
-        </div>
-
-        {(locationLabel || notice) && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {locationLabel && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1.5 text-sm font-black text-primary-700">
-                <MapPin size={14} /> {locationLabel}
-              </span>
-            )}
-            {notice && <span className="text-sm font-bold text-risk-moderate">{notice}</span>}
-          </div>
-        )}
-
-        {/* Filters */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {filterOptions.map((opt) => (
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={detectLocation}
+          style={{
+            background: '#D63384', color: 'white', border: 'none',
+            borderRadius: 12, padding: '10px 16px', fontSize: 13,
+            fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {t('detectLocation')}
+        </button>
+        <div style={{ flex: 1, position: 'relative', minWidth: 200 }} onClick={(e) => e.stopPropagation()}>
+          <div style={{ display: 'flex', gap: 0 }}>
+            <input
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { setShowSuggestions(false); handleCitySearch(); } }}
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchPlaceholder')}
+              style={{
+                flex: 1, padding: '10px 14px', borderRadius: '12px 0 0 12px',
+                border: '2px solid #E0E0E0', fontSize: 13, outline: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
             <button
-              key={opt.key}
               type="button"
-              onClick={() => setFilter(opt.key)}
-              aria-pressed={filter === opt.key}
-              className={cn(
-                'focus-ring inline-flex h-10 items-center gap-1.5 rounded-full border px-4 text-sm font-black transition',
-                filter === opt.key
-                  ? 'border-primary-400 bg-rose-gradient text-white shadow-petal'
-                  : 'border-line bg-white/60 text-ink hover:border-primary-200',
-              )}
+              onClick={handleCitySearch}
+              aria-label={t('searchPlaceholder')}
+              style={{
+                background: '#F0F0F0', border: '2px solid #E0E0E0', borderLeft: 'none',
+                borderRadius: '0 12px 12px 0', padding: '10px 14px', cursor: 'pointer',
+                fontSize: 16,
+              }}
             >
-              <span aria-hidden>{opt.emoji}</span>
-              {opt.label}
+              🔍
             </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Map */}
-      <section className="mx-auto mt-6 max-w-5xl">
-        <div className="overflow-hidden rounded-3xl border border-white/70 shadow-petal-xl">
-          <MapContainer
-            center={[DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng]}
-            zoom={12}
-            scrollWheelZoom={false}
-            style={{ height: '60vh', width: '100%' }}
-          >
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution={t.doctors.attribution} />
-            <MapController view={view} />
-            <Marker position={[location.lat, location.lng]} icon={userIcon} zIndexOffset={1000}>
-              <Popup>{t.doctors.you}</Popup>
-            </Marker>
-            {filtered.map((doc) => (
-              <Marker
-                key={doc.id}
-                position={[doc.lat, doc.lng]}
-                icon={doctorIcon(SPECIALTY_COLOR[doc.specialty])}
-                ref={(ref) => {
-                  if (ref) markerRefs.current.set(doc.id, ref);
-                  else markerRefs.current.delete(doc.id);
-                }}
-              >
-                <Popup>
-                  <strong>{doc.name}</strong>
-                  <br />
-                  {t.doctors.specialties[doc.specialty]}
-                  {doc.address && (
-                    <>
-                      <br />
-                      {doc.address}
-                    </>
-                  )}
-                  {doc.phone && (
-                    <>
-                      <br />
-                      <a href={`tel:${doc.phone}`}>📞 {doc.phone}</a>
-                    </>
-                  )}
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-        <p className="mt-2 text-center text-xs font-semibold text-faint">{interpolate(t.doctors.radiusLabel, { km: radius / 1000 })}</p>
-      </section>
-
-      {/* Results */}
-      <section className="mx-auto mt-6 max-w-3xl">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-black text-ink">
-            {loading ? t.doctors.loading : interpolate(t.doctors.resultsCount, { n: filtered.length })}
-          </h2>
-        </div>
-
-        {usedFallback && !loading && (
-          <p className="mb-3 rounded-2xl bg-primary-50 p-3 text-sm font-bold text-primary-800">{t.doctors.fallbackNote}</p>
-        )}
-
-        {loading ? (
-          <div className="grid gap-3">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-3xl border border-line bg-card p-6 text-center shadow-petal">
-            <p className="text-4xl" aria-hidden>🔍</p>
-            <p className="mt-3 font-bold leading-7 text-muted">{t.doctors.noResults}</p>
-            {canExpand && (
-              <Button className="mt-4" variant="secondary" onClick={expandRadius}>
-                {interpolate(t.doctors.expandRadius, { km: RADIUS_STEPS[radiusIndex + 1] / 1000 })}
-              </Button>
-            )}
-          </div>
-        ) : (
-          <AnimatePresence mode="popLayout">
-            <div className="grid gap-3">
-              {filtered.map((doc, i) => (
-                <motion.article
-                  key={doc.id}
-                  layout
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: Math.min(i * 0.03, 0.3) }}
-                  onClick={() => focusDoctor(doc)}
-                  style={{ borderInlineStartWidth: 4, borderInlineStartColor: SPECIALTY_COLOR[doc.specialty] }}
-                  className="group cursor-pointer rounded-3xl border border-line bg-card p-4 shadow-petal transition hover:-translate-y-0.5 hover:shadow-petal-lg"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="truncate font-black text-ink">{doc.name}</h3>
-                      <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                        <Badge tone={SPECIALTY_BADGE[doc.specialty]}>{t.doctors.specialties[doc.specialty]}</Badge>
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-muted">
-                          <MapPin size={12} />
-                          {interpolate(t.doctors.distanceAway, { km: doc.distanceKm.toFixed(1) })}
-                        </span>
+
+          {/* Autocomplete dropdown */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, right: 0,
+              background: 'white', borderRadius: '0 0 12px 12px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+              zIndex: 100, maxHeight: 300, overflowY: 'auto',
+              border: '1px solid #E0E0E0', borderTop: 'none',
+            }}>
+              {suggestions.map((s, i) => {
+                const parts = s.display_name.split(',');
+                const mainName = parts[0]?.trim();
+                const subName = parts.slice(1, 3).join(',').trim();
+                const dist = userLocation
+                  ? Math.round(haversineDistance(userLocation.lat, userLocation.lng, parseFloat(s.lat), parseFloat(s.lon)))
+                  : null;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => selectSuggestion(s)}
+                    style={{
+                      padding: '10px 14px', cursor: 'pointer',
+                      borderBottom: i < suggestions.length - 1 ? '1px solid #F5F5F5' : 'none',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = '#FFF0F5')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+                  >
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#2D1F2D' }}>
+                        📍 {mainName}
                       </div>
-                      {doc.address && <p className="mt-1.5 truncate text-sm font-medium text-muted">{doc.address}</p>}
+                      <div style={{ fontSize: 11, color: '#888' }}>{subName}</div>
                     </div>
-                    {doc.phone && (
-                      <a
-                        href={`tel:${doc.phone}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="focus-ring inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-rose-gradient px-4 text-sm font-black text-white shadow-petal active:scale-95"
-                      >
-                        <Phone size={15} />
-                        {t.doctors.callBtn}
-                      </a>
+                    {dist !== null && (
+                      <span style={{ fontSize: 11, color: '#D63384', fontWeight: 600, flexShrink: 0 }}>
+                        ~{dist} {t('km')}
+                      </span>
                     )}
                   </div>
-                </motion.article>
-              ))}
+                );
+              })}
             </div>
-          </AnimatePresence>
-        )}
+          )}
+        </div>
+      </div>
 
-        {!loading && filtered.length > 0 && canExpand && (
-          <div className="mt-4 text-center">
-            <Button variant="outline" onClick={expandRadius}>
-              {interpolate(t.doctors.expandRadius, { km: RADIUS_STEPS[radiusIndex + 1] / 1000 })}
-            </Button>
+      {/* City name + radius */}
+      {cityName && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+          <span style={{ fontSize: 15, fontWeight: 600, color: '#2D1F2D' }}>
+            📍 {cityName} — {filteredFacilities.length} {t('found')}
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 12, color: '#888' }}>{t('radius')}:</span>
+            {[5, 10, 20, 50].map((rad) => (
+              <button
+                type="button"
+                key={rad}
+                onClick={() => handleRadiusChange(rad)}
+                style={{
+                  background: radius === rad ? '#D63384' : 'white',
+                  color: radius === rad ? 'white' : '#666',
+                  border: radius === rad ? 'none' : '1px solid #E0E0E0',
+                  borderRadius: 8, padding: '4px 10px', fontSize: 12,
+                  fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {rad}{t('km')}
+              </button>
+            ))}
           </div>
-        )}
-      </section>
-    </PageTransition>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto' }}>
+        {filters.map((f) => (
+          <button
+            type="button"
+            key={f.key}
+            onClick={() => setActiveFilter(f.key)}
+            style={{
+              background: activeFilter === f.key ? '#D63384' : 'white',
+              color: activeFilter === f.key ? 'white' : '#666',
+              border: activeFilter === f.key ? 'none' : '1px solid #E0E0E0',
+              borderRadius: 20, padding: '8px 16px', fontSize: 12,
+              fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+              fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4,
+            }}
+          >
+            {f.icon} {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Error */}
+      {locationError && (
+        <div style={{ background: '#FFF5F5', border: '1px solid #FED7D7', borderRadius: 12, padding: '10px 16px', marginBottom: 12, color: '#DC2626', fontSize: 13 }}>
+          {locationError}
+        </div>
+      )}
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ textAlign: 'center', padding: 20, color: '#D63384', fontSize: 14 }}>
+          {t('loading')}
+        </div>
+      )}
+
+      {/* Map */}
+      <div
+        ref={mapContainer}
+        role="region"
+        aria-label={t('title')}
+        style={{
+          width: '100%', height: '55vh', borderRadius: 20,
+          boxShadow: '0 4px 24px rgba(214,51,132,0.1)',
+          border: '2px solid #FFE0EC', marginBottom: 20,
+        }}
+      />
+
+      {/* No results */}
+      {!loading && facilities.length === 0 && userLocation && (
+        <div style={{ textAlign: 'center', padding: 24, color: '#888', fontSize: 14 }}>
+          {t('noResults')}
+        </div>
+      )}
+
+      {/* Facility cards list */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {filteredFacilities.slice(0, 20).map((fac) => (
+          <div
+            key={fac.id}
+            onClick={() => {
+              setSelectedFacility(fac);
+              mapRef.current?.flyTo({ center: [fac.lng, fac.lat], zoom: 16 });
+            }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 14,
+              background: selectedFacility?.id === fac.id ? '#FFF0F5' : 'white',
+              borderRadius: 16, padding: '14px 16px',
+              border: selectedFacility?.id === fac.id ? '2px solid #D63384' : '1px solid #F0E0EC',
+              cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              transition: 'all 0.2s',
+            }}
+          >
+            {/* Type icon */}
+            <div style={{
+              width: 44, height: 44, borderRadius: '50%',
+              background: (TYPE_COLORS[fac.type] || '#D63384') + '15',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 22, flexShrink: 0,
+            }}>
+              {TYPE_ICONS[fac.type]}
+            </div>
+
+            {/* Info */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#2D1F2D', marginBottom: 2 }}>
+                {fac.name}
+              </div>
+              <div style={{ fontSize: 11, color: TYPE_COLORS[fac.type], fontWeight: 600 }}>
+                {fac.type}{fac.specialty ? ' — ' + fac.specialty : ''}
+              </div>
+              {fac.address && (
+                <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>📍 {fac.address}</div>
+              )}
+            </div>
+
+            {/* Distance + call */}
+            <div style={{ textAlign: 'center', flexShrink: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#D63384' }}>
+                {fac.distance} {t('km')}
+              </div>
+              {fac.phone && (
+                <a
+                  href={`tel:${fac.phone}`}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    fontSize: 11, color: '#16A34A', fontWeight: 600,
+                    textDecoration: 'none', display: 'block', marginTop: 4,
+                  }}
+                >
+                  {t('call')}
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
-
-export default DoctorsPage;

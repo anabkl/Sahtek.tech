@@ -11,7 +11,7 @@ import { ChatPage } from '@/pages/ChatPage';
 import { ReminderPage } from '@/pages/ReminderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
-// Map page pulls in Leaflet — load it only when the route is visited.
+// Map page pulls in MapLibre — load it only when the route is visited.
 const DoctorsPage = lazy(() => import('@/pages/DoctorsPage'));
 
 function RouteFallback() {

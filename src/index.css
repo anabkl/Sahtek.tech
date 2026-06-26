@@ -137,55 +137,17 @@ h3 {
   }
 }
 
-/* -- Leaflet map (Find a Doctor) ----------------------------------- */
-.leaflet-container {
+/* -- MapLibre map (Find a Doctor) ---------------------------------- */
+.maplibregl-popup-content {
   font-family: inherit;
-}
-.leaflet-popup-content {
   font-weight: 600;
   color: #2d1f2d;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
-.leaflet-popup-content a {
+.maplibregl-popup-content a {
   color: #d63384;
   font-weight: 800;
-}
-
-/* Pulsing "you are here" marker. */
-.sahtek-user-pin {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-}
-.sahtek-user-core {
-  position: relative;
-  z-index: 1;
-  width: 14px;
-  height: 14px;
-  border-radius: 9999px;
-  background: #3b82f6;
-  border: 3px solid #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-}
-.sahtek-user-pin::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background: rgba(59, 130, 246, 0.45);
-  animation: sahtek-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-@keyframes sahtek-ping {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.9;
-  }
-  80%,
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
 }
 
 /* -- Honour reduced-motion preference ------------------------------ */

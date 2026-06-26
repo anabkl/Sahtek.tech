@@ -111,6 +111,16 @@ const CANCEL_LABEL: Record<string, string> = {
 const ENABLED_LABEL: Record<string, string> = {
   ar: '✅ مفعّل', fr: '✅ Activé', en: '✅ Enabled', es: '✅ Activado', de: '✅ Aktiviert', ru: '✅ Включено', pt: '✅ Ativado',
 };
+// Shown after a WhatsApp confirmation message is successfully delivered.
+const WA_CONFIRMATION_SENT: Record<string, string> = {
+  ar: '✅ وجدنا ليك رسالة تأكيد فالواتساب! شوفي الهاتف ديالك 📱',
+  fr: '✅ Un message de confirmation a été envoyé sur votre WhatsApp ! Vérifiez votre téléphone 📱',
+  en: '✅ A confirmation message has been sent to your WhatsApp! Check your phone 📱',
+  es: '✅ Se ha enviado un mensaje de confirmación a su WhatsApp! Revise su teléfono 📱',
+  de: '✅ Eine Bestätigungsnachricht wurde an Ihr WhatsApp gesendet! Prüfen Sie Ihr Telefon 📱',
+  ru: '✅ Подтверждение отправлено в WhatsApp! Проверьте телефон 📱',
+  pt: '✅ Uma mensagem de confirmação foi enviada ao seu WhatsApp! Verifique seu telefone 📱',
+};
 
 const tr = (rec: Record<string, string>, lang: string) => rec[lang] || rec.en;
 
@@ -215,6 +225,8 @@ export function ReminderPage() {
   // Inline edit state for the confirmed view (email / whatsapp number).
   const [editingField, setEditingField] = useState<null | 'email' | 'whatsapp'>(null);
   const [draft, setDraft] = useState('');
+  // True once a WhatsApp confirmation message has actually been delivered this session.
+  const [whatsappSent, setWhatsappSent] = useState(false);
 
   useEffect(() => {
     checkWhatsAppAvailable().then(setWhatsappAvailable);
@@ -288,7 +300,8 @@ export function ReminderPage() {
     // WhatsApp — fire the confirmation message immediately via the local OpenWA API.
     if (methods.includes('whatsapp') && whatsappAvailable) {
       const result = await sendWhatsAppConfirmation(whatsappNumber, lang, day, time);
-      if (!result.success) toast(tr(WA_SEND_FAIL, lang), 'error');
+      if (result.success) setWhatsappSent(true);
+      else toast(tr(WA_SEND_FAIL, lang), 'error');
     }
 
     writeSettings();
@@ -304,16 +317,23 @@ export function ReminderPage() {
     setEditingField(field);
   };
   const cancelEdit = () => setEditingField(null);
-  const saveEdit = () => {
+  const saveEdit = async () => {
     if (editingField === 'email') {
       setEmail(draft);
       writeSettings({ email: draft });
+      setEditingField(null);
     } else if (editingField === 'whatsapp') {
       const digits = draft.replace(/[^0-9]/g, '');
       setWhatsappNumber(digits);
       writeSettings({ whatsappNumber: digits });
+      setEditingField(null);
+      // Re-send the confirmation to the new number so the user gets it on WhatsApp.
+      if (whatsappAvailable && digits.length >= 9 && day != null && time != null) {
+        const result = await sendWhatsAppConfirmation(digits, lang, day, time);
+        if (result.success) setWhatsappSent(true);
+        else toast(tr(WA_SEND_FAIL, lang), 'error');
+      }
     }
-    setEditingField(null);
   };
 
   const timeLabel = time ? `${r.times[time].label} — ${TIME_CLOCK[time]}` : '';
@@ -444,6 +464,13 @@ export function ReminderPage() {
               )}
             </div>
           </div>
+
+          {/* WhatsApp confirmation delivered — tell the user to check their phone. */}
+          {whatsappSent && methods.includes('whatsapp') && (
+            <div className="mt-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-700">
+              {tr(WA_CONFIRMATION_SENT, lang)}
+            </div>
+          )}
 
           {methods.includes('push') && permissionStatus !== 'default' && (
             <div className="mt-4">

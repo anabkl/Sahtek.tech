@@ -11,23 +11,82 @@ import { useSpeech } from '@/hooks/useSpeech';
 import { formatDuration } from '@/utils/formatters';
 import type { SelfCheckStep } from '@/types/api';
 
+// Shared, language-independent metadata for the 5 self-check steps.
+const STEP_META = [
+  { step_number: 1, icon: 'mirror', duration_seconds: 60 },
+  { step_number: 2, icon: 'arms', duration_seconds: 45 },
+  { step_number: 3, icon: 'touch', duration_seconds: 90 },
+  { step_number: 4, icon: 'rest', duration_seconds: 90 },
+  { step_number: 5, icon: 'alert', duration_seconds: 30 },
+];
+
+type StepText = { title: string; instruction: string; tags: string[] };
+
+// Localized title / instruction / symptom tags for each step, in step order.
+// Every supported language is covered; unknown languages fall back to English.
+const STEP_TEXT: Record<string, StepText[]> = {
+  ar: [
+    { title: 'راقبي فالمرآة', instruction: 'وقفي قدام المرآة وشوفي واش كاين تغيير فالشكل، الحجم أو لون الجلد.', tags: ['تغيير فالحجم', 'تورم', 'تغيير فالجلد'] },
+    { title: 'رفعي يديك', instruction: 'رفعي يديك فوق راسك وراقبي نفس العلامات من زاوية جديدة.', tags: ['انكماش', 'اختلاف بين الجهتين'] },
+    { title: 'فحصي وانتي واقفة', instruction: 'استعملي أصابعك بحركات دائرية وضغط خفيف ثم متوسط.', tags: ['كتلة', 'ألم فبلاصة وحدة'] },
+    { title: 'فحصي وانتي مستلقية', instruction: 'حطي وسادة تحت الكتف وكرري الحركات على كل ثدي.', tags: ['فرق بين الثديين', 'صلابة'] },
+    { title: 'راقبي الحلمة', instruction: 'ضغطي بلطف وشوفي واش كاين إفراز غير عادي.', tags: ['إفرازات', 'دم', 'تغيير فالشكل'] },
+  ],
+  fr: [
+    { title: 'Observer au miroir', instruction: 'Regardez la forme, la taille et la peau.', tags: ['Forme', 'Taille', 'Peau'] },
+    { title: 'Lever les bras', instruction: 'Levez les bras et observez encore.', tags: ['Gonflement', 'Changements du mamelon'] },
+    { title: 'Examiner debout', instruction: 'Faites des cercles avec les doigts, doucement.', tags: ['Masse', 'Dureté', 'Douleur'] },
+    { title: 'Examiner allongée', instruction: 'Allongez-vous et répétez sur chaque sein.', tags: ['Différences', 'Texture'] },
+    { title: 'Vérifier le mamelon', instruction: 'Pressez doucement et observez.', tags: ['Écoulement', 'Sang', 'Forme'] },
+  ],
+  en: [
+    { title: 'Look in the mirror', instruction: 'Look for changes in shape, size or skin.', tags: ['Shape', 'Size', 'Skin'] },
+    { title: 'Raise your arms', instruction: 'Raise your arms and look again from a new angle.', tags: ['Swelling', 'Nipple changes'] },
+    { title: 'Examine standing', instruction: 'Use circular finger motions with gentle pressure.', tags: ['Lump', 'Hardness', 'Pain'] },
+    { title: 'Examine lying down', instruction: 'Lie down and repeat the same pattern on each breast.', tags: ['Differences', 'Texture'] },
+    { title: 'Check the nipple', instruction: 'Gently squeeze and check for unusual discharge.', tags: ['Discharge', 'Blood', 'Shape'] },
+  ],
+  es: [
+    { title: 'Observar en el espejo', instruction: 'Frente al espejo, observa la forma, el tamaño y la piel.', tags: ['Forma', 'Tamaño', 'Piel'] },
+    { title: 'Levantar los brazos', instruction: 'Levanta los brazos y observa de nuevo desde otro ángulo.', tags: ['Hinchazón', 'Cambios en el pezón'] },
+    { title: 'Examen de pie', instruction: 'Haz movimientos circulares con los dedos, con presión suave.', tags: ['Bulto', 'Dureza', 'Dolor'] },
+    { title: 'Examen acostada', instruction: 'Acuéstate y repite el mismo patrón en cada seno.', tags: ['Diferencias', 'Textura'] },
+    { title: 'Revisar el pezón', instruction: 'Presiona suavemente y revisa si hay secreción inusual.', tags: ['Secreción', 'Sangre', 'Forma'] },
+  ],
+  de: [
+    { title: 'Im Spiegel betrachten', instruction: 'Achte im Spiegel auf Form, Größe und Haut.', tags: ['Form', 'Größe', 'Haut'] },
+    { title: 'Arme heben', instruction: 'Hebe die Arme und betrachte alles aus einem neuen Winkel.', tags: ['Schwellung', 'Veränderung der Brustwarze'] },
+    { title: 'Im Stehen untersuchen', instruction: 'Taste mit kreisenden Fingerbewegungen und sanftem Druck.', tags: ['Knoten', 'Verhärtung', 'Schmerz'] },
+    { title: 'Im Liegen untersuchen', instruction: 'Lege dich hin und wiederhole das Muster an jeder Brust.', tags: ['Unterschiede', 'Struktur'] },
+    { title: 'Brustwarze prüfen', instruction: 'Drücke sanft und prüfe auf ungewöhnlichen Ausfluss.', tags: ['Ausfluss', 'Blut', 'Form'] },
+  ],
+  ru: [
+    { title: 'Осмотр в зеркале', instruction: 'Перед зеркалом обратите внимание на форму, размер и кожу.', tags: ['Форма', 'Размер', 'Кожа'] },
+    { title: 'Поднимите руки', instruction: 'Поднимите руки и осмотрите снова под новым углом.', tags: ['Отёк', 'Изменения соска'] },
+    { title: 'Осмотр стоя', instruction: 'Круговыми движениями пальцев с лёгким нажимом ощупайте грудь.', tags: ['Уплотнение', 'Твёрдость', 'Боль'] },
+    { title: 'Осмотр лёжа', instruction: 'Лягте и повторите те же движения на каждой груди.', tags: ['Различия', 'Текстура'] },
+    { title: 'Проверьте сосок', instruction: 'Слегка сожмите и проверьте, нет ли необычных выделений.', tags: ['Выделения', 'Кровь', 'Форма'] },
+  ],
+  pt: [
+    { title: 'Observar no espelho', instruction: 'Em frente ao espelho, observe a forma, o tamanho e a pele.', tags: ['Forma', 'Tamanho', 'Pele'] },
+    { title: 'Levantar os braços', instruction: 'Levante os braços e observe novamente de um novo ângulo.', tags: ['Inchaço', 'Alterações no mamilo'] },
+    { title: 'Exame em pé', instruction: 'Faça movimentos circulares com os dedos, com pressão suave.', tags: ['Nódulo', 'Rigidez', 'Dor'] },
+    { title: 'Exame deitada', instruction: 'Deite-se e repita o mesmo padrão em cada mama.', tags: ['Diferenças', 'Textura'] },
+    { title: 'Verificar o mamilo', instruction: 'Pressione suavemente e verifique se há secreção incomum.', tags: ['Secreção', 'Sangue', 'Forma'] },
+  ],
+};
+
 function stepsFor(lang: string): SelfCheckStep[] {
-  if (lang === 'ar') {
-    return [
-      { step_number: 1, title: 'راقبي فالمرآة', icon: 'mirror', duration_seconds: 60, instruction: 'وقفي قدام المرآة وشوفي واش كاين تغيير فالشكل، الحجم أو لون الجلد.', what_to_look_for: ['تغيير فالحجم', 'تورم', 'تغيير فالجلد'], image_url: '' },
-      { step_number: 2, title: 'رفعي يديك', icon: 'arms', duration_seconds: 45, instruction: 'رفعي يديك فوق راسك وراقبي نفس العلامات من زاوية جديدة.', what_to_look_for: ['انكماش', 'اختلاف بين الجهتين'], image_url: '' },
-      { step_number: 3, title: 'فحصي وانتي واقفة', icon: 'touch', duration_seconds: 90, instruction: 'استعملي أصابعك بحركات دائرية وضغط خفيف ثم متوسط.', what_to_look_for: ['كتلة', 'ألم فبلاصة وحدة'], image_url: '' },
-      { step_number: 4, title: 'فحصي وانتي مستلقية', icon: 'rest', duration_seconds: 90, instruction: 'حطي وسادة تحت الكتف وكرري الحركات على كل ثدي.', what_to_look_for: ['فرق بين الثديين', 'صلابة'], image_url: '' },
-      { step_number: 5, title: 'راقبي الحلمة', icon: 'alert', duration_seconds: 30, instruction: 'ضغطي بلطف وشوفي واش كاين إفراز غير عادي.', what_to_look_for: ['إفرازات', 'دم', 'تغيير فالشكل'], image_url: '' },
-    ];
-  }
-  return [
-    { step_number: 1, title: lang === 'fr' ? 'Observer au miroir' : 'Look in the mirror', icon: 'mirror', duration_seconds: 60, instruction: lang === 'fr' ? 'Regardez la forme, la taille et la peau.' : 'Look for changes in shape, size or skin.', what_to_look_for: ['Shape', 'Size', 'Skin'], image_url: '' },
-    { step_number: 2, title: lang === 'fr' ? 'Lever les bras' : 'Raise your arms', icon: 'arms', duration_seconds: 45, instruction: lang === 'fr' ? 'Levez les bras et observez encore.' : 'Raise your arms and look again from a new angle.', what_to_look_for: ['Swelling', 'Nipple changes'], image_url: '' },
-    { step_number: 3, title: lang === 'fr' ? 'Examiner debout' : 'Examine standing', icon: 'touch', duration_seconds: 90, instruction: lang === 'fr' ? 'Faites des cercles avec les doigts, doucement.' : 'Use circular finger motions with gentle pressure.', what_to_look_for: ['Lump', 'Hardness', 'Pain'], image_url: '' },
-    { step_number: 4, title: lang === 'fr' ? 'Examiner allongee' : 'Examine lying down', icon: 'rest', duration_seconds: 90, instruction: lang === 'fr' ? 'Allongez-vous et repetez sur chaque sein.' : 'Lie down and repeat the same pattern on each breast.', what_to_look_for: ['Differences', 'Texture'], image_url: '' },
-    { step_number: 5, title: lang === 'fr' ? 'Verifier le mamelon' : 'Check the nipple', icon: 'alert', duration_seconds: 30, instruction: lang === 'fr' ? 'Pressez doucement et observez.' : 'Gently squeeze and check for unusual discharge.', what_to_look_for: ['Discharge', 'Blood', 'Shape'], image_url: '' },
-  ];
+  const text = STEP_TEXT[lang] ?? STEP_TEXT.en;
+  return STEP_META.map((meta, i) => ({
+    step_number: meta.step_number,
+    icon: meta.icon,
+    duration_seconds: meta.duration_seconds,
+    title: text[i].title,
+    instruction: text[i].instruction,
+    what_to_look_for: text[i].tags,
+    image_url: '',
+  }));
 }
 
 export function SelfCheckPage() {
@@ -36,7 +95,7 @@ export function SelfCheckPage() {
   // otherwise the timer's reset effect refires every render and freezes the countdown.
   const guide = useMemo(() => stepsFor(lang), [lang]);
   const check = useSelfCheck(guide);
-  const { speak, activeId, stop } = useSpeech();
+  const { speak, activeId, stop, voicesLoaded, hasVoice } = useSpeech();
   const navigate = useNavigate();
   const [showReminderCta, setShowReminderCta] = useState(false);
   const ctaTimer = useRef<number | null>(null);
@@ -50,6 +109,9 @@ export function SelfCheckPage() {
   const speechId = `step-${check.index}`;
   const isNarrating = activeId === speechId;
   const narrationText = check.current ? check.current.instruction || check.current.title : '';
+  // Only offer narration once voices are loaded and one exists for this language.
+  // voicesLoaded re-renders the page when voices arrive so hasVoice re-evaluates.
+  const canNarrate = voicesLoaded && hasVoice(lang);
   const listenLabel =
     lang === 'ar' ? 'سمعي' : lang === 'fr' ? 'Écouter' : lang === 'es' ? 'Escuchar' :
     lang === 'de' ? 'Anhören' : lang === 'ru' ? 'Слушать' : lang === 'pt' ? 'Ouvir' : 'Listen';
@@ -144,33 +206,35 @@ export function SelfCheckPage() {
               <div className="absolute inset-0 grid place-items-center text-4xl font-black text-ink">{formatDuration(check.remaining)}</div>
             </div>
             <p className="text-lg font-medium leading-8 text-muted">{check.current.instruction}</p>
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  speak(narrationText, lang, speechId);
-                }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: isNarrating ? '#D63384' : 'white',
-                  color: isNarrating ? 'white' : '#D63384',
-                  border: '2px solid #D63384',
-                  borderRadius: 999,
-                  padding: '6px 14px',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  fontFamily: 'inherit',
-                }}
-              >
-                <span style={{ fontSize: 16 }}>{isNarrating ? '⏸️' : '🔊'}</span>
-                {isNarrating ? pauseLabel : listenLabel}
-              </button>
-            </div>
+            {canNarrate && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    speak(narrationText, lang, speechId);
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    background: isNarrating ? '#D63384' : 'white',
+                    color: isNarrating ? 'white' : '#D63384',
+                    border: '2px solid #D63384',
+                    borderRadius: 999,
+                    padding: '6px 14px',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <span style={{ fontSize: 16 }}>{isNarrating ? '⏸️' : '🔊'}</span>
+                  {isNarrating ? pauseLabel : listenLabel}
+                </button>
+              </div>
+            )}
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               {check.current.what_to_look_for.map((item) => <span key={item} className="rounded-full bg-primary-50 px-3 py-2 text-sm font-bold text-primary-700">{item}</span>)}
             </div>

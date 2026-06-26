@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, CheckCircle2, Pencil } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/toastStore';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { formatDate, nextReminderDate } from '@/utils/formatters';
 import { REMINDER_STORAGE_KEY, scheduleNotificationCheck, showNotification } from '@/utils/notificationScheduler';
+import { sendWhatsAppConfirmation, checkWhatsAppAvailable } from '@/services/whatsappService';
 import { cn } from '@/utils/cn';
 
 type ReminderTime = 'morning' | 'afternoon' | 'evening';
@@ -155,6 +156,16 @@ export function ReminderPage() {
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission | 'unsupported'>(
     typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported',
   );
+
+  const [whatsappAvailable, setWhatsappAvailable] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [whatsappSending, setWhatsappSending] = useState(false);
+  const [whatsappSent, setWhatsappSent] = useState(false);
+  const [whatsappError, setWhatsappError] = useState('');
+
+  useEffect(() => {
+    checkWhatsAppAvailable().then(setWhatsappAvailable);
+  }, []);
 
   const toast = useToast();
   const selectedDate = day != null ? new Date(new Date().getFullYear(), new Date().getMonth(), day) : null;
@@ -302,6 +313,176 @@ export function ReminderPage() {
               weekdays={r.calendar.weekdays}
               readOnly
             />
+          </div>
+
+          {/* ── WhatsApp Reminder ── */}
+          <div style={{
+            marginTop: 20,
+            padding: 24,
+            background: 'white',
+            borderRadius: 20,
+            border: whatsappAvailable ? '2px solid #25D366' : '2px solid #E0E0E0',
+            boxShadow: '0 4px 20px rgba(37,211,102,0.1)',
+            opacity: whatsappAvailable ? 1 : 0.6,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <span style={{ fontSize: 28 }}>💬</span>
+              <div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#2D1F2D', margin: 0 }}>
+                  {lang === 'ar' ? 'تذكير بالواتساب' :
+                   lang === 'fr' ? 'Rappel WhatsApp' :
+                   lang === 'es' ? 'Recordatorio WhatsApp' :
+                   lang === 'de' ? 'WhatsApp-Erinnerung' :
+                   lang === 'ru' ? 'Напоминание WhatsApp' :
+                   lang === 'pt' ? 'Lembrete WhatsApp' :
+                   'WhatsApp Reminder'}
+                </h3>
+                <p style={{ fontSize: 12, color: whatsappAvailable ? '#25D366' : '#999', margin: 0, marginTop: 2 }}>
+                  {whatsappAvailable
+                    ? (lang === 'ar' ? '✅ الخدمة متوفرة' :
+                       lang === 'fr' ? '✅ Service disponible' :
+                       lang === 'es' ? '✅ Servicio disponible' :
+                       lang === 'de' ? '✅ Dienst verfügbar' :
+                       lang === 'ru' ? '✅ Сервис доступен' :
+                       lang === 'pt' ? '✅ Serviço disponível' :
+                       '✅ Service available')
+                    : (lang === 'ar' ? '⚪ غير متوفر حالياً' :
+                       lang === 'fr' ? '⚪ Non disponible' :
+                       lang === 'es' ? '⚪ No disponible' :
+                       lang === 'de' ? '⚪ Nicht verfügbar' :
+                       lang === 'ru' ? '⚪ Недоступно' :
+                       lang === 'pt' ? '⚪ Indisponível' :
+                       '⚪ Not available')}
+                </p>
+              </div>
+            </div>
+
+            {whatsappAvailable && !whatsappSent && (
+              <>
+                <p style={{ fontSize: 13, color: '#666', marginBottom: 12 }}>
+                  {lang === 'ar' ? 'دخلي رقم الواتساب ديالك باش نوجدو ليك تأكيد و تذكير شهري:' :
+                   lang === 'fr' ? 'Entrez votre numéro WhatsApp pour recevoir une confirmation et un rappel mensuel :' :
+                   lang === 'es' ? 'Ingrese su número de WhatsApp para recibir confirmación y recordatorio mensual:' :
+                   lang === 'de' ? 'Geben Sie Ihre WhatsApp-Nummer ein für Bestätigung und monatliche Erinnerung:' :
+                   lang === 'ru' ? 'Введите номер WhatsApp для подтверждения и ежемесячного напоминания:' :
+                   lang === 'pt' ? 'Digite seu número do WhatsApp para confirmação e lembrete mensal:' :
+                   'Enter your WhatsApp number for confirmation and monthly reminder:'}
+                </p>
+                <div style={{ display: 'flex', gap: 0, marginBottom: 12 }} dir="ltr">
+                  <span style={{
+                    background: '#F0F0F0', borderRadius: '12px 0 0 12px',
+                    padding: '12px 14px', fontSize: 14, color: '#666',
+                    border: '2px solid #E0E0E0', borderRight: 'none',
+                    fontWeight: 600,
+                  }}>+212</span>
+                  <input
+                    type="tel"
+                    value={whatsappNumber}
+                    onChange={(e) => setWhatsappNumber(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="6XXXXXXXX"
+                    style={{
+                      flex: 1, padding: '12px 16px', borderRadius: '0 12px 12px 0',
+                      border: '2px solid #E0E0E0', fontSize: 14, outline: 'none',
+                      fontFamily: 'inherit',
+                    }}
+                  />
+                </div>
+
+                <button
+                  onClick={async () => {
+                    if (!whatsappNumber || whatsappNumber.length < 9) return;
+                    setWhatsappSending(true);
+                    setWhatsappError('');
+
+                    const result = await sendWhatsAppConfirmation(
+                      whatsappNumber,
+                      lang,
+                      day,
+                      time,
+                    );
+                    setWhatsappSending(false);
+                    if (result.success) {
+                      setWhatsappSent(true);
+                    } else {
+                      setWhatsappError(
+                        lang === 'ar' ? 'ما قدرناش نوجدو الرسالة. عاودي مرة أخرى.' :
+                        lang === 'fr' ? 'Impossible d\'envoyer. Réessayez.' :
+                        lang === 'es' ? 'No se pudo enviar. Inténtelo de nuevo.' :
+                        lang === 'de' ? 'Senden fehlgeschlagen. Versuchen Sie es erneut.' :
+                        lang === 'ru' ? 'Не удалось отправить. Попробуйте снова.' :
+                        lang === 'pt' ? 'Não foi possível enviar. Tente novamente.' :
+                        'Could not send. Please try again.'
+                      );
+                    }
+                  }}
+                  disabled={whatsappSending || !whatsappNumber || whatsappNumber.length < 9}
+                  style={{
+                    width: '100%', padding: '14px', borderRadius: 12,
+                    background: whatsappSending ? '#ccc' : '#25D366',
+                    color: 'white', border: 'none', fontSize: 15,
+                    fontWeight: 700, cursor: whatsappSending ? 'wait' : 'pointer',
+                    fontFamily: 'inherit',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  }}
+                >
+                  {whatsappSending
+                    ? (lang === 'ar' ? '⏳ كنوجد...' :
+                       lang === 'fr' ? '⏳ Envoi...' :
+                       lang === 'es' ? '⏳ Enviando...' :
+                       lang === 'de' ? '⏳ Wird gesendet...' :
+                       lang === 'ru' ? '⏳ Отправка...' :
+                       lang === 'pt' ? '⏳ Enviando...' :
+                       '⏳ Sending...')
+                    : (lang === 'ar' ? '💬 فعّلي التذكير بالواتساب' :
+                       lang === 'fr' ? '💬 Activer le rappel WhatsApp' :
+                       lang === 'es' ? '💬 Activar recordatorio WhatsApp' :
+                       lang === 'de' ? '💬 WhatsApp-Erinnerung aktivieren' :
+                       lang === 'ru' ? '💬 Активировать напоминание WhatsApp' :
+                       lang === 'pt' ? '💬 Ativar lembrete WhatsApp' :
+                       '💬 Activate WhatsApp Reminder')}
+                </button>
+
+                {whatsappError && (
+                  <p style={{ color: '#DC2626', fontSize: 12, marginTop: 8, textAlign: 'center' }}>{whatsappError}</p>
+                )}
+              </>
+            )}
+
+            {whatsappSent && (
+              <div style={{ textAlign: 'center', padding: 16 }}>
+                <span style={{ fontSize: 48 }}>✅</span>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#25D366', marginTop: 8 }}>
+                  {lang === 'ar' ? 'التذكير مفعّل! شوفي الواتساب 💬' :
+                   lang === 'fr' ? 'Rappel activé ! Vérifiez WhatsApp 💬' :
+                   lang === 'es' ? '¡Recordatorio activado! Revise WhatsApp 💬' :
+                   lang === 'de' ? 'Erinnerung aktiviert! Prüfen Sie WhatsApp 💬' :
+                   lang === 'ru' ? 'Напоминание активировано! Проверьте WhatsApp 💬' :
+                   lang === 'pt' ? 'Lembrete ativado! Verifique o WhatsApp 💬' :
+                   'Reminder activated! Check WhatsApp 💬'}
+                </p>
+                <p style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
+                  {lang === 'ar' ? 'توصلك رسالة تأكيد + تذكير كل شهر' :
+                   lang === 'fr' ? 'Vous recevrez une confirmation + rappel mensuel' :
+                   lang === 'es' ? 'Recibirá confirmación + recordatorio mensual' :
+                   lang === 'de' ? 'Sie erhalten Bestätigung + monatliche Erinnerung' :
+                   lang === 'ru' ? 'Вы получите подтверждение + ежемесячное напоминание' :
+                   lang === 'pt' ? 'Você receberá confirmação + lembrete mensal' :
+                   'You will receive confirmation + monthly reminder'}
+                </p>
+              </div>
+            )}
+
+            {!whatsappAvailable && (
+              <p style={{ fontSize: 12, color: '#999', textAlign: 'center' }}>
+                {lang === 'ar' ? 'خدمة الواتساب غير متوفرة حالياً. جربي الإشعارات 🔔' :
+                 lang === 'fr' ? 'Service WhatsApp non disponible. Essayez les notifications 🔔' :
+                 lang === 'es' ? 'Servicio WhatsApp no disponible. Pruebe notificaciones 🔔' :
+                 lang === 'de' ? 'WhatsApp-Dienst nicht verfügbar. Versuchen Sie Benachrichtigungen 🔔' :
+                 lang === 'ru' ? 'WhatsApp недоступен. Попробуйте уведомления 🔔' :
+                 lang === 'pt' ? 'Serviço WhatsApp indisponível. Tente notificações 🔔' :
+                 'WhatsApp service not available. Try notifications 🔔'}
+              </p>
+            )}
           </div>
 
           {USE_MOCK && <p className="mt-3 text-sm font-semibold leading-6 text-muted">{r.demoNote}</p>}

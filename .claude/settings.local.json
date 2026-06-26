@@ -15,7 +15,9 @@
       "Bash(git add *)",
       "Bash(npm run *)",
       "mcp__ide__getDiagnostics",
-      "PowerShell(npm run *)"
+      "PowerShell(npm run *)",
+      "mcp__gbrain__search",
+      "mcp__gbrain__code_def"
     ]
   }
 }

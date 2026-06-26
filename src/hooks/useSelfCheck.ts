@@ -39,21 +39,31 @@ function clearSnapshot() {
   }
 }
 
+/** Keep a restored step index inside the valid range for the current guide. */
+function clampIndex(i: number, total: number): number {
+  return Math.min(Math.max(i, 0), Math.max(total - 1, 0));
+}
+
 /** Wizard + per-step countdown timer for the guided self-check. */
 export function useSelfCheck(steps: SelfCheckStep[]) {
-  const [stage, setStage] = useState<SelfCheckStage>('intro');
-  const [index, setIndex] = useState(0);
-  const [remaining, setRemaining] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  // Read any recent (<24h) saved session ONCE, up front, and seed all state from
+  // it so navigating away and back drops the user straight back into their step
+  // with the same countdown — no prompt. readSnapshot() is null when nothing fresh
+  // is stored, in which case we start clean at the intro.
+  const [restored] = useState(() => readSnapshot());
+
+  const [stage, setStage] = useState<SelfCheckStage>(restored ? 'active' : 'intro');
+  const [index, setIndex] = useState(() =>
+    restored ? clampIndex((restored.currentStep ?? 1) - 1, steps.length) : 0,
+  );
+  const [remaining, setRemaining] = useState(() => restored?.timerSeconds ?? 0);
+  const [paused, setPaused] = useState(() => restored?.timerState === 'paused');
+  const [completedSteps, setCompletedSteps] = useState<number[]>(() => restored?.completedSteps ?? []);
   /** Slide direction for transitions (1 forward, -1 back). */
   const [direction, setDirection] = useState(1);
 
-  // A resumable session detected on mount (read once). The continue-prompt UI
-  // keys off this; restoring or discarding clears it.
-  const [savedSnapshot, setSavedSnapshot] = useState<SelfCheckSnapshot | null>(() => readSnapshot());
-  // When restoring, the step-change reset effect must NOT wipe the saved timer.
-  const restoringRef = useRef(false);
+  // Skip the first step-change reset so a restored countdown isn't overwritten.
+  const restoringRef = useRef(!!restored);
 
   const total = steps.length;
   const current = steps[index];
@@ -144,27 +154,6 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     clearSnapshot();
   }, []);
 
-  /** Resume the saved session detected on mount. */
-  const resumeSaved = useCallback(() => {
-    setSavedSnapshot((snap) => {
-      if (!snap) return null;
-      restoringRef.current = true;
-      setCompletedSteps(snap.completedSteps ?? []);
-      setIndex(Math.min(Math.max((snap.currentStep ?? 1) - 1, 0), Math.max(total - 1, 0)));
-      setRemaining(snap.timerSeconds ?? steps[0]?.duration_seconds ?? 0);
-      setPaused(snap.timerState === 'paused');
-      setDirection(1);
-      setStage('active');
-      return null;
-    });
-  }, [total, steps]);
-
-  /** Discard the saved session and start clean. */
-  const discardSaved = useCallback(() => {
-    setSavedSnapshot(null);
-    clearSnapshot();
-  }, []);
-
   const goTo = useCallback(
     (target: number) => {
       if (target < 0 || target >= total) return;
@@ -202,7 +191,6 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     isLast,
     stepProgress,
     completedSteps,
-    savedSnapshot,
     start,
     next,
     prev,
@@ -210,7 +198,5 @@ export function useSelfCheck(steps: SelfCheckStep[]) {
     skipTimer,
     restart,
     goTo,
-    resumeSaved,
-    discardSaved,
   };
 }

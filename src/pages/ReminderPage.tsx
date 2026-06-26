@@ -25,7 +25,6 @@ const TIME_META: { key: ReminderTime; emoji: string; ring: string }[] = [
 const METHOD_META: { key: Method; emoji: string }[] = [
   { key: 'push', emoji: '🔔' },
   { key: 'email', emoji: '📧' },
-  { key: 'whatsapp', emoji: '💬' },
 ];
 
 const STORAGE_KEY = REMINDER_STORAGE_KEY;
@@ -97,7 +96,6 @@ function loadSettings(): ReminderSettings | null {
 }
 
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-const isPhone = (v: string) => v.replace(/\D/g, '').length >= 6;
 
 /** A wizard step that slides up when it appears. */
 function StepCard({ children }: { children: ReactNode }) {
@@ -151,7 +149,9 @@ export function ReminderPage() {
   const [time, setTime] = useState<ReminderTime | null>(existing?.reminderTime ?? null);
   const [methods, setMethods] = useState<Method[]>(existing?.notificationMethods ?? []);
   const [email, setEmail] = useState(existing?.email ?? '');
-  const [phone, setPhone] = useState(existing?.phone ?? '');
+  // Retained from saved settings for backward-compat; WhatsApp now goes through
+  // the OpenWA section below, not this reminder method.
+  const [phone] = useState(existing?.phone ?? '');
   const [confetti, setConfetti] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission | 'unsupported'>(
     typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported',
@@ -191,8 +191,7 @@ export function ReminderPage() {
   };
 
   const emailOk = !methods.includes('email') || isEmail(email);
-  const phoneOk = !methods.includes('whatsapp') || isPhone(phone);
-  const canActivate = day != null && time != null && methods.length > 0 && emailOk && phoneOk;
+  const canActivate = day != null && time != null && methods.length > 0 && emailOk;
 
   const activate = async () => {
     if (!canActivate || day == null || time == null) return;
@@ -258,7 +257,6 @@ export function ReminderPage() {
                 <span key={m} className="rounded-full bg-primary-100 px-3 py-1.5 text-sm font-bold text-primary-700">
                   {METHOD_META.find((x) => x.key === m)?.emoji} {r.methods[m].label}
                   {m === 'email' && email ? ` · ${email}` : ''}
-                  {m === 'whatsapp' && phone ? ` · +212 ${phone}` : ''}
                 </span>
               ))}
             </div>
@@ -558,7 +556,7 @@ export function ReminderPage() {
           {day != null && time != null && (
             <StepCard>
               <h2 className="text-xl font-black text-ink">{r.stepMethodTitle}</h2>
-              <div className="mt-4 grid grid-cols-3 gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-2">
                 {METHOD_META.map(({ key, emoji }) => {
                   const selected = methods.includes(key);
                   return (
@@ -600,29 +598,6 @@ export function ReminderPage() {
                 )}
               </AnimatePresence>
 
-              <AnimatePresence>
-                {methods.includes('whatsapp') && (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                    <div className="mt-4">
-                      <label htmlFor="reminder-phone" className="text-sm font-black text-muted">{r.phoneLabel}</label>
-                      <div className="mt-2 flex min-h-12 items-center overflow-hidden rounded-2xl border border-line bg-white/70 focus-within:border-primary-300" dir="ltr">
-                        <span className="grid h-12 place-items-center bg-primary-50 px-3 font-black text-primary-700">+212</span>
-                        <input
-                          id="reminder-phone"
-                          type="tel"
-                          inputMode="tel"
-                          autoComplete="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="6 00 00 00 00"
-                          className="min-w-0 flex-1 bg-transparent px-3 font-bold text-ink outline-none"
-                        />
-                      </div>
-                      {!phoneOk && phone.length > 0 && <p className="mt-1.5 text-sm font-bold text-risk-high">{r.phoneInvalid}</p>}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </StepCard>
           )}
         </AnimatePresence>

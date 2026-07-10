@@ -1,14 +1,24 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { Volume2 } from 'lucide-react';
 import { BottomNav } from './BottomNav';
 import { Navbar } from './Navbar';
 import { NavArrows } from './NavArrows';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useSpeech } from '@/hooks/useSpeech';
 
 export function Layout() {
   const { t, dir, lang, fontClass } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Narration keeps playing across navigation (see useSpeech), so surface a
+  // global Stop control whenever something is speaking — no matter the page.
+  const { isSpeaking, stop } = useSpeech();
+  const stopAudioLabel =
+    lang === 'ar' ? 'وقفي الصوت' : lang === 'fr' ? 'Arrêter le son' :
+    lang === 'es' ? 'Detener audio' : lang === 'de' ? 'Audio stoppen' :
+    lang === 'ru' ? 'Остановить' : lang === 'pt' ? 'Parar áudio' : 'Stop audio';
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -57,6 +67,17 @@ export function Layout() {
           prev={prevPage ? { label: prevPage.label, aria: t.common.previous, onActivate: () => go(prevPage.path) } : null}
           next={nextPage ? { label: nextPage.label, aria: t.common.next, onActivate: () => go(nextPage.path) } : null}
         />
+      )}
+      {isSpeaking && (
+        <button
+          type="button"
+          onClick={stop}
+          aria-label={stopAudioLabel}
+          className="fixed bottom-[140px] left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full bg-rose-gradient px-5 py-2.5 text-sm font-bold text-white shadow-petal-lg transition active:scale-95"
+        >
+          <Volume2 size={16} />
+          {stopAudioLabel}
+        </button>
       )}
       <BottomNav />
     </div>

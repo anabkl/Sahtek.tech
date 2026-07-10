@@ -23,9 +23,13 @@ dist-ssr/
 vite.config.js
 vite.config.d.ts
 
-# Environment
+# Environment & secrets
 .env
 .env.local
+.env*.local
+*.pem
+*.key
+secrets.json
 backend/appsettings.Development.json
 
 # Editor

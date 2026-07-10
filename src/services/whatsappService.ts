@@ -1,6 +1,8 @@
-const OPENWA_URL = 'http://localhost:2785/api';
-const OPENWA_KEY = 'owa_k1_d33a3b829cb51090434963bd99385d45eae9dd38cabb21333bc4b8c7ab424634';
-const SESSION_ID = '37be792e-8318-4044-a375-b8220611ee99';
+// Credentials come from the environment (.env, gitignored) — never hardcode
+// secrets in source. See .env.example for the required variables.
+const OPENWA_URL = import.meta.env.VITE_OPENWA_URL || 'http://localhost:2785/api';
+const OPENWA_KEY = import.meta.env.VITE_OPENWA_KEY || '';
+const SESSION_ID = import.meta.env.VITE_OPENWA_SESSION || '';
 
 const TIME_LABELS: Record<string, Record<string, string>> = {
   morning: {

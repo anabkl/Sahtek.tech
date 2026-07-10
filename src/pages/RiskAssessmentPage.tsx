@@ -1,13 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Download, Gauge, MapPin, Share2 } from 'lucide-react';
+import { CheckCircle2, Download, FileText, Gauge, MapPin, Share2 } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { useRiskAssessment } from '@/hooks/useRiskAssessment';
 import { analyzeRiskWithGroq } from '@/services/groqService';
+import type { RiskReportData } from '@/utils/reportGenerator';
 import { cn } from '@/utils/cn';
+
+// Download button labels per language — never hardcode a single locale.
+const DOWNLOAD_LABELS = {
+  downloadPdf: {
+    ar: 'تحميل PDF', fr: 'Télécharger PDF', en: 'Download PDF',
+    es: 'Descargar PDF', de: 'PDF herunterladen', ru: 'Скачать PDF', pt: 'Baixar PDF',
+  },
+  downloadJson: {
+    ar: 'تحميل JSON', fr: 'Télécharger JSON', en: 'Download JSON',
+    es: 'Descargar JSON', de: 'JSON herunterladen', ru: 'Скачать JSON', pt: 'Baixar JSON',
+  },
+  shareDoctor: {
+    ar: 'شاركي مع طبيبك', fr: 'Partager avec votre médecin', en: 'Share with your doctor',
+    es: 'Compartir con su médico', de: 'Mit Ihrem Arzt teilen', ru: 'Поделиться с врачом', pt: 'Compartilhar com médico',
+  },
+} as const;
 
 export function RiskAssessmentPage() {
   const { t, lang } = useLanguage();
@@ -49,49 +66,24 @@ export function RiskAssessmentPage() {
     setCopied(true);
   };
 
-  const downloadMedicalReport = () => {
-    if (!risk.result) return;
-
-    const answers = risk.questions.map((question) => {
-      const value = risk.answers[question.id];
-      const option = question.options.find((item) => item.value === value);
-
-      return {
-        id: question.id,
-        question: question.question,
-        answer_value: value ?? null,
-        answer_label: option?.label ?? value ?? 'Not answered',
-      };
-    });
-
-    const report = {
-      report_type: 'Sahtek Clinical Data Export',
-      generated_at: new Date().toISOString(),
-      risk_level: risk.result.risk_level,
-      risk_score: risk.result.risk_score,
-      max_score: risk.result.max_score,
-      risk_percentage: risk.result.risk_percentage,
-      summary: risk.result.summary,
-      recommendations: risk.result.recommendations,
-      risk_factors_identified: risk.result.risk_factors_identified,
-      protective_factors_identified: risk.result.protective_factors_identified,
-      next_steps: risk.result.next_steps,
-      disclaimer: risk.result.disclaimer,
-      answers,
-    };
-
-    const blob = new Blob([JSON.stringify(report, null, 2)], {
-      type: 'application/json;charset=utf-8',
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-
-    link.href = url;
-    link.download = `sahtek-medical-report-${new Date().toISOString().slice(0, 10)}.json`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  };
+  // Build the report from the current result. The content is already localized
+  // by the risk engine (it runs in the active language), and the report labels
+  // come from `lang` too — so PDF/JSON always match the current app language.
+  const reportData: RiskReportData | null = risk.result
+    ? {
+        riskLevel: risk.result.risk_level,
+        riskScore: risk.result.risk_score,
+        maxScore: risk.result.max_score,
+        riskPercentage: risk.result.risk_percentage,
+        summary: aiInsight?.summary || risk.result.summary,
+        recommendations:
+          aiInsight && aiInsight.recommendations.length > 0
+            ? aiInsight.recommendations
+            : risk.result.recommendations.map((r) => r.action),
+        riskFactors: risk.result.risk_factors_identified,
+        protectiveFactors: risk.result.protective_factors_identified,
+      }
+    : null;
 
   return (
     <PageTransition>
@@ -181,7 +173,28 @@ export function RiskAssessmentPage() {
             <p className="mt-5 rounded-2xl bg-white/60 p-4 text-sm font-bold leading-6 text-muted">{t.disclaimer.short}</p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <Button onClick={copy} leftIcon={<Share2 size={18} />}>{copied ? t.risk.shared : t.risk.shareBtn}</Button>
-              <Button variant="secondary" onClick={downloadMedicalReport} leftIcon={<Download size={18} />}>تحميل التقرير الطبي</Button>
+              <Button
+                onClick={async () => {
+                  if (!reportData) return;
+                  // Lazy-load jsPDF so it only ships when a report is downloaded.
+                  const { downloadPDF } = await import('@/utils/reportGenerator');
+                  downloadPDF(reportData, lang);
+                }}
+                leftIcon={<FileText size={18} />}
+              >
+                {DOWNLOAD_LABELS.downloadPdf[lang] || DOWNLOAD_LABELS.downloadPdf.en}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={async () => {
+                  if (!reportData) return;
+                  const { downloadJSON } = await import('@/utils/reportGenerator');
+                  downloadJSON(reportData, lang);
+                }}
+                leftIcon={<Download size={18} />}
+              >
+                {DOWNLOAD_LABELS.downloadJson[lang] || DOWNLOAD_LABELS.downloadJson.en}
+              </Button>
               <Button variant="secondary" onClick={risk.restart}>{t.risk.retakeBtn}</Button>
             </div>
           </div>

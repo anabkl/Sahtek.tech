@@ -1,6 +1,7 @@
 import { GROQ_API_KEY } from '@/config/groq';
 import type { Language } from '@/types/api';
 import { knowledgeBase, fallbackResponse } from '@/data/chatKnowledge';
+import { getUserContext, buildContextPrompt } from '@/utils/userContext';
 
 // ════════════════════════════════════════════════════════════════════
 //  Groq LLM service — powers the AI chat + optional risk personalization.
@@ -136,8 +137,13 @@ export async function askGroqChat(
       .slice(-6) // last 6 messages for context
       .map((m) => ({ role: m.role, content: m.content }));
 
+    // Read the user's in-app progress fresh on every message so the model can
+    // personalize (self-check done? reminder set? risk assessment taken?).
+    const contextPrompt = buildContextPrompt(getUserContext(), lang);
+    const systemContent = `${CHAT_SYSTEM_PROMPTS[lang] || CHAT_SYSTEM_PROMPTS.en}\n\n${contextPrompt}`;
+
     const messages = [
-      { role: 'system', content: CHAT_SYSTEM_PROMPTS[lang] || CHAT_SYSTEM_PROMPTS.en },
+      { role: 'system', content: systemContent },
       ...safeHistory,
       { role: 'user', content: message },
     ];

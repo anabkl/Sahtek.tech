@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Download, Gauge, MapPin, Share2 } from 'lucide-react';
@@ -6,15 +6,42 @@ import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { useRiskAssessment } from '@/hooks/useRiskAssessment';
+import { analyzeRiskWithGroq } from '@/services/groqService';
 import { cn } from '@/utils/cn';
 
 export function RiskAssessmentPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const risk = useRiskAssessment();
   const [copied, setCopied] = useState(false);
+  // Optional AI personalization layered on top of the local score/level.
+  // Stays null (→ static copy) unless Groq returns a usable summary.
+  const [aiInsight, setAiInsight] = useState<{ summary: string; recommendations: string[] } | null>(null);
   const pct = risk.result?.risk_percentage ?? 0;
   const levelLabel = risk.result?.risk_level === 'high' ? t.risk.levelHigh : risk.result?.risk_level === 'moderate' ? t.risk.levelModerate : t.risk.levelLow;
+
+  // Once the local result is ready, ask Groq for a warmer, personalized
+  // summary + recommendations. Any failure silently keeps the static copy.
+  useEffect(() => {
+    if (risk.stage !== 'result' || !risk.result) {
+      setAiInsight(null);
+      return;
+    }
+    let cancelled = false;
+    void analyzeRiskWithGroq(risk.answers, lang).then((res) => {
+      if (!cancelled && res.summary) setAiInsight(res);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [risk.stage, risk.result, lang]);
+
+  const summaryText = aiInsight?.summary || risk.result?.summary || t.disclaimer.short;
+  const recommendations =
+    aiInsight && aiInsight.recommendations.length > 0
+      ? aiInsight.recommendations
+      : [t.selfCheck.logBtn, t.learn.whenToSee, t.reminder.confirmBtn, t.home.ctaSecondary];
 
   const copy = async () => {
     if (!risk.result) return;
@@ -129,14 +156,9 @@ export function RiskAssessmentPage() {
           </div>
           <div className="rounded-[2rem] border border-white/70 bg-card/85 p-6 shadow-petal-xl">
             <h1 className="text-3xl font-black text-ink">{t.risk.summary}</h1>
-            <p className="mt-3 font-medium leading-7 text-muted">{risk.result.summary || t.disclaimer.short}</p>
+            <p className="mt-3 font-medium leading-7 text-muted">{summaryText}</p>
             <div className="mt-5 grid gap-3">
-              {[
-                t.selfCheck.logBtn,
-                t.learn.whenToSee,
-                t.reminder.confirmBtn,
-                t.home.ctaSecondary,
-              ].map((action, index) => (
+              {recommendations.map((action, index) => (
                 <div key={action} className="rounded-2xl bg-primary-50 p-4">
                   <p className="text-xs font-black uppercase text-primary-700">{index === 0 ? t.risk.priorityHigh : t.risk.priorityMedium}</p>
                   <p className="mt-1 font-bold text-ink">{action}</p>

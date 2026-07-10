@@ -1,8 +1,12 @@
 import type { RiskRequest, RiskResponse } from '@/types/risk';
-import { api } from './api';
+import { mockRiskAssessment } from './mockService';
 
-/** Submit the questionnaire to the live backend risk assessment endpoint. */
+/**
+ * Score the questionnaire locally with the weighted algorithm.
+ * The backend is retired, so the deterministic local scoring is the source
+ * of truth for the score/level. The result summary + recommendations can be
+ * optionally personalized on top via analyzeRiskWithGroq (see RiskAssessmentPage).
+ */
 export async function assessRisk(req: RiskRequest): Promise<RiskResponse> {
-  const { data } = await api.post<RiskResponse>('/risk-assessment', req);
-  return data;
+  return mockRiskAssessment(req);
 }

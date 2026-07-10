@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/toastStore';
 import { useLanguage } from '@/hooks/useLanguage';
 import { usePersistedState } from '@/hooks/usePersistedState';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { askGroqChat } from '@/services/groqService';
 import { formatTime } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 
@@ -79,7 +80,9 @@ export function ChatPage() {
     [{ role: 'assistant', content: t.chat.disclaimer, timestamp: Date.now() }],
     CHAT_MAX_AGE,
   );
-  const [text, setText] = useState('');
+  // Persist the in-progress draft so a half-typed message survives navigating
+  // away and back. Sending clears it via setText('') below (persisted as empty).
+  const [text, setText] = usePersistedState<string>('sahtek_chat_draft', '');
   const [typing, setTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const quickReplies = useMemo(() => t.chat.quickReplies, [t.chat.quickReplies]);
@@ -115,23 +118,33 @@ export function ChatPage() {
     voice.start();
   };
 
-  const send = (value = text) => {
+  const send = async (value = text) => {
     const trimmed = value.trim();
     if (!trimmed || typing) return;
     if (voice.listening) voice.stop();
+
+    // Snapshot the recent turns as context before appending the new message.
+    const history = messages.slice(-6).map((m) => ({ role: m.role, content: m.content }));
+
     setMessages((prev) => [...prev, { role: 'user' as const, content: trimmed, timestamp: Date.now() }].slice(-MAX_MESSAGES));
     setText('');
     setTyping(true);
-    window.setTimeout(() => {
+
+    try {
+      const reply = await askGroqChat(trimmed, lang, history);
+      setMessages((prev) => [...prev, { role: 'assistant' as const, content: reply, timestamp: Date.now() }].slice(-MAX_MESSAGES));
+    } catch {
+      // askGroqChat already falls back internally; this is a last-resort safety net.
       setMessages((prev) => [...prev, { role: 'assistant' as const, content: answerFor(trimmed, lang), timestamp: Date.now() }].slice(-MAX_MESSAGES));
+    } finally {
       setTyping(false);
       window.setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
-    }, 650);
+    }
   };
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    send();
+    void send();
   };
 
   return (
@@ -146,7 +159,7 @@ export function ChatPage() {
             <button onClick={() => setMessages([])} className="grid h-11 w-11 place-items-center rounded-full bg-primary-50 text-primary-700" aria-label={t.chat.clear}><Trash2 size={18} /></button>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-            {quickReplies.map((reply) => <button key={reply} onClick={() => send(reply)} className="shrink-0 rounded-full bg-white/70 px-4 py-2 text-sm font-bold text-primary-700 shadow-petal">{reply}</button>)}
+            {quickReplies.map((reply) => <button key={reply} onClick={() => void send(reply)} className="shrink-0 rounded-full bg-white/70 px-4 py-2 text-sm font-bold text-primary-700 shadow-petal">{reply}</button>)}
           </div>
         </header>
         <div className="flex-1 space-y-4 overflow-y-auto p-4">

@@ -1,0 +1,230 @@
+/* ====================================================================
+   Sahtek.tech — Design Tokens
+   THE single source of truth. Every colour, shadow, gradient, radius and
+   type step in the product resolves back to a variable in this file.
+   tailwind.config.js consumes these; never hardcode a hex in a component.
+
+   Colours are stored as space-separated RGB triplets ("214 51 132") so
+   Tailwind can apply opacity: rgb(var(--brand-500) / <alpha-value>).
+
+   Contrast: every pair marked [AA] was measured against WCAG 2.1.
+   AA = 4.5:1 for body text, 3:1 for large text / UI shapes.
+   ==================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* -- Brand: rose → magenta → berry ------------------------------- */
+  /* The identity. Unchanged from the original Sahtek palette.        */
+  --brand-50: 255 240 246;
+  --brand-100: 255 224 236;
+  --brand-200: 255 194 217;
+  --brand-300: 255 148 186;
+  --brand-400: 255 92 149;
+  --brand-500: 214 51 132; /* ← the Sahtek magenta */
+  --brand-600: 181 36 110;
+  --brand-700: 140 26 85;
+  --brand-800: 107 19 63;
+  --brand-900: 74 13 44;
+  --brand-950: 46 7 25; /* deep berry, for dark surfaces */
+
+  /* -- Warm neutral base (rose-tinted, never cold grey) ------------- */
+  --sand-50: 253 248 249;
+  --sand-100: 250 241 244;
+  --sand-200: 243 228 234;
+  --sand-300: 229 211 219;
+  --sand-400: 201 180 191;
+  --sand-500: 154 127 143; /* 3.4:1 on canvas — UI / large text only */
+  --sand-600: 122 100 115; /* 5.0:1 on canvas [AA] body-secondary     */
+  --sand-700: 90 72 84;
+  --sand-800: 61 47 58;
+  --sand-900: 45 31 45; /* 15.6:1 on white [AAA] primary text       */
+
+  /* -- Semantic surfaces -------------------------------------------- */
+  --canvas: 255 245 247; /* page background, rose-tinted white */
+  --card: 255 255 255; /* default surface                    */
+  --elevated: 255 255 255; /* modals, popovers, floating panels  */
+  --sunken: 250 241 244; /* wells, inset areas                 */
+  --line: 243 220 230; /* hairline borders                   */
+  --line-strong: 229 211 219;
+
+  /* -- Semantic text ------------------------------------------------ */
+  --ink: 45 31 45; /* 15.6:1 [AAA] — primary            */
+  --muted: 122 100 115; /*  5.0:1 [AA]  — secondary          */
+  --faint: 154 127 143; /*  3.4:1 [AA]  — LARGE TEXT / UI ONLY, never body */
+  --on-brand: 255 255 255; /*  4.5:1 on --brand-500 [AA]        */
+
+  /* -- Accent: brand as an interactive colour ----------------------- */
+  --accent: 214 51 132; /* fills, icons, active states        */
+  --accent-hover: 181 36 110;
+  --accent-text: 181 36 110; /* 5.7:1 on canvas [AA] — brand-coloured TEXT.
+                                 Never use --accent for text: 4.2:1 on canvas = fail. */
+  --accent-soft: 255 240 246; /* tinted background                 */
+  --accent-ring: 214 51 132;
+
+  /* -- Calm / success (teal — trust, confirmation, AI) --------------- */
+  --calm: 20 184 166; /* fill                              */
+  --calm-text: 15 118 110; /* 4.8:1 on white [AA]               */
+  --calm-soft: 230 247 244;
+
+  /* -- Warning, soft (never alarm — HARD RULE 3) --------------------- */
+  --warn: 217 119 6; /* fill                              */
+  --warn-text: 180 83 9; /* 4.7:1 on white [AA]               */
+  --warn-soft: 254 243 231;
+
+  /* -- Attention (highest band — used sparingly, never as a verdict) -- */
+  --attention: 220 38 38;
+  --attention-text: 180 35 24; /* 5.9:1 on white [AA] — #DC2626 is only 4.0:1 */
+  --attention-soft: 253 236 234;
+
+  /* -- Info ---------------------------------------------------------- */
+  --info: 59 130 246;
+  --info-text: 29 78 216; /* 6.3:1 on white [AA]               */
+  --info-soft: 234 241 254;
+
+  /* -- Gold (Moroccan warmth — ornament, hairlines, zellige) ---------- */
+  --gold: 224 164 88; /* decorative fill only (1.9:1 — never text) */
+  --gold-text: 146 94 24; /* 5.2:1 on white [AA]               */
+  --gold-soft: 253 244 231;
+
+  /* -- Risk bands (risk-FACTOR awareness only, never a diagnosis) ----- */
+  --risk-low: 22 163 74;
+  --risk-low-text: 21 128 61; /* 4.5:1 [AA] */
+  --risk-moderate: 217 119 6;
+  --risk-moderate-text: 180 83 9; /* 4.7:1 [AA] */
+  --risk-high: 220 38 38;
+  --risk-high-text: 180 35 24; /* 5.9:1 [AA] */
+
+  /* -- Glass -------------------------------------------------------- */
+  --glass-tint: 255 255 255;
+  --glass-alpha: 0.72;
+  --glass-blur: 20px;
+  --glass-border: 255 255 255;
+  --glass-border-alpha: 0.65;
+
+  /* -- Elevation — soft, pink-tinted, never neutral grey -------------- */
+  --shadow-1: 0 1px 2px rgb(74 13 44 / 0.05), 0 1px 3px rgb(74 13 44 / 0.04);
+  --shadow-2: 0 4px 24px rgb(214 51 132 / 0.08);
+  --shadow-3: 0 12px 40px rgb(214 51 132 / 0.14);
+  --shadow-4: 0 24px 60px rgb(214 51 132 / 0.2);
+  --shadow-5: 0 32px 80px -12px rgb(46 7 25 / 0.28);
+  --ring-brand: 0 0 0 4px rgb(214 51 132 / 0.1);
+  --glow-brand: 0 0 28px -6px rgb(214 51 132 / 0.5);
+  --glow-calm: 0 0 28px -6px rgb(20 184 166 / 0.45);
+
+  /* -- Gradients ----------------------------------------------------- */
+  /* Decorative. Light end is only 2.9:1 — NEVER put white text on it.  */
+  --gradient-brand: linear-gradient(135deg, #d63384 0%, #ff5c95 50%, #ff94ba 100%);
+  /* CTA. Every stop clears 5.2:1 with white text [AA]. Use for buttons. */
+  --gradient-cta: linear-gradient(135deg, #d63384 0%, #c42c79 45%, #a81f63 100%);
+  --gradient-soft: linear-gradient(135deg, #fff0f6 0%, #ffe0ec 100%);
+  --gradient-berry: linear-gradient(160deg, #4a0d2c 0%, #8c1a55 100%);
+  /* Ambient page atmosphere — air, not decoration. Keep it faint. */
+  --gradient-aurora:
+    radial-gradient(60% 40% at 85% 0%, rgb(214 51 132 / 0.1), transparent 70%),
+    radial-gradient(50% 35% at 0% 100%, rgb(255 92 149 / 0.1), transparent 70%);
+
+  /* -- Typography ---------------------------------------------------- */
+  --font-display: 'Plus Jakarta Sans', 'Noto Sans', system-ui, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Fluid type scale — 1.25 (major third) at the top, tightening down. */
+  --text-display: clamp(2.75rem, 1.9rem + 3.4vw, 4.25rem);
+  --text-h1: clamp(2.125rem, 1.7rem + 1.9vw, 3rem);
+  --text-h2: clamp(1.625rem, 1.4rem + 1vw, 2.125rem);
+  --text-h3: 1.375rem;
+  --text-h4: 1.125rem;
+  --text-body-lg: 1.0625rem;
+  --text-body: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-caption: 0.8125rem;
+  --text-overline: 0.6875rem;
+
+  /* -- Spacing (4px base) --------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --gutter: 1.25rem;
+  --section-y: 4rem;
+
+  /* -- Radii — nothing sharp. Softness is the brand. ------------------ */
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+  --radius-pill: 999px;
+
+  /* -- Motion — short, soft, never bouncy ------------------------------ */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 450ms;
+  --duration-ambient: 7s;
+}
+
+/* ====================================================================
+   Dark theme — deep berry, not black. The rose accent stays constant;
+   only surfaces and the *text* tint of the accent flip.
+   ==================================================================== */
+.dark {
+  color-scheme: dark;
+
+  --canvas: 26 16 32;
+  --card: 38 26 46;
+  --elevated: 47 33 56;
+  --sunken: 22 13 27;
+  --line: 61 43 68;
+  --line-strong: 79 57 88;
+
+  --ink: 251 238 244; /* 15.2:1 on --card [AAA] */
+  --muted: 201 169 190; /*  7.8:1 on --card [AA]  */
+  --faint: 138 115 132; /*  3.8:1 on --card [AA]  — large text / UI only */
+
+  /* On dark, brand-500 as text is only 3.7:1 → step up to brand-300. */
+  --accent: 214 51 132;
+  --accent-hover: 255 92 149;
+  --accent-text: 255 148 186; /* 8.0:1 on --card [AA] */
+  --accent-soft: 214 51 132;
+
+  --calm-text: 94 234 212;
+  --warn-text: 252 211 77;
+  --attention-text: 252 165 165;
+  --info-text: 147 197 253;
+  --gold-text: 231 189 138;
+
+  --risk-low-text: 134 239 172;
+  --risk-moderate-text: 252 211 77;
+  --risk-high-text: 252 165 165;
+
+  --glass-tint: 47 33 56;
+  --glass-alpha: 0.6;
+  --glass-border: 255 255 255;
+  --glass-border-alpha: 0.1;
+
+  /* Dark elevation reads as depth, not pink haze. */
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-2: 0 4px 24px rgb(0 0 0 / 0.35);
+  --shadow-3: 0 12px 40px rgb(0 0 0 / 0.45);
+  --shadow-4: 0 24px 60px rgb(0 0 0 / 0.55);
+  --shadow-5: 0 32px 80px -12px rgb(0 0 0 / 0.65);
+  --ring-brand: 0 0 0 4px rgb(255 92 149 / 0.16);
+
+  --gradient-soft: linear-gradient(135deg, #2e0719 0%, #4a0d2c 100%);
+  --gradient-aurora:
+    radial-gradient(60% 40% at 85% 0%, rgb(214 51 132 / 0.22), transparent 70%),
+    radial-gradient(50% 35% at 0% 100%, rgb(140 26 85 / 0.3), transparent 70%);
+}

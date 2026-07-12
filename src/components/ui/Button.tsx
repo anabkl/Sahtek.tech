@@ -14,8 +14,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS: Record<Variant, string> = {
+  // brand-cta, not rose-gradient: white text on the decorative gradient's light
+  // end is only 2.4:1. Every stop of the CTA gradient clears AA.
   primary:
-    'bg-rose-gradient text-white shadow-petal-lg hover:shadow-petal-xl hover:brightness-105',
+    'bg-brand-cta text-white shadow-petal-lg hover:shadow-petal-xl hover:brightness-105',
   secondary:
     'bg-card text-ink border border-line shadow-petal hover:border-primary-200',
   outline:

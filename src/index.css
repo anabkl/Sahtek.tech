@@ -1,32 +1,13 @@
+@import './styles/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* --------------------------------------------------------------------
-   Sahtek design system tokens. Semantic surfaces flip with the theme;
-   the rose accent stays constant in light and dark.
+   Sahtek global styles. All values come from src/styles/tokens.css —
+   if you need a new colour, shadow or radius, add it there first.
    -------------------------------------------------------------------- */
-:root {
-  --canvas: 255 245 247;
-  --card: 255 255 255;
-  --elevated: 255 255 255;
-  --ink: 45 31 45;
-  --muted: 122 100 115;
-  --faint: 168 146 160;
-  --line: 243 220 230;
-  color-scheme: light;
-}
-
-.dark {
-  --canvas: 26 16 32;
-  --card: 38 26 46;
-  --elevated: 47 33 56;
-  --ink: 251 238 244;
-  --muted: 201 169 190;
-  --faint: 138 115 132;
-  --line: 61 43 68;
-  color-scheme: dark;
-}
 
 * {
   -webkit-tap-highlight-color: transparent;
@@ -42,27 +23,17 @@ body {
   margin: 0;
   background-color: rgb(var(--canvas));
   color: rgb(var(--ink));
-  font-family: 'Plus Jakarta Sans', 'Noto Sans', system-ui, sans-serif;
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* Soft rose blooms for atmospheric depth. */
-  background-image:
-    radial-gradient(60% 40% at 85% 0%, rgba(214, 51, 132, 0.10), transparent 70%),
-    radial-gradient(50% 35% at 0% 100%, rgba(255, 92, 149, 0.10), transparent 70%);
+  /* Ambient rose blooms — air, not decoration. */
+  background-image: var(--gradient-aurora);
   background-attachment: fixed;
 }
 
-.dark body {
-  background-image:
-    radial-gradient(60% 40% at 85% 0%, rgba(214, 51, 132, 0.22), transparent 70%),
-    radial-gradient(50% 35% at 0% 100%, rgba(140, 26, 85, 0.30), transparent 70%);
-}
-
-[dir='rtl'] body {
-  font-family: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif;
-}
-
-/* -- Typographic rhythm -------------------------------------------- */
+/* -- Typographic rhythm --------------------------------------------- */
 h1,
 h2,
 h3 {
@@ -70,12 +41,24 @@ h3 {
   line-height: 1.15;
 }
 
+/* Arabic needs more vertical room and zero letter-spacing — tracking on
+   Arabic script breaks the joins between letters. */
+[dir='rtl'] body {
+  font-family: var(--font-arabic);
+  line-height: 1.85;
+}
+
+[dir='rtl'] :is(h1, h2, h3, h4) {
+  letter-spacing: 0 !important;
+  line-height: 1.45;
+}
+
 ::selection {
-  background: rgba(214, 51, 132, 0.22);
+  background: rgb(var(--brand-500) / 0.22);
   color: rgb(var(--ink));
 }
 
-/* -- Scrollbars ---------------------------------------------------- */
+/* -- Scrollbars ------------------------------------------------------ */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -84,22 +67,102 @@ h3 {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(214, 51, 132, 0.28);
-  border-radius: 999px;
+  background: rgb(var(--brand-500) / 0.28);
+  border-radius: var(--radius-pill);
   border: 3px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(214, 51, 132, 0.5);
+  background: rgb(var(--brand-500) / 0.5);
   background-clip: padding-box;
 }
 
-/* -- Reusable component layer -------------------------------------- */
+/* -- Reusable component layer ---------------------------------------- */
 @layer components {
+  /* GLASS — selective and tasteful. Navbars, one floating panel, a single
+     hero card. Never stack glass on glass: it turns muddy and destroys
+     contrast. Always pair with an opaque text colour (ink/muted). */
   .glass {
-    background-color: rgb(var(--card) / 0.78);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background-color: rgb(var(--glass-tint) / var(--glass-alpha));
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid rgb(var(--glass-border) / var(--glass-border-alpha));
+  }
+
+  /* A denser variant for glass that sits over busy imagery or gradients. */
+  .glass-strong {
+    background-color: rgb(var(--glass-tint) / calc(var(--glass-alpha) + 0.18));
+    backdrop-filter: blur(calc(var(--glass-blur) + 8px)) saturate(150%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 8px)) saturate(150%);
+    border: 1px solid rgb(var(--glass-border) / var(--glass-border-alpha));
+  }
+
+  /* The full frosted panel: glass + soft radius + elevation. */
+  .glass-panel {
+    background-color: rgb(var(--glass-tint) / var(--glass-alpha));
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid rgb(var(--glass-border) / var(--glass-border-alpha));
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-3);
+  }
+
+  /* Graceful degradation where backdrop-filter is unsupported. */
+  @supports not (backdrop-filter: blur(1px)) {
+    .glass,
+    .glass-strong,
+    .glass-panel {
+      background-color: rgb(var(--card) / 0.96);
+    }
+  }
+
+  /* GLOW — a soft bloom, not a neon ring. One per view, at most. */
+  .glow-brand {
+    box-shadow: var(--glow-brand);
+  }
+  .glow-calm {
+    box-shadow: var(--glow-calm);
+  }
+
+  /* SOFT GRADIENT BACKGROUND — for hero sections and page wells. */
+  .bg-aurora {
+    background-image: var(--gradient-aurora);
+  }
+  .bg-soft {
+    background-image: var(--gradient-soft);
+  }
+
+  /* Gradient text for a single highlighted word. Falls back to a solid
+     AA-safe brand tone where background-clip is unsupported. */
+  .text-gradient {
+    color: rgb(var(--accent-text));
+  }
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .text-gradient {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  }
+
+  /* Hairline divider — warm, never a grey rule. */
+  .hairline {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgb(var(--line-strong)) 20%,
+      rgb(var(--line-strong)) 80%,
+      transparent
+    );
+  }
+
+  .focus-ring:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgb(var(--canvas)),
+      0 0 0 5px rgb(var(--accent-ring) / 0.55);
   }
 
   .hide-scrollbar {
@@ -108,20 +171,6 @@ h3 {
   }
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
-  }
-
-  /* Gradient text used for highlighted words. */
-  .text-gradient {
-    background: linear-gradient(120deg, #d63384 0%, #ff5c95 55%, #ff94ba 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  /* Focus ring for keyboard accessibility. */
-  .focus-ring:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px rgb(var(--canvas)), 0 0 0 5px rgba(214, 51, 132, 0.55);
   }
 }
 
@@ -137,20 +186,20 @@ h3 {
   }
 }
 
-/* -- MapLibre map (Find a Doctor) ---------------------------------- */
+/* -- MapLibre map (Find a Doctor) ------------------------------------ */
 .maplibregl-popup-content {
   font-family: inherit;
   font-weight: 600;
-  color: #2d1f2d;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  color: rgb(var(--ink));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
 }
 .maplibregl-popup-content a {
-  color: #d63384;
+  color: rgb(var(--accent-text));
   font-weight: 800;
 }
 
-/* -- Honour reduced-motion preference ------------------------------ */
+/* -- Honour reduced-motion preference --------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -161,7 +210,7 @@ h3 {
   }
 }
 
-/* -- Print: clean self-check guide hand-out ------------------------ */
+/* -- Print: clean self-check guide hand-out --------------------------- */
 @media print {
   .no-print {
     display: none !important;

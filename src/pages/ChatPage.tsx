@@ -153,7 +153,7 @@ export function ChatPage() {
         <header className="border-b border-line p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-rose-gradient text-white"><Bot /></span>
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-cta text-white"><Bot /></span>
               <div><h1 className="text-2xl font-black text-ink">{t.chat.title}</h1><p className="text-sm font-bold text-muted">{t.chat.online}</p></div>
             </div>
             <button onClick={() => setMessages([])} className="grid h-11 w-11 place-items-center rounded-full bg-primary-50 text-primary-700" aria-label={t.chat.clear}><Trash2 size={18} /></button>
@@ -166,9 +166,13 @@ export function ChatPage() {
           {messages.map((message, index) => (
             <div key={`${message.timestamp}-${index}`} className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {message.role === 'assistant' && <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 text-primary-700"><Sparkles size={16} /></span>}
-              <div className={`max-w-[82%] rounded-3xl p-4 shadow-petal ${message.role === 'user' ? 'bg-rose-gradient text-white' : 'bg-white/80 text-ink'}`}>
+              <div className={`max-w-[82%] rounded-3xl p-4 shadow-petal ${message.role === 'user' ? 'bg-brand-cta text-white' : 'bg-white/80 text-ink'}`}>
                 <p className="whitespace-pre-wrap font-medium leading-7">{renderMarkdownBold(message.content)}</p>
-                <p className="mt-2 text-[11px] opacity-70">{formatTime(message.timestamp, lang)}</p>
+                {/* opacity-70 put the timestamp at 2.9:1 on the bubble. Use a solid
+                    tone per bubble instead — muted on light, white on brand. */}
+                <p className={cn('mt-2 text-[11px]', message.role === 'user' ? 'text-white' : 'text-muted')}>
+                  {formatTime(message.timestamp, lang)}
+                </p>
               </div>
               {message.role === 'user' && <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-teal/15 text-accent-teal"><UserRound size={16} /></span>}
             </div>
@@ -200,7 +204,7 @@ export function ChatPage() {
                 className={cn(
                   'relative grid h-12 w-12 place-items-center rounded-full transition-all duration-200 active:scale-95',
                   voice.listening
-                    ? 'bg-rose-gradient text-white shadow-petal-lg'
+                    ? 'bg-brand-cta text-white shadow-petal-lg'
                     : 'bg-primary-50 text-primary-600 hover:bg-primary-100',
                 )}
               >

@@ -73,7 +73,7 @@ export function Layout() {
           type="button"
           onClick={stop}
           aria-label={stopAudioLabel}
-          className="fixed bottom-[140px] left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full bg-rose-gradient px-5 py-2.5 text-sm font-bold text-white shadow-petal-lg transition active:scale-95"
+          className="fixed bottom-[140px] left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-bold text-white shadow-petal-lg transition active:scale-95"
         >
           <Volume2 size={16} />
           {stopAudioLabel}

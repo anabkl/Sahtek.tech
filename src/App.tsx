@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
+import { useTheme } from '@/hooks/useTheme';
 import { REMINDER_STORAGE_KEY, scheduleNotificationCheck } from '@/utils/notificationScheduler';
 import { HomePage } from '@/pages/HomePage';
 import { LearnPage } from '@/pages/LearnPage';
@@ -13,6 +14,9 @@ import { NotFoundPage } from '@/pages/NotFoundPage';
 
 // Map page pulls in MapLibre — load it only when the route is visited.
 const DoctorsPage = lazy(() => import('@/pages/DoctorsPage'));
+
+// Design-system preview. Unlisted, lazy — never in the main bundle.
+const DesignSystemPage = lazy(() => import('@/pages/DesignSystemPage'));
 
 function RouteFallback() {
   return (
@@ -26,6 +30,9 @@ function RouteFallback() {
 }
 
 export default function App() {
+  // Owns the `.dark` class on <html> for the whole app.
+  useTheme();
+
   // Resume a saved monthly reminder on load so an open tab can still fire it.
   useEffect(() => {
     try {
@@ -42,6 +49,15 @@ export default function App() {
   return (
     <AnimatePresence mode="wait">
       <Routes>
+        {/* Outside Layout: the preview owns its own chrome and theme toggle. */}
+        <Route
+          path="/design-system"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <DesignSystemPage />
+            </Suspense>
+          }
+        />
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="learn" element={<LearnPage />} />

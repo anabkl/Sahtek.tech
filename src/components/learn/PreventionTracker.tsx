@@ -281,11 +281,12 @@ export function PreventionTracker() {
             exit={{ opacity: 0, y: 14 }}
             className="space-y-3"
           >
-            <div className="overflow-hidden rounded-[1.75rem] bg-rose-gradient p-6 text-center text-white shadow-petal-xl">
+            <div className="overflow-hidden rounded-[1.75rem] bg-brand-cta p-6 text-center text-white shadow-petal-xl">
               <Trophy className="mx-auto" size={40} />
               <p className="mt-3 text-lg font-black">{p.shareCardLine1}</p>
               <p className="mt-1 text-2xl font-black">{p.shareCardLine2}</p>
-              <p className="mt-3 text-sm font-bold text-white/80">sahtek.tech</p>
+              {/* Solid white, not white/80: any transparency drops below 4.5:1 on the gradient. */}
+              <p className="mt-3 text-sm font-bold text-white">sahtek.tech</p>
             </div>
             <Button fullWidth leftIcon={<Share2 size={18} />} onClick={share}>
               {p.shareBtn}

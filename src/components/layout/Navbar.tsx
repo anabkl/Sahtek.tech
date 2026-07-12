@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { HeartPulse, Languages, ShieldCheck } from 'lucide-react';
+import { HeartPulse, Languages, Moon, ShieldCheck, Sun } from 'lucide-react';
 import { LANGUAGE_META, SUPPORTED_LANGUAGES } from '@/config/constants';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/utils/cn';
 
 const navItems = [
@@ -15,12 +16,16 @@ const navItems = [
 
 export function Navbar() {
   const { t, lang, setLang } = useLanguage();
+  const { resolved, toggle } = useTheme();
+  const isDark = resolved === 'dark';
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/50 bg-canvas/80 px-4 py-3 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
         <NavLink to="/" className="flex min-w-0 items-center gap-2">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-rose-gradient text-white shadow-petal-lg">
+          {/* brand-cta, not rose-gradient: a white glyph on the decorative
+              gradient sits at 2.4:1, under the 3:1 floor for UI shapes. */}
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-cta text-white shadow-petal-lg">
             <HeartPulse size={22} />
           </span>
           <span className="min-w-0">
@@ -51,6 +56,18 @@ export function Navbar() {
             <ShieldCheck size={14} />
             {t.common.demoMode}
           </span>
+
+          <button
+            type="button"
+            onClick={toggle}
+            aria-pressed={isDark}
+            aria-label={`${t.settings.theme}: ${isDark ? t.settings.dark : t.settings.light}`}
+            title={isDark ? t.settings.light : t.settings.dark}
+            className="focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-card text-accent-text shadow-petal transition hover:border-primary-200 active:scale-95"
+          >
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
           <div className="relative">
             <Languages className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-600" />
             <select

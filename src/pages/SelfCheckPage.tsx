@@ -154,7 +154,7 @@ export function SelfCheckPage() {
             <div className="grid gap-3">
               {guide.map((step) => (
                 <div key={step.step_number} className="flex items-center gap-4 rounded-2xl bg-white/55 p-4">
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-rose-gradient text-lg font-black text-white">{step.step_number}</span>
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-brand-cta text-lg font-black text-white">{step.step_number}</span>
                   <div><h3 className="font-black text-ink">{step.title}</h3><p className="text-sm font-medium text-muted">{formatDuration(step.duration_seconds)}</p></div>
                 </div>
               ))}
@@ -246,7 +246,7 @@ export function SelfCheckPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 28 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="mt-6 rounded-[1.75rem] bg-rose-gradient p-5 text-start text-white shadow-petal-xl"
+                className="mt-6 rounded-[1.75rem] bg-brand-cta p-5 text-start text-white shadow-petal-xl"
               >
                 <div className="flex items-center gap-2">
                   <BellRing size={22} />

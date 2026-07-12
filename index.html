@@ -18,6 +18,24 @@
     />
 
     <title>صحّتك - Sahtek | التوعية بسرطان الثدي</title>
+
+    <!-- Resolve the theme before first paint so dark users never see a white
+         flash. Mirrors useTheme(); the store is the source of truth after boot. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('sahtek:user');
+          var theme = saved ? JSON.parse(saved).state.theme : 'system';
+          var isDark =
+            theme === 'dark' ||
+            ((!theme || theme === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) document.documentElement.classList.add('dark');
+        } catch (e) {
+          /* storage unavailable — fall back to light */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -93,7 +93,7 @@ export function HomePage() {
                 to={['/learn', '/self-check', '/risk', '/chat'][index]}
                 className="group rounded-3xl border border-white/70 bg-card/80 p-5 shadow-petal transition hover:-translate-y-1 hover:shadow-petal-lg"
               >
-                <span className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-rose-gradient text-white shadow-petal">
+                <span className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-brand-cta text-white shadow-petal">
                   <Icon size={22} />
                 </span>
                 <h3 className="text-lg font-black text-ink">{feature.title}</h3>
@@ -104,12 +104,14 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="my-8 overflow-hidden rounded-[2rem] bg-rose-gradient p-6 text-white shadow-petal-xl sm:p-8">
+      <section className="my-8 overflow-hidden rounded-[2rem] bg-brand-cta p-6 text-white shadow-petal-xl sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CalendarHeart size={34} />
             <h2 className="mt-3 text-3xl font-black">{t.home.bannerTitle}</h2>
-            <p className="mt-2 max-w-2xl text-white/85">{t.home.bannerText}</p>
+            {/* Solid white: white/85 measured 3.6:1 on the gradient. Hierarchy
+                comes from weight and size here, not from transparency. */}
+            <p className="mt-2 max-w-2xl text-white">{t.home.bannerText}</p>
           </div>
           <Link to="/self-check">
             <Button variant="secondary" size="lg">{t.home.bannerCta}</Button>

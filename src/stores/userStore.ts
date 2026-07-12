@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { STORAGE_KEYS } from '@/config/constants';
 
-export type Theme = 'light' | 'dark';
+/** 'system' follows prefers-color-scheme; the others are an explicit user choice. */
+export type Theme = 'light' | 'dark' | 'system';
 
 export interface SavedReminder {
   preferredDay: number;
@@ -22,7 +23,6 @@ interface UserState {
   reminder: SavedReminder | null;
 
   setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
   setOnboarded: (value: boolean) => void;
   togglePreventionItem: (id: string) => void;
   logSelfCheck: () => void;
@@ -33,14 +33,13 @@ interface UserState {
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      theme: 'light',
+      theme: 'system',
       onboarded: false,
       preventionChecklist: [],
       selfCheckLog: [],
       reminder: null,
 
       setTheme: (theme) => set({ theme }),
-      toggleTheme: () => set((s) => ({ theme: s.theme === 'light' ? 'dark' : 'light' })),
       setOnboarded: (onboarded) => set({ onboarded }),
       togglePreventionItem: (id) =>
         set((s) => ({
@@ -57,6 +56,16 @@ export const useUserStore = create<UserState>()(
         }),
       setReminder: (reminder) => set({ reminder }),
     }),
-    { name: STORAGE_KEYS.onboarded.replace(':onboarded', ':user') },
+    {
+      name: STORAGE_KEYS.onboarded.replace(':onboarded', ':user'),
+      version: 1,
+      migrate: (persisted, version) => {
+        const state = persisted as UserState;
+        // v0 defaulted to 'light', but no toggle existed then — nobody actually
+        // chose it. Treat it as "never picked" so the OS preference wins.
+        if (version === 0 && state) state.theme = 'system';
+        return state;
+      },
+    },
   ),
 );

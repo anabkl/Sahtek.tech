@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import { ArrowRight, BellRing, Link2, MapPin, Share2, Stethoscope } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
@@ -90,23 +90,19 @@ export function SignsPage() {
           <p className="mt-5 text-body-lg text-muted">{page.intro}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link to="/self-check">
-              <Button
+            <Button to="/self-check"
                 size="lg"
                 fullWidth
                 rightIcon={<ArrowRight size={20} className={isRTL ? 'rotate-180' : undefined} />}
               >
                 {page.ctaSelfCheck}
               </Button>
-            </Link>
             {/* Was an in-page anchor. /when-to-seek-help now carries the full
                 guidance — urgency levels, timeframes, what to bring — so send
                 her there. The section below stays as the in-context summary. */}
-            <Link to="/when-to-seek-help">
-              <Button size="lg" variant="secondary" fullWidth leftIcon={<Stethoscope size={18} />}>
+            <Button to="/when-to-seek-help" size="lg" variant="secondary" fullWidth leftIcon={<Stethoscope size={18} />}>
                 {page.ctaHelp}
               </Button>
-            </Link>
             <Button
               size="lg"
               variant="ghost"
@@ -234,16 +230,12 @@ export function SignsPage() {
         </SafetyNote>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link to="/doctors">
-            <Button size="lg" fullWidth leftIcon={<MapPin size={18} />}>
+          <Button to="/doctors" size="lg" fullWidth leftIcon={<MapPin size={18} />}>
               {t.home.nextSteps.ctaDoctors}
             </Button>
-          </Link>
-          <Link to="/reminder">
-            <Button size="lg" variant="secondary" fullWidth leftIcon={<BellRing size={18} />}>
+          <Button to="/reminder" size="lg" variant="secondary" fullWidth leftIcon={<BellRing size={18} />}>
               {t.home.nextSteps.ctaReminder}
             </Button>
-          </Link>
         </div>
 
         {/* No disclaimer here: the Footer renders <Disclaimer full withTitle />

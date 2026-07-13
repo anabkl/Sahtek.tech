@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -74,14 +74,12 @@ export function Companion() {
           </div>
 
           <div className="mt-7">
-            <Link to="/chat">
-              <Button
+            <Button to="/chat"
                 size="lg"
                 rightIcon={<ArrowRight size={20} className={isRTL ? 'rotate-180' : undefined} />}
               >
                 {companion.cta}
               </Button>
-            </Link>
           </div>
         </motion.div>
 

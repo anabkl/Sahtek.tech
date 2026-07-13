@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -164,15 +164,13 @@ export function WhenToSeekHelpPage() {
         </motion.ul>
 
         <div className="mt-6 flex justify-center">
-          <Link to="/signs">
-            <Button
+          <Button to="/signs"
               variant="secondary"
               size="lg"
               rightIcon={<ArrowRight size={18} className={isRTL ? 'rotate-180' : undefined} />}
             >
               {page.seeAllSigns}
             </Button>
-          </Link>
         </div>
       </section>
 
@@ -201,16 +199,12 @@ export function WhenToSeekHelpPage() {
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="pb-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link to="/doctors">
-            <Button size="lg" fullWidth leftIcon={<MapPin size={18} />}>
+          <Button to="/doctors" size="lg" fullWidth leftIcon={<MapPin size={18} />}>
               {page.ctaDoctors}
             </Button>
-          </Link>
-          <Link to="/self-check">
-            <Button size="lg" variant="secondary" fullWidth leftIcon={<BellRing size={18} />}>
+          <Button to="/self-check" size="lg" variant="secondary" fullWidth leftIcon={<BellRing size={18} />}>
               {page.ctaSelfCheck}
             </Button>
-          </Link>
         </div>
       </section>
     </PageTransition>

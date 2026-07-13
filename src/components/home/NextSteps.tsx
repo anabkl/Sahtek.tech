@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import { BellRing, CalendarClock, CircleCheck, Eye, MapPin, Stethoscope, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -82,16 +82,12 @@ export function NextSteps() {
       </SafetyNote>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-        <Link to="/doctors">
-          <Button size="lg" fullWidth leftIcon={<MapPin size={18} />}>
+        <Button to="/doctors" size="lg" fullWidth leftIcon={<MapPin size={18} />}>
             {section.ctaDoctors}
           </Button>
-        </Link>
-        <Link to="/reminder">
-          <Button size="lg" variant="secondary" fullWidth leftIcon={<BellRing size={18} />}>
+        <Button to="/reminder" size="lg" variant="secondary" fullWidth leftIcon={<BellRing size={18} />}>
             {section.ctaReminder}
           </Button>
-        </Link>
       </div>
     </section>
   );

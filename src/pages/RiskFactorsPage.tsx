@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -169,20 +169,16 @@ export function RiskFactorsPage() {
         </SafetyNote>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link to="/risk">
-            <Button
+          <Button to="/risk"
               size="lg"
               fullWidth
               rightIcon={<ArrowRight size={20} className={isRTL ? 'rotate-180' : undefined} />}
             >
               {page.ctaAssessment}
             </Button>
-          </Link>
-          <Link to="/doctors">
-            <Button size="lg" variant="secondary" fullWidth leftIcon={<Stethoscope size={18} />}>
+          <Button to="/doctors" size="lg" variant="secondary" fullWidth leftIcon={<Stethoscope size={18} />}>
               {page.ctaDoctors}
             </Button>
-          </Link>
         </div>
       </section>
     </PageTransition>

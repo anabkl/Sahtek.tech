@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, LockKeyhole } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -36,8 +35,7 @@ export function FinalCta() {
           <p className="mt-4 text-body-lg text-white">{cta.text}</p>
 
           <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <Link to="/self-check" className="sm:w-auto">
-              <Button
+            <Button to="/self-check"
                 variant="secondary"
                 size="lg"
                 fullWidth
@@ -45,18 +43,16 @@ export function FinalCta() {
               >
                 {cta.primary}
               </Button>
-            </Link>
-            <Link to="/learn" className="sm:w-auto">
-              {/* Outline-on-gradient: a white hairline button. The ghost/outline
-                  variants are tuned for the light canvas and disappear here. */}
-              <Button
-                size="lg"
-                fullWidth
-                className="border-2 border-white/70 bg-transparent text-white shadow-none hover:bg-white/10"
-              >
-                {cta.secondary}
-              </Button>
-            </Link>
+            {/* Outline-on-gradient: a white hairline button. The ghost/outline
+                variants are tuned for the light canvas and disappear here. */}
+            <Button
+              to="/learn"
+              size="lg"
+              fullWidth
+              className="border-2 border-white/70 bg-transparent text-white shadow-none hover:bg-white/10"
+            >
+              {cta.secondary}
+            </Button>
           </div>
 
           <p className="mt-7 flex items-center gap-2 text-caption font-bold text-white">

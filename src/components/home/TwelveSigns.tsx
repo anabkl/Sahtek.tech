@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -90,15 +90,13 @@ export function TwelveSigns() {
       </motion.ul>
 
       <div className="mt-8 flex justify-center">
-        <Link to="/signs">
-          <Button
+        <Button to="/signs"
             variant="secondary"
             size="lg"
             rightIcon={<ArrowRight size={18} className={isRTL ? 'rotate-180' : undefined} />}
           >
             {signs.allCta}
           </Button>
-        </Link>
       </div>
 
       <Modal open={active !== null} onClose={() => setOpenSign(null)} title={active?.label}>

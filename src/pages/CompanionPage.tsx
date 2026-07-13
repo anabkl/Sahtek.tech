@@ -61,20 +61,16 @@ export function CompanionPage() {
           <p className="mt-5 max-w-prose text-body-lg text-muted">{page.intro}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link to="/chat">
-              <Button
+            <Button to="/chat"
                 size="lg"
                 fullWidth
                 rightIcon={<ArrowRight size={20} className={isRTL ? 'rotate-180' : undefined} />}
               >
                 {page.cta}
               </Button>
-            </Link>
-            <Link to="/signs">
-              <Button size="lg" variant="secondary" fullWidth>
+            <Button to="/signs" size="lg" variant="secondary" fullWidth>
                 {page.ctaSecondary}
               </Button>
-            </Link>
           </div>
 
           <Disclaimer className="mt-8" />
@@ -247,8 +243,7 @@ export function CompanionPage() {
             <p className="mt-3 text-body-lg text-white">{t.chat.subtitle}</p>
 
             <div className="mt-7 w-full sm:w-auto">
-              <Link to="/chat">
-                <Button
+              <Button to="/chat"
                   variant="secondary"
                   size="lg"
                   fullWidth
@@ -256,7 +251,6 @@ export function CompanionPage() {
                 >
                   {page.cta}
                 </Button>
-              </Link>
             </div>
           </div>
         </div>

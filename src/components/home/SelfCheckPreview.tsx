@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -65,14 +65,12 @@ export function SelfCheckPreview() {
       </ol>
 
       <div className="mt-14 flex justify-center">
-        <Link to="/self-check">
-          <Button
+        <Button to="/self-check"
             size="lg"
             rightIcon={<ArrowRight size={20} className={isRTL ? 'rotate-180' : undefined} />}
           >
             {section.cta}
           </Button>
-        </Link>
       </div>
     </section>
   );

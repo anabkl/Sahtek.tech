@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   BellRing,
@@ -316,16 +316,12 @@ export function SelfCheckPage() {
             </SafetyNote>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Link to="/doctors">
-                <Button size="lg" fullWidth leftIcon={<MapPin size={18} />}>
+              <Button to="/doctors" size="lg" fullWidth leftIcon={<MapPin size={18} />}>
                   {t.home.nextSteps.ctaDoctors}
                 </Button>
-              </Link>
-              <Link to="/signs">
-                <Button size="lg" variant="secondary" fullWidth leftIcon={<Eye size={18} />}>
+              <Button to="/signs" size="lg" variant="secondary" fullWidth leftIcon={<Eye size={18} />}>
                   {t.home.signs.allCta}
                 </Button>
-              </Link>
             </div>
           </div>
 

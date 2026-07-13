@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import { ArrowRight, Baby, Cigarette, Clock, Pill, Scale, UserRound, Users, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -88,15 +88,13 @@ export function RiskFactors() {
         {/* /risk-factors, not /risk: this section teaches, so its CTA should
             keep teaching. The questionnaire is one click further on, from the
             bottom of that page — learn first, then assess. */}
-        <Link to="/risk-factors">
-          <Button
+        <Button to="/risk-factors"
             variant="secondary"
             size="lg"
             rightIcon={<ArrowRight size={18} className={isRTL ? 'rotate-180' : undefined} />}
           >
             {section.cta}
           </Button>
-        </Link>
       </div>
     </section>
   );

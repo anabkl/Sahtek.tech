@@ -1,4 +1,5 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/utils/cn';
 
 type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -11,6 +12,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  /**
+   * In-app route. Renders the whole control as a single <a> — NOT a <button>
+   * inside an <a>.
+   *
+   * `<Link><Button/></Link>` puts interactive content inside interactive
+   * content: invalid HTML, and both elements are focusable, so a keyboard user
+   * lands on the same CTA twice — once on the link, once on the button. Pass
+   * `to` instead and there is one element and one tab stop.
+   */
+  to?: string;
 }
 
 const VARIANTS: Record<Variant, string> = {
@@ -45,30 +56,28 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     disabled,
     className,
     children,
+    to,
     ...props
   },
   ref,
 ) {
-  return (
-    <button
-      ref={ref}
-      disabled={disabled || loading}
-      className={cn(
-        'focus-ring relative inline-flex select-none items-center justify-center rounded-full font-semibold',
-        /* Microinteraction: a 1px lift on hover, a 3% press on tap. Both are
-           CSS transforms — composited, and neutralised by the reduced-motion
-           block in index.css, so they need no JS guard. The press is the one
-           that matters: it is the only feedback a touch device gets, since a
-           phone has no hover. */
-        'transition-all duration-base ease-soft hover:-translate-y-px active:translate-y-0 active:scale-[0.97]',
-        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100',
-        VARIANTS[variant],
-        SIZES[size],
-        fullWidth && 'w-full',
-        className,
-      )}
-      {...props}
-    >
+  const classes = cn(
+    'focus-ring relative inline-flex select-none items-center justify-center rounded-full font-semibold',
+    /* Microinteraction: a 1px lift on hover, a 3% press on tap. Both are
+       CSS transforms — composited, and neutralised by the reduced-motion
+       block in index.css, so they need no JS guard. The press is the one
+       that matters: it is the only feedback a touch device gets, since a
+       phone has no hover. */
+    'transition-all duration-base ease-soft hover:-translate-y-px active:translate-y-0 active:scale-[0.97]',
+    'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100',
+    VARIANTS[variant],
+    SIZES[size],
+    fullWidth && 'w-full',
+    className,
+  );
+
+  const body = (
+    <>
       {loading && (
         <span
           className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
@@ -78,6 +87,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {!loading && leftIcon}
       {children}
       {!loading && rightIcon}
+    </>
+  );
+
+  // One element, one tab stop, valid HTML.
+  if (to) {
+    return (
+      <Link to={to} className={classes}>
+        {body}
+      </Link>
+    );
+  }
+
+  return (
+    <button ref={ref} disabled={disabled || loading} className={classes} {...props}>
+      {body}
     </button>
   );
 });

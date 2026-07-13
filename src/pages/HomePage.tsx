@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -110,20 +110,16 @@ export function HomePage() {
           <p className="mt-5 max-w-prose text-body-lg text-muted">{t.home.heroSubtitle}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link to="/self-check" className="sm:w-auto">
-              <Button
+            <Button to="/self-check"
                 size="lg"
                 fullWidth
                 rightIcon={<ArrowRight size={20} className={isRTL ? 'rotate-180' : undefined} />}
               >
                 {t.home.ctaPrimary}
               </Button>
-            </Link>
-            <Link to="/learn" className="sm:w-auto">
-              <Button size="lg" variant="secondary" fullWidth>
+            <Button to="/learn" size="lg" variant="secondary" fullWidth>
                 {t.home.ctaSecondary}
               </Button>
-            </Link>
           </div>
 
           {/* Immediate trust signals. Privacy leads — it is the differentiator. */}

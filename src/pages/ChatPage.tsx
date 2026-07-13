@@ -185,7 +185,7 @@ export function ChatPage() {
             <button onClick={() => setMessages([])} className="grid h-11 w-11 place-items-center rounded-full bg-primary-50 text-primary-700" aria-label={t.chat.clear}><Trash2 size={18} /></button>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-            {quickReplies.map((reply) => <button key={reply} onClick={() => void send(reply)} className="shrink-0 rounded-full bg-white/70 px-4 py-2 text-sm font-bold text-primary-700 shadow-petal">{reply}</button>)}
+            {quickReplies.map((reply) => <button key={reply} onClick={() => void send(reply)} className="focus-ring min-h-11 shrink-0 rounded-full bg-white/70 px-4 py-2 text-sm font-bold text-primary-700 shadow-petal">{reply}</button>)}
           </div>
         </header>
         <div className="flex-1 space-y-4 overflow-y-auto p-4">
@@ -217,7 +217,15 @@ export function ChatPage() {
             </div>
           )}
           <div className="flex gap-2 rounded-full bg-white/80 p-2 shadow-inner">
-            <input value={text} onChange={(e) => setText(e.target.value)} placeholder={t.chat.placeholder} className="min-w-0 flex-1 bg-transparent px-4 font-bold text-ink outline-none" />
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder={t.chat.placeholder}
+              /* The placeholder is not an accessible name: it disappears the
+                 moment she types, and some screen readers never announce it. */
+              aria-label={t.chat.placeholder}
+              className="min-w-0 flex-1 bg-transparent px-4 font-bold text-ink outline-none"
+            />
             <div className="relative shrink-0">
               {voice.listening && (
                 <span className="pointer-events-none absolute inset-0 motion-safe:animate-pulse-ring rounded-full bg-rose-gradient" aria-hidden />

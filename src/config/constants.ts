@@ -47,6 +47,24 @@ export const FOOTER_LINKS: { key: 'about' | 'privacy' | 'terms' | 'contact'; to?
   { key: 'contact', href: `mailto:${APP.email}` },
 ];
 
+/**
+ * The clinician who reviewed the medical content, and the sources it is drawn
+ * from. Both render on the homepage credibility section ONLY when filled in.
+ *
+ * THIS IS DELIBERATELY EMPTY. Nobody has reviewed the content yet, and we cite
+ * no sources yet — so the app claims neither. A credibility block is worth
+ * exactly as much as it is true, and an invented reviewer or a decorative
+ * "evidence-based" badge is the fastest way to lose a woman who is scared and
+ * checking whether we can be trusted.
+ *
+ * To turn the block on: get a named, credentialled clinician to actually review
+ * the content, list the sources it was written from, and fill these in. Do not
+ * fill them in first.
+ */
+export const MEDICAL_REVIEW: { name: string; credential: string; reviewedOn: string } | null = null;
+
+export const EVIDENCE_SOURCES: { label: string; url: string }[] = [];
+
 export const LANGUAGE_META: Record<Language, { label: string; native: string; flag: string }> = {
   ar: { label: 'Darija', native: 'الدارجة', flag: 'MA' },
   fr: { label: 'Francais', native: 'Francais', flag: 'FR' },

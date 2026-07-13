@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  CalendarHeart,
   EyeOff,
   Gauge,
   HeartPulse,
@@ -13,7 +12,13 @@ import {
   ShieldCheck,
   Stethoscope,
 } from 'lucide-react';
+import { Companion } from '@/components/home/Companion';
+import { Credibility } from '@/components/home/Credibility';
+import { Faq } from '@/components/home/Faq';
+import { FinalCta } from '@/components/home/FinalCta';
 import { HowItWorks } from '@/components/home/HowItWorks';
+import { NextSteps } from '@/components/home/NextSteps';
+import { RiskFactors } from '@/components/home/RiskFactors';
 import { SelfCheckPreview } from '@/components/home/SelfCheckPreview';
 import { TwelveSigns } from '@/components/home/TwelveSigns';
 import { PageTransition } from '@/components/layout/PageTransition';
@@ -181,23 +186,26 @@ export function HomePage() {
       {/* ── GUIDED SELF-CHECK PREVIEW ────────────────────────────────────── */}
       <SelfCheckPreview />
 
-      {/* ── MONTHLY-HABIT BANNER ─────────────────────────────────────────── */}
-      <section className="my-8 overflow-hidden rounded-[2rem] bg-brand-cta p-6 text-white shadow-petal-xl sm:p-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CalendarHeart size={34} aria-hidden />
-            <h2 className="mt-3 text-h2">{t.home.bannerTitle}</h2>
-            {/* Solid white: white/85 measured 3.6:1 on the gradient. Hierarchy
-                comes from weight and size here, not from transparency. */}
-            <p className="mt-2 max-w-prose text-white">{t.home.bannerText}</p>
-          </div>
-          <Link to="/self-check" className="shrink-0">
-            <Button variant="secondary" size="lg">
-              {t.home.bannerCta}
-            </Button>
-          </Link>
-        </div>
-      </section>
+      {/* ── THE ASSISTANT — a companion, never a clinician ───────────────── */}
+      <Companion />
+
+      {/* ── RISK FACTORS — education, not fear ───────────────────────────── */}
+      <RiskFactors />
+
+      {/* ── WHAT TO DO NEXT — awareness becomes action ───────────────────── */}
+      <NextSteps />
+
+      {/* ── CREDIBILITY — method, not badges ─────────────────────────────── */}
+      <Credibility />
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <Faq />
+
+      {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
+      <FinalCta />
+
+      {/* The shared <Footer /> is rendered by <Layout />, so it is already
+          below this — it carries the full disclaimer and the privacy pill. */}
     </PageTransition>
   );
 }

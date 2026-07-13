@@ -553,7 +553,7 @@ export const es: Translation = {
   chat: {
     title: 'Asistente Sahtek',
     subtitle: 'Pregunta sobre la salud mamaria, los autoexámenes o los próximos pasos.',
-    online: 'Conectado a la IA en vivo',
+    online: 'Responde en tu dispositivo',
     placeholder: 'Escribe tu pregunta...',
     disclaimer: 'Solo información educativa. No es un diagnóstico.',
     quickRepliesTitle: 'Prueba a preguntar',

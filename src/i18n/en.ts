@@ -621,7 +621,7 @@ export const en = {
   chat: {
     title: 'Sahtek Assistant',
     subtitle: 'Ask about breast health, self-checks or next steps.',
-    online: 'Connected to live AI',
+    online: 'Answers on your device',
     placeholder: 'Write your question...',
     disclaimer: 'Educational information only. Not a diagnosis.',
     quickRepliesTitle: 'Try asking',

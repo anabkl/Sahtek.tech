@@ -540,7 +540,7 @@ export const fr: Translation = {
     you: 'Vous êtes ici',
   },
   chat: {
-    title: 'Assistante Sahtek', subtitle: 'Posez vos questions sur la santé du sein.', online: 'Connectée à l’IA en direct',
+    title: 'Assistante Sahtek', subtitle: 'Posez vos questions sur la santé du sein.', online: 'Répond depuis votre appareil',
     placeholder: 'Écrivez votre question...', disclaimer: 'Information éducative uniquement. Pas un diagnostic.',
     quickRepliesTitle: 'Essayez', quickReplies: ['Quels signes surveiller ?', 'Comment m’examiner ?', 'J’ai peur', 'La famille compte ?'],
     typing: 'Sahtek écrit...', voiceLabel: 'Saisie vocale', listening: 'Écoute en cours...',

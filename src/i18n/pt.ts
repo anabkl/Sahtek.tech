@@ -146,15 +146,84 @@ export const pt: Translation = {
       { prefix: '', value: 99, suffix: '%', label: 'sobrevivência', caption: 'quando o câncer de mama é detectado cedo' },
       { prefix: '', value: 5, suffix: ' min', label: 'por mês', caption: 'para um hábito simples de autoexame' },
     ],
-    bannerTitle: 'Dedique cinco minutos a você mesma',
-    bannerText: 'Um pequeno hábito mensal pode fazer uma diferença real. Se algo parecer incomum, fale com um médico.',
-    bannerCta: 'Começar agora',
-    testimonialsTitle: 'Vozes da nossa comunidade',
-    testimonials: [
-      { quote: 'Finalmente entendi como me examinar sem medo.', name: 'Khadija', role: 'Casablanca' },
-      { quote: 'Compartilhei com minha mãe e minhas irmãs. O darija deixa tudo mais próximo.', name: 'Salma', role: 'Fez' },
-      { quote: 'A assistente respondeu com carinho quando eu estava com muito medo de perguntar.', name: 'Naima', role: 'Marrakech' },
-    ],
+    companion: {
+      eyebrow: 'A sua companheira',
+      title: 'Pergunte sem vergonha e sem julgamento',
+      subtitle:
+        'A assistente do Sahtek não é médica e nunca dará um diagnóstico. Ela explica, tranquiliza e diz quando procurar alguém.',
+      helpsWithTitle: 'Em que ajuda',
+      helpsWith: [
+        'Explica as palavras médicas em linguagem simples',
+        'Responde às perguntas difíceis de fazer',
+        'Aponta o próximo passo',
+      ],
+      sampleTitle: 'Experimente perguntar',
+      safetyNote:
+        'Não é médica nem diagnóstico. A assistente oferece apenas informação educativa — as decisões médicas ficam com o seu médico.',
+      privacyNote:
+        'As respostas vêm do próprio Sahtek, no seu aparelho. As suas perguntas não são enviadas a lugar nenhum.',
+      cta: 'Abrir o chat',
+      mock: {
+        question: 'Encontrei um nódulo pequeno. Devo me assustar?',
+        answer:
+          'Respire. A maioria dos nódulos não é câncer. Observe e, se durar mais de duas semanas ou mudar, marque uma consulta para um médico avaliar.',
+      },
+    },
+    riskFactorsSection: {
+      eyebrow: 'Fatores de risco',
+      title: 'Conhecê-los, sem temê-los',
+      cta: 'Explorar seus fatores de risco',
+    },
+    nextSteps: {
+      eyebrow: 'O que fazer depois',
+      title: 'Você notou algo. E agora?',
+      subtitle: 'Nem toda mudança pede o mesmo passo. Veja como pensar nisso, com calma.',
+      cards: [
+        { state: 'Nada fora do comum', meaning: 'Seu corpo está como sempre.', action: 'Mantenha o hábito: um autoexame por mês. Programe um lembrete para não precisar lembrar.' },
+        { state: 'Uma mudança leve', meaning: 'Algo parece um pouco diferente — por exemplo, sensibilidade que acompanha o ciclo.', action: 'Observe por duas semanas e anote o dia em que notou. Se passar, ótimo. Se ficar, marque consulta.' },
+        { state: 'Uma mudança que dura duas semanas', meaning: 'A mudança não foi embora, ou ficou mais clara.', action: 'Marque consulta com um médico. Não é emergência — mas não espere mais.' },
+        { state: 'Um sinal que precisa ser visto logo', meaning: 'Como secreção com sangue, nódulo duro e fixo, ou mudança clara na pele ou no mamilo.', action: 'Procure um médico em breve. A maioria desses casos não é grave — mas devem ser avaliados agora.' },
+      ],
+      ctaDoctors: 'Encontrar um médico perto de você',
+      ctaReminder: 'Programar lembrete mensal',
+      note: 'Esta orientação é geral e não é um diagnóstico. Se você estiver preocupada, quem decide é o seu médico.',
+    },
+    credibility: {
+      eyebrow: 'Como este conteúdo é feito',
+      title: 'A confiança se constrói com clareza',
+      subtitle: 'Sem credenciais inventadas nem avaliações fabricadas. Apenas o que fazemos e o que nos recusamos a fazer.',
+      points: [
+        { title: 'Conscientização, não diagnóstico', desc: 'O Sahtek nunca diz “você tem” nem “está tudo bem”. Ele explica e diz quando procurar um médico.' },
+        { title: 'Privado por concepção', desc: 'Sem conta, sem rastreamento, sem análises. Suas respostas ficam no seu navegador.' },
+        { title: 'Darija primeiro', desc: 'Os textos são escritos primeiro em darija, não traduzidos automaticamente do inglês.' },
+      ],
+      methodTitle: 'Nosso método',
+      method: [
+        'Escrevemos primeiro em darija e depois adaptamos para francês e inglês.',
+        'Evitamos imagens clínicas e linguagem que assusta.',
+        'Dizemos “o que observar” e “o que fazer” — nunca “o que você tem”.',
+        'Toda página com orientação traz um aviso médico visível.',
+      ],
+      reviewTitle: 'Revisão médica',
+    },
+    faq: {
+      eyebrow: 'Perguntas',
+      title: 'As que sempre nos fazem',
+      items: [
+        { q: 'Isto é uma ferramenta de diagnóstico?', a: 'Não. O Sahtek oferece conscientização e orientação. Ele nunca diagnostica nem diz se você tem uma doença. Só um médico pode fazer isso.' },
+        { q: 'Meus dados são privados?', a: 'Sim. Não há conta, rastreamento nem análises. Suas respostas ficam no seu navegador, e até o chat responde de dentro do app — suas perguntas não são enviadas a lugar nenhum.' },
+        { q: 'Posso usar em darija?', a: 'Sim, e o darija é a nossa primeira língua. Também há francês e inglês, além de outros idiomas.' },
+        { q: 'Quando devo falar com um médico?', a: 'Se notar uma mudança nova que dure mais de duas semanas, ou se houver secreção com sangue, nódulo duro ou mudança clara na pele ou no mamilo — marque uma consulta. E se você estiver simplesmente preocupada, isso já basta.' },
+        { q: 'Posso usar sem conta?', a: 'Sim. O Sahtek funciona sem conta e sem cadastro. Nunca pedimos seu nome ou e-mail.' },
+      ],
+    },
+    finalCta: {
+      title: 'Dedique cinco minutos a você mesma',
+      text: 'Um pequeno hábito mensal pode fazer uma diferença real. Comece agora — sem conta, e nada sai do seu aparelho.',
+      primary: 'Começar o autoexame guiado',
+      secondary: 'Aprender os sinais',
+      note: 'Se algo parecer incomum, fale com um médico.',
+    },
     trustNote: 'Tudo fica no seu aparelho. Sem conta, sem rastreamento, sem análises.',
   },
   learn: {
@@ -484,7 +553,7 @@ export const pt: Translation = {
   chat: {
     title: 'Assistente Sahtek',
     subtitle: 'Pergunte sobre a saúde da mama, autoexames ou próximos passos.',
-    online: 'Conectado à IA ao vivo',
+    online: 'Responde no seu aparelho',
     placeholder: 'Escreva sua pergunta...',
     disclaimer: 'Apenas informação educativa. Não é um diagnóstico.',
     quickRepliesTitle: 'Experimente perguntar',

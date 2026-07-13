@@ -553,7 +553,7 @@ export const de: Translation = {
   chat: {
     title: 'Sahtek-Assistentin',
     subtitle: 'Frage zur Brustgesundheit, zu Selbstuntersuchungen oder zu nächsten Schritten.',
-    online: 'Mit der Live-KI verbunden',
+    online: 'Antwortet auf deinem Gerät',
     placeholder: 'Schreibe deine Frage...',
     disclaimer: 'Nur aufklärende Informationen. Keine Diagnose.',
     quickRepliesTitle: 'Frag doch mal',

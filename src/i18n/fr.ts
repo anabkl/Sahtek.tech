@@ -36,29 +36,224 @@ export const fr: Translation = {
     getStarted: 'Commencer mon parcours',
   },
   home: {
-    badge: 'Pour les femmes marocaines', heroTitle: 'Votre santé,', heroHighlight: 'avec douceur',
-    heroSubtitle: 'Sahtek vous aide à apprendre, à vous auto-examiner et à comprendre la santé du sein — en toute confidentialité, avec chaleur et une IA connectée.',
-    ctaPrimary: 'Commencer l’auto-examen', ctaSecondary: 'Voir les signes', statsTitle: 'La détection précoce change tout',
+    badge: 'Un accompagnement pensé avec soin',
+    heroTitle: 'Reconnaissez les signes,',
+    heroHighlight: 'avancez l’esprit tranquille.',
+    heroSubtitle:
+      'Sahtek vous accompagne pas à pas : repérer les changements, suivre un auto-examen guidé et savoir quoi faire ensuite. Sans compte, sans traceur — vos réponses restent sur votre appareil.',
+    ctaPrimary: 'Commencer l’auto-examen guidé', ctaSecondary: 'Apprendre les signes',
+    heroTrust: ['Sans compte', 'Sans traceur', 'Vos réponses restent sur votre appareil'],
+    previewAlt: 'Aperçu de l’application Sahtek : l’écran de l’auto-examen guidé.',
+    trustBarLabel: 'Les promesses de Sahtek',
+    trustBar: [
+      'Privé et respectueux',
+      'La sensibilisation, jamais un diagnostic',
+      'Des examens guidés et simples',
+      'Darija, français et anglais',
+      'Conçu pour les femmes au Maroc',
+    ],
+    helpsTitle: 'Ce que Sahtek vous aide à faire',
+    helpsSubtitle: 'Six façons sereines de mieux connaître votre corps — et d’agir tôt, en confiance.',
+    helps: [
+      { title: 'Reconnaître les signes', desc: 'Les changements à remarquer, expliqués simplement.' },
+      { title: 'Suivre un auto-examen guidé', desc: 'Cinq étapes douces. Cinq minutes, une fois par mois.' },
+      { title: 'Comprendre les changements', desc: 'La plupart ne sont pas un cancer. Apprenez lesquels méritent une visite.' },
+      { title: 'Explorer les facteurs de risque', desc: 'Une prise de conscience — jamais un verdict sur votre corps.' },
+      { title: 'Poser vos questions', desc: 'Des réponses calmes aux questions difficiles à poser.' },
+      { title: 'Savoir quoi faire ensuite', desc: 'Quand consulter, et comment trouver un médecin près de chez vous.' },
+    ],
+    signs: {
+      eyebrow: 'Les signes',
+      title: '12 changements à connaître',
+      subtitle:
+        'Non pas pour vous effrayer, mais pour vous aider à connaître ce qui est normal pour votre corps, et à remarquer vite si quelque chose change.',
+      cardCta: 'En savoir plus',
+      whatToNotice: 'Ce qu’il faut remarquer',
+      nextStepTitle: 'La prochaine étape',
+      nextStepText:
+        'La plupart de ces changements ne sont pas un cancer. Mais si vous remarquez un changement nouveau qui dure plus de deux semaines, prenez rendez-vous avec un médecin — non pas pour vous inquiéter, simplement pour savoir.',
+      allCta: 'Voir les 12 signes en détail',
+      items: [
+        { label: 'Une nouvelle boule', detail: 'Une boule ou une fermeté nouvelle dans le sein, souvent indolore. Une boule qui ne fait pas mal mérite la même attention qu’une boule douloureuse.' },
+        { label: 'Un gonflement d’une partie du sein', detail: 'Une partie du sein paraît gonflée ou plus pleine, même sans boule nettement palpable.' },
+        { label: 'Un capitonnage de la peau', detail: 'La peau se creuse de petits trous, comme une peau d’orange, ou se rétracte quand vous levez le bras.' },
+        { label: 'Une rougeur ou une chaleur', detail: 'La peau devient rouge ou chaude sans raison claire, et le reste plusieurs jours.' },
+        { label: 'Un changement de taille ou de forme', detail: 'Un sein devient visiblement différent de l’autre, de façon nouvelle. Une différence naturelle entre les deux est normale — c’est la nouveauté qui compte.' },
+        { label: 'Un mamelon qui se rétracte', detail: 'Le mamelon rentre vers l’intérieur alors qu’il ressortait avant. S’il a toujours été ainsi, c’est votre normal.' },
+        { label: 'Un écoulement du mamelon', detail: 'Un écoulement hors allaitement, surtout s’il est sanglant ou ne vient que d’un seul côté.' },
+        { label: 'Une desquamation ou des démangeaisons', detail: 'La peau autour du mamelon pèle, démange ou s’épaissit, et ne guérit pas.' },
+        { label: 'Une douleur persistante au même endroit', detail: 'Une douleur à un seul endroit qui persiste et ne suit pas votre cycle. La douleur seule est rarement un signe, mais la persistance compte.' },
+        { label: 'De nouvelles veines apparentes', detail: 'De nouvelles veines bien visibles sur la peau du sein, qui ne se remarquaient pas avant.' },
+        { label: 'Une boule sous le bras', detail: 'Un gonflement ou une boule sous l’aisselle, même si le sein lui-même paraît normal.' },
+        { label: 'Un gonflement au-dessus de la clavicule', detail: 'Un gonflement au-dessus ou en dessous de la clavicule, sans cause évidente.' },
+      ],
+    },
+    howItWorks: {
+      eyebrow: 'Comment ça marche',
+      title: 'Quatre étapes, sans précipitation',
+      subtitle: 'De la première fois où vous apprenez les signes, jusqu’à savoir exactement quoi faire ensuite.',
+      steps: [
+        {
+          title: 'Découvrir',
+          desc: 'Apprenez les 12 changements à connaître, simplement et sans peur.',
+          imageAlt: 'Illustration simple : une femme lisant sur les signes de la santé du sein.',
+        },
+        {
+          title: 'Examiner',
+          desc: 'Cinq minutes, une fois par mois, avec un auto-examen qui vous guide pas à pas.',
+          imageAlt: 'Illustration simple : un minuteur calme et les étapes de l’auto-examen.',
+        },
+        {
+          title: 'Comprendre',
+          desc: 'Explorez vos facteurs de risque et posez vos questions à l’assistante.',
+          imageAlt: 'Illustration simple : questions et réponses sereines sur la santé du sein.',
+        },
+        {
+          title: 'Agir',
+          desc: 'Sachez quand consulter, et trouvez un médecin près de chez vous.',
+          imageAlt: 'Illustration simple : un rendez-vous médical et une petite carte.',
+        },
+      ],
+    },
+    selfCheckPreview: {
+      eyebrow: 'L’auto-examen',
+      title: 'Cinq minutes, seule, en toute sérénité',
+      subtitle: 'Sahtek vous guide pas à pas. Sans photo, sans compte, sans rien envoyer nulle part.',
+      cta: 'Commencer l’auto-examen guidé',
+      steps: [
+        {
+          title: 'Trouvez un moment calme',
+          desc: 'Le meilleur moment se situe 3 à 5 jours après la fin des règles. Choisissez un endroit où vous êtes à l’aise.',
+          imageAlt: 'Écran Sahtek : le début de l’auto-examen et le choix du bon moment.',
+        },
+        {
+          title: 'Suivez les étapes',
+          desc: 'Cinq étapes guidées, une à la fois, avec un minuteur doux et sans se presser.',
+          imageAlt: 'Écran Sahtek : une étape de l’auto-examen avec le minuteur en cours.',
+        },
+        {
+          title: 'Notez-le et pensez-y',
+          desc: 'Enregistrez votre examen et programmez un rappel pour le mois prochain. Tout reste sur votre appareil.',
+          imageAlt: 'Écran Sahtek : confirmation de l’examen et programmation d’un rappel mensuel.',
+        },
+      ],
+    },
+    statsTitle: 'La détection précoce change tout',
     stats: [
       { prefix: '1/', value: 8, suffix: '', label: 'femmes', caption: 'peut être concernée dans sa vie' },
       { prefix: '', value: 99, suffix: '%', label: 'survie', caption: 'lorsque le cancer est détecté tôt' },
       { prefix: '', value: 5, suffix: ' min', label: 'par mois', caption: 'pour une habitude simple' },
     ],
-    featuresTitle: 'Un parcours complet de sensibilisation', featuresSubtitle: 'Rapide, chaleureux, privé et vraiment utile.',
-    features: [
-      { title: 'Apprendre', desc: 'Symptômes, prévention et mythes, simplement.' },
-      { title: 'Auto-examen', desc: 'Cinq étapes guidées avec minuteur.' },
-      { title: 'Profil de risque', desc: 'Dix questions et un score animé.' },
-      { title: 'Chat IA', desc: 'Réponses aux questions fréquentes.' },
-    ],
-    bannerTitle: 'Prenez cinq minutes pour vous', bannerText: 'Une petite habitude mensuelle peut faire une vraie différence.',
-    bannerCta: 'Commencer', testimonialsTitle: 'Voix de notre communauté',
-    testimonials: [
-      { quote: 'J’ai enfin compris comment m’examiner sans peur.', name: 'Khadija', role: 'Casablanca' },
-      { quote: 'Je l’ai partagé avec ma mère et mes sœurs.', name: 'Salma', role: 'Fès' },
-      { quote: 'L’assistante m’a répondu avec douceur.', name: 'Naïma', role: 'Marrakech' },
-    ],
-    trustNote: 'Connecté au backend Sahtek en direct pour le chat IA et l’évaluation du risque.',
+    companion: {
+      eyebrow: 'Votre compagne',
+      title: 'Posez vos questions, sans gêne et sans jugement',
+      subtitle:
+        'L’assistante Sahtek n’est pas médecin et ne vous donnera jamais de diagnostic. Elle explique, elle rassure, et elle vous dit quand consulter.',
+      helpsWithTitle: 'Ce qu’elle apporte',
+      helpsWith: [
+        'Elle explique les mots médicaux simplement',
+        'Elle répond aux questions difficiles à poser',
+        'Elle vous oriente vers la bonne prochaine étape',
+      ],
+      sampleTitle: 'Essayez de demander',
+      safetyNote:
+        'Ni médecin, ni diagnostic. L’assistante donne uniquement des informations éducatives — les décisions médicales restent à votre médecin.',
+      privacyNote:
+        'Les réponses viennent de Sahtek, sur votre appareil. Vos questions ne sont envoyées nulle part.',
+      cta: 'Ouvrir le chat',
+      mock: {
+        question: 'J’ai trouvé une petite boule. Dois-je m’inquiéter ?',
+        answer:
+          'Respirez. La plupart des boules ne sont pas un cancer. Surveillez-la, et si elle dure plus de deux semaines ou change, prenez rendez-vous pour qu’un médecin l’examine.',
+      },
+    },
+    riskFactorsSection: {
+      eyebrow: 'Facteurs de risque',
+      title: 'Les connaître, sans les craindre',
+      cta: 'Explorer vos facteurs de risque',
+    },
+    nextSteps: {
+      eyebrow: 'Que faire ensuite',
+      title: 'Vous avez remarqué quelque chose. Et maintenant ?',
+      subtitle: 'Tous les changements n’appellent pas la même réponse. Voici comment y réfléchir, calmement.',
+      cards: [
+        {
+          state: 'Rien d’inhabituel',
+          meaning: 'Votre corps est comme d’habitude.',
+          action: 'Gardez l’habitude : un auto-examen par mois. Programmez un rappel pour ne pas avoir à y penser.',
+        },
+        {
+          state: 'Un changement léger',
+          meaning: 'Quelque chose semble un peu différent — une sensibilité liée au cycle, par exemple.',
+          action: 'Surveillez pendant deux semaines et notez le jour où vous l’avez remarqué. Si cela passe, tant mieux. Si cela reste, prenez rendez-vous.',
+        },
+        {
+          state: 'Un changement qui dure depuis deux semaines',
+          meaning: 'Le changement n’a pas disparu, ou il est devenu plus net.',
+          action: 'Prenez rendez-vous avec un médecin. Ce n’est pas une urgence — mais n’attendez pas davantage.',
+        },
+        {
+          state: 'Un signe à faire voir rapidement',
+          meaning: 'Par exemple un écoulement sanglant, une boule dure et fixe, ou un changement net de la peau ou du mamelon.',
+          action: 'Consultez rapidement. La plupart de ces situations se révèlent bénignes — mais elles doivent être examinées maintenant.',
+        },
+      ],
+      ctaDoctors: 'Trouver un médecin près de chez vous',
+      ctaReminder: 'Programmer un rappel mensuel',
+      note: 'Ces repères sont généraux et ne constituent pas un diagnostic. Si vous êtes inquiète, c’est votre médecin qui décide.',
+    },
+    credibility: {
+      eyebrow: 'Comment ce contenu est fait',
+      title: 'La confiance se construit par la clarté',
+      subtitle: 'Aucun titre inventé, aucun avis fabriqué. Simplement ce que nous faisons, et ce que nous refusons de faire.',
+      points: [
+        { title: 'Sensibilisation, pas diagnostic', desc: 'Sahtek ne dit jamais « vous avez » ni « tout va bien ». Elle explique, et vous dit quand consulter.' },
+        { title: 'Privée par conception', desc: 'Sans compte, sans traceur, sans analyse d’audience. Vos réponses restent dans votre navigateur.' },
+        { title: 'La darija d’abord', desc: 'Les textes sont écrits en darija d’abord, et non traduits automatiquement depuis l’anglais.' },
+      ],
+      methodTitle: 'Notre méthode',
+      method: [
+        'Nous écrivons en darija d’abord, puis adaptons en français et en anglais.',
+        'Nous évitons l’imagerie clinique et les formulations qui font peur.',
+        'Nous disons « ce qu’il faut remarquer » et « ce qu’il faut faire » — jamais « ce que vous avez ».',
+        'Chaque page qui donne des repères porte un avertissement médical visible.',
+      ],
+      reviewTitle: 'Relecture médicale',
+    },
+    faq: {
+      eyebrow: 'Questions',
+      title: 'Ce qu’on nous demande souvent',
+      items: [
+        {
+          q: 'Est-ce un outil de diagnostic ?',
+          a: 'Non. Sahtek apporte de la sensibilisation et des repères. Elle ne diagnostique jamais et ne vous dit jamais si vous avez une maladie. Seul un médecin peut le faire.',
+        },
+        {
+          q: 'Mes données sont-elles privées ?',
+          a: 'Oui. Il n’y a ni compte, ni traceur, ni analyse d’audience. Vos réponses d’auto-examen et de risque restent dans votre navigateur, et même le chat répond depuis l’application — vos questions ne sont envoyées nulle part.',
+        },
+        {
+          q: 'Puis-je l’utiliser en darija ?',
+          a: 'Oui, et la darija est notre première langue. Le français et l’anglais sont également disponibles, ainsi que plusieurs autres langues.',
+        },
+        {
+          q: 'Quand dois-je parler à un médecin ?',
+          a: 'Si vous remarquez un changement nouveau qui dure plus de deux semaines, ou en cas d’écoulement sanglant, de boule dure ou de changement net de la peau ou du mamelon — prenez rendez-vous. Et si vous êtes simplement inquiète, c’est une raison suffisante.',
+        },
+        {
+          q: 'Puis-je l’utiliser sans compte ?',
+          a: 'Oui. Sahtek fonctionne sans compte et sans inscription. Nous ne demandons ni votre nom ni votre e-mail.',
+        },
+      ],
+    },
+    finalCta: {
+      title: 'Prenez cinq minutes pour vous',
+      text: 'Une petite habitude mensuelle peut faire une vraie différence. Commencez maintenant — sans compte, et rien ne quitte votre appareil.',
+      primary: 'Commencer l’auto-examen guidé',
+      secondary: 'Apprendre les signes',
+      note: 'Si quelque chose vous semble inhabituel, parlez-en à un médecin.',
+    },
+    trustNote: 'Tout reste sur votre appareil. Sans compte, sans traceur, sans analyse d’audience.',
   },
   learn: {
     title: 'Comprendre la santé du sein', subtitle: 'Information claire, soutien et prochaines étapes.',
@@ -350,6 +545,11 @@ export const fr: Translation = {
     quickRepliesTitle: 'Essayez', quickReplies: ['Quels signes surveiller ?', 'Comment m’examiner ?', 'J’ai peur', 'La famille compte ?'],
     typing: 'Sahtek écrit...', voiceLabel: 'Saisie vocale', listening: 'Écoute en cours...',
     voiceUnsupported: 'La reconnaissance vocale n’est pas prise en charge par ce navigateur.',
+    micNoticeTitle: 'Avant d’utiliser le microphone',
+    micNoticeBody:
+      'La saisie vocale ne se fait pas sur votre appareil. Votre navigateur enregistre ce que vous dites et envoie l’audio au service de reconnaissance vocale de Google pour le transcrire. Sahtek ne reçoit jamais l’enregistrement, et vous pouvez toujours écrire à la place.',
+    micNoticeAccept: 'J’ai compris — utiliser le microphone',
+    micNoticeDecline: 'Non merci, je vais écrire',
     clear: 'Effacer', relatedTopics: 'Sujets liés',
   },
   reminder: {

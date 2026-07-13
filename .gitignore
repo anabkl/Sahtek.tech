@@ -42,3 +42,4 @@ backend/appsettings.Development.json
 *.njsproj
 *.sln
 *.sw?
+.gstack/

@@ -10,11 +10,12 @@ import { useToast } from '@/components/ui/toastStore';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { formatDate, nextReminderDate } from '@/utils/formatters';
 import { REMINDER_STORAGE_KEY, scheduleNotificationCheck, showNotification } from '@/utils/notificationScheduler';
+import { downloadReminderIcs } from '@/utils/calendarReminder';
 import { sendWhatsAppConfirmation, checkWhatsAppAvailable } from '@/services/whatsappService';
 import { cn } from '@/utils/cn';
 
 type ReminderTime = 'morning' | 'afternoon' | 'evening';
-type Method = 'push' | 'email' | 'whatsapp';
+type Method = 'calendar' | 'push' | 'email' | 'whatsapp';
 
 const TIME_CLOCK: Record<ReminderTime, string> = { morning: '8:00', afternoon: '14:00', evening: '20:00' };
 const TIME_META: { key: ReminderTime; emoji: string; ring: string }[] = [
@@ -22,24 +23,27 @@ const TIME_META: { key: ReminderTime; emoji: string; ring: string }[] = [
   { key: 'afternoon', emoji: '🌤️', ring: 'border-orange-200' },
   { key: 'evening', emoji: '🌙', ring: 'border-indigo-200' },
 ];
-// Push + email render in the top row; WhatsApp is a full-width card below them.
-const METHOD_META: { key: Exclude<Method, 'whatsapp'>; emoji: string }[] = [
+// Calendar + push in the top row. Email and WhatsApp are full-width cards below,
+// both disabled: neither actually delivers anything yet (see the notes below).
+const METHOD_META: { key: 'calendar' | 'push'; emoji: string }[] = [
+  { key: 'calendar', emoji: '📅' },
   { key: 'push', emoji: '🔔' },
-  { key: 'email', emoji: '📧' },
 ];
 
 const STORAGE_KEY = REMINDER_STORAGE_KEY;
 
 // Notification UI strings, kept inline (not in the i18n files) for all 7 languages.
 const NOTIF_BADGE: Record<'granted' | 'denied' | 'unsupported', Record<string, string>> = {
+  // Honest: this is an in-page timer, not background push. It cannot fire once
+  // she closes the tab, so the badge must not promise that it will.
   granted: {
-    ar: '🔔 الإشعارات مفعّلة — غادي نذكّروك',
-    fr: '🔔 Notifications activées — nous vous rappellerons',
-    en: '🔔 Notifications on — we will remind you',
-    es: '🔔 Notificaciones activadas — te recordaremos',
-    de: '🔔 Benachrichtigungen aktiv — wir erinnern dich',
-    ru: '🔔 Уведомления включены — мы напомним вам',
-    pt: '🔔 Notificações ativadas — vamos lembrá-la',
+    ar: '🔔 الإشعارات مفعّلة — غير فاش التطبيق محلول',
+    fr: '🔔 Notifications activées — seulement si Sahtek est ouvert',
+    en: '🔔 Notifications on — only while Sahtek is open',
+    es: '🔔 Notificaciones activadas — solo si Sahtek está abierto',
+    de: '🔔 Benachrichtigungen aktiv — nur wenn Sahtek geöffnet ist',
+    ru: '🔔 Уведомления включены — только когда Sahtek открыт',
+    pt: '🔔 Notificações ativadas — apenas com o Sahtek aberto',
   },
   denied: {
     ar: '⚠️ خاصك تفعّلي الإشعارات من إعدادات المتصفح',
@@ -75,6 +79,71 @@ const TEST_BTN_LABEL: Record<string, string> = {
   de: '🔔 Benachrichtigung testen',
   ru: '🔔 Тест уведомления',
   pt: '🔔 Testar notificação',
+};
+
+// ── Calendar: the one method that fires when the app is closed ─────────
+const CAL_LABEL: Record<string, string> = {
+  ar: 'فالأجندة',
+  fr: 'Dans mon agenda',
+  en: 'In my calendar',
+  es: 'En mi calendario',
+  de: 'In meinem Kalender',
+  ru: 'В календаре',
+  pt: 'Na minha agenda',
+};
+const CAL_HINT: Record<string, string> = {
+  ar: 'كيخدم حتى فاش التطبيق مسدود ✅',
+  fr: 'Fonctionne même quand l’app est fermée ✅',
+  en: 'Works even when the app is closed ✅',
+  es: 'Funciona incluso con la app cerrada ✅',
+  de: 'Funktioniert auch bei geschlossener App ✅',
+  ru: 'Работает, даже если приложение закрыто ✅',
+  pt: 'Funciona mesmo com o app fechado ✅',
+};
+const CAL_ADDED: Record<string, string> = {
+  ar: '📅 تنزّل ملف الأجندة — زيديه للتقويم ديالك',
+  fr: '📅 Fichier d’agenda téléchargé — ajoutez-le à votre calendrier',
+  en: '📅 Calendar file downloaded — add it to your calendar',
+  es: '📅 Archivo de calendario descargado — añádelo a tu calendario',
+  de: '📅 Kalenderdatei heruntergeladen — füge sie deinem Kalender hinzu',
+  ru: '📅 Файл календаря загружен — добавьте его в свой календарь',
+  pt: '📅 Arquivo de agenda baixado — adicione-o ao seu calendário',
+};
+const CAL_REDOWNLOAD: Record<string, string> = {
+  ar: '⬇️ تحميل من جديد',
+  fr: '⬇️ Télécharger à nouveau',
+  en: '⬇️ Download again',
+  es: '⬇️ Descargar de nuevo',
+  de: '⬇️ Erneut herunterladen',
+  ru: '⬇️ Скачать снова',
+  pt: '⬇️ Baixar novamente',
+};
+
+// Push is NOT background push — it is an in-page timer. Say so, rather than
+// promising a notification that will not arrive once she closes the tab.
+const PUSH_HINT: Record<string, string> = {
+  ar: 'غير فاش صحّتك محلولة فالمتصفح',
+  fr: 'Seulement si Sahtek est ouvert',
+  en: 'Only while Sahtek is open',
+  es: 'Solo si Sahtek está abierto',
+  de: 'Nur wenn Sahtek geöffnet ist',
+  ru: 'Только когда Sahtek открыт',
+  pt: 'Apenas com o Sahtek aberto',
+};
+
+// Email is not wired to any sending service — nothing is ever delivered. It is
+// shown disabled rather than quietly collecting an address that goes nowhere.
+const EMAIL_LABEL: Record<string, string> = {
+  ar: 'بالإيميل', fr: 'Par e-mail', en: 'By email', es: 'Por correo', de: 'Per E-Mail', ru: 'По эл. почте', pt: 'Por e-mail',
+};
+const SOON_LABEL: Record<string, string> = {
+  ar: 'قريباً',
+  fr: 'Bientôt disponible',
+  en: 'Coming soon',
+  es: 'Próximamente',
+  de: 'Demnächst',
+  ru: 'Скоро',
+  pt: 'Em breve',
 };
 
 // WhatsApp card label — Arabic localizes it; everyone else keeps the brand name.
@@ -144,10 +213,13 @@ function loadSettings(): ReminderSettings | null {
       phone?: string;
     };
     if (s.reminderDay == null || s.reminderTime == null) return null;
+    const saved = s.methods ?? s.notificationMethods ?? [];
     return {
       reminderDay: s.reminderDay,
       reminderTime: s.reminderTime as ReminderTime,
-      methods: s.methods ?? s.notificationMethods ?? [],
+      // Drop email/WhatsApp from anyone's saved settings: neither ever delivered
+      // anything, so showing them as "active" was a promise the app never kept.
+      methods: saved.filter((m) => m === 'calendar' || m === 'push'),
       email: s.email ?? '',
       whatsappNumber: s.whatsappNumber ?? s.phone ?? '',
       lang: s.lang ?? 'ar',
@@ -297,9 +369,17 @@ export function ReminderPage() {
       }
     }
 
-    // WhatsApp — fire the confirmation message immediately via the local OpenWA API.
+    // Calendar — hand her the recurring event. This is the only method that
+    // still fires once the app is closed, and it uploads nothing.
+    if (methods.includes('calendar')) {
+      downloadReminderIcs(day, time, lang);
+      toast(tr(CAL_ADDED, lang), 'success');
+    }
+
+    // WhatsApp — disabled until the send is proxied server-side, so
+    // whatsappAvailable is always false and this branch does not run.
     if (methods.includes('whatsapp') && whatsappAvailable) {
-      const result = await sendWhatsAppConfirmation(whatsappNumber, lang, day, time);
+      const result = await sendWhatsAppConfirmation();
       if (result.success) setWhatsappSent(true);
       else toast(tr(WA_SEND_FAIL, lang), 'error');
     }
@@ -327,9 +407,9 @@ export function ReminderPage() {
       setWhatsappNumber(digits);
       writeSettings({ whatsappNumber: digits });
       setEditingField(null);
-      // Re-send the confirmation to the new number so the user gets it on WhatsApp.
+      // Re-send the confirmation to the new number. Disabled with WhatsApp itself.
       if (whatsappAvailable && digits.length >= 9 && day != null && time != null) {
-        const result = await sendWhatsAppConfirmation(digits, lang, day, time);
+        const result = await sendWhatsAppConfirmation();
         if (result.success) setWhatsappSent(true);
         else toast(tr(WA_SEND_FAIL, lang), 'error');
       }
@@ -359,9 +439,28 @@ export function ReminderPage() {
           <div className="mt-4 text-start">
             <p className="text-sm font-black text-muted">{r.viaLabel}</p>
             <div className="mt-2 space-y-2">
+              {methods.includes('calendar') && (
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-primary-50 px-4 py-3">
+                  <span className="min-w-0">
+                    <span className="block font-bold text-primary-800">📅 {tr(CAL_LABEL, lang)}</span>
+                    <span className="block text-xs font-bold text-muted">{tr(CAL_HINT, lang)}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => downloadReminderIcs(day, time, lang)}
+                    className="shrink-0 rounded-full border border-primary-200 px-3 py-1.5 text-xs font-black text-primary-700"
+                  >
+                    {tr(CAL_REDOWNLOAD, lang)}
+                  </button>
+                </div>
+              )}
+
               {methods.includes('push') && (
                 <div className="flex items-center justify-between gap-2 rounded-2xl bg-primary-50 px-4 py-3">
-                  <span className="font-bold text-primary-800">🔔 {r.methods.push.label}</span>
+                  <span className="min-w-0">
+                    <span className="block font-bold text-primary-800">🔔 {r.methods.push.label}</span>
+                    <span className="block text-xs font-bold text-muted">{tr(PUSH_HINT, lang)}</span>
+                  </span>
                   <span className="shrink-0 text-sm font-black text-green-600">{tr(ENABLED_LABEL, lang)}</span>
                 </div>
               )}
@@ -597,10 +696,12 @@ export function ReminderPage() {
             <StepCard>
               <h2 className="text-xl font-black text-ink">{r.stepMethodTitle}</h2>
 
-              {/* Top row: Browser Push + Email (equal width) */}
+              {/* Top row: Calendar + Browser notification (equal width) */}
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {METHOD_META.map(({ key, emoji }) => {
                   const selected = methods.includes(key);
+                  const label = key === 'calendar' ? tr(CAL_LABEL, lang) : r.methods.push.label;
+                  const hint = key === 'calendar' ? tr(CAL_HINT, lang) : tr(PUSH_HINT, lang);
                   return (
                     <button
                       key={key}
@@ -608,17 +709,31 @@ export function ReminderPage() {
                       onClick={() => toggleMethod(key)}
                       aria-pressed={selected}
                       className={cn(
-                        'relative flex min-h-[88px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 p-3 text-center text-sm font-black transition',
+                        'relative flex min-h-[104px] flex-col items-center justify-center gap-1 rounded-2xl border-2 p-3 text-center text-sm font-black transition',
                         selected ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-line bg-white/55 text-muted',
                       )}
                     >
                       {selected && <CheckCircle2 className="absolute end-2 top-2 text-primary-500" size={18} />}
                       <span className="text-2xl" aria-hidden>{emoji}</span>
-                      {r.methods[key].label}
+                      {label}
+                      {/* Say plainly what each one can actually do. */}
+                      <span className="text-[11px] font-bold leading-tight text-muted">{hint}</span>
                     </button>
                   );
                 })}
               </div>
+
+              {/* Email — disabled. Nothing is wired to send it, so it does not
+                  pretend to be selectable and does not collect an address. */}
+              <button
+                type="button"
+                disabled
+                className="relative mt-2 flex min-h-[88px] w-full cursor-not-allowed flex-col items-center justify-center gap-1 rounded-2xl border-2 border-line bg-gray-100 p-4 text-center text-base font-black text-gray-400 opacity-60"
+              >
+                <span className="text-3xl" aria-hidden>📧</span>
+                {tr(EMAIL_LABEL, lang)}
+                <span className="text-xs font-bold text-gray-400">{tr(SOON_LABEL, lang)}</span>
+              </button>
 
               {/* Bottom row: WhatsApp (full width, slightly bigger). Disabled when unavailable. */}
               <button

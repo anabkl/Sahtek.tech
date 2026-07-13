@@ -1,8 +1,19 @@
-// Credentials come from the environment (.env, gitignored) — never hardcode
-// secrets in source. See .env.example for the required variables.
-const OPENWA_URL = import.meta.env.VITE_OPENWA_URL || 'http://localhost:2785/api';
-const OPENWA_KEY = import.meta.env.VITE_OPENWA_KEY || '';
-const SESSION_ID = import.meta.env.VITE_OPENWA_SESSION || '';
+// ════════════════════════════════════════════════════════════════════
+//  WhatsApp reminders — DISABLED, pending a server-side proxy.
+//
+//  This module used to read VITE_OPENWA_URL / VITE_OPENWA_KEY / _SESSION.
+//  Vite inlines every VITE_-prefixed variable into the public JS bundle, so
+//  the gateway's API key was readable by anyone who opened the page. It also
+//  POSTed the woman's phone number straight from her browser to the gateway.
+//
+//  The credentials are now out of the client entirely. Until the send is
+//  proxied through the backend (where the key can actually stay secret),
+//  checkWhatsAppAvailable() reports false and the ReminderPage renders the
+//  WhatsApp option disabled — email and browser push are unaffected.
+//
+//  The message templates below are intentionally kept: they are the copy the
+//  backend proxy will send, in all seven languages.
+// ════════════════════════════════════════════════════════════════════
 
 const TIME_LABELS: Record<string, Record<string, string>> = {
   morning: {
@@ -34,7 +45,8 @@ const TIME_LABELS: Record<string, Record<string, string>> = {
   },
 };
 
-function getConfirmationMessage(day: number, time: string, lang: string): string {
+/** Exported for the backend proxy migration — see the note at the top. */
+export function getConfirmationMessage(day: number, time: string, lang: string): string {
   const timeLabel = TIME_LABELS[time]?.[lang] || TIME_LABELS[time]?.en || time;
 
   const messages: Record<string, string> = {
@@ -56,7 +68,8 @@ function getConfirmationMessage(day: number, time: string, lang: string): string
   return messages[lang] || messages.en;
 }
 
-function getMonthlyReminderMessage(lang: string): string {
+/** Exported for the backend proxy migration — see the note at the top. */
+export function getMonthlyReminderMessage(lang: string): string {
   const messages: Record<string, string> = {
     ar: `🎀 *صحّتك — تذكير الفحص الذاتي*\n\nمرحبا! هاد الشهر ما تنساي الفحص الذاتي للثدي 🩺\n\nالفحص كياخد غير *5 دقائق* وكيقدر ينقذ حياتك.\n\n*الخطوات:*\n1️⃣ راقبي فالمرآة\n2️⃣ رفعي يديك\n3️⃣ افحصي واقفة\n4️⃣ افحصي مستلقية\n5️⃣ افحصي الحلمة\n\n🩺 *ابداي الفحص دابا:*\nhttps://sahtek.tech/self-check\n\nصحتك بين يديك 💗`,
 
@@ -76,89 +89,34 @@ function getMonthlyReminderMessage(lang: string): string {
   return messages[lang] || messages.en;
 }
 
-function formatPhoneNumber(phone: string): string {
-  let num = phone.replace(/[\s\-\(\)\+]/g, '');
+/** Normalises a Moroccan number to the gateway's chat-id form. Kept for the proxy. */
+export function formatPhoneNumber(phone: string): string {
+  let num = phone.replace(/[\s\-()+]/g, '');
   if (num.startsWith('0')) num = '212' + num.slice(1);
   if (!num.startsWith('212')) num = '212' + num;
   return num + '@c.us';
 }
 
-export async function sendWhatsAppConfirmation(
-  phoneNumber: string,
-  lang: string,
-  day: number,
-  time: string,
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const chatId = formatPhoneNumber(phoneNumber);
-    const text = getConfirmationMessage(day, time, lang);
-
-    const response = await fetch(
-      `${OPENWA_URL}/sessions/${SESSION_ID}/messages/send-text`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': OPENWA_KEY,
-        },
-        body: JSON.stringify({ chatId, text }),
-      }
-    );
-
-    if (!response.ok) {
-      const err = await response.json();
-      return { success: false, error: err.message || 'Failed to send' };
-    }
-
-    // Save phone + lang for monthly reminders
-    localStorage.setItem('sahtek_whatsapp', JSON.stringify({
-      phone: phoneNumber,
-      lang,
-      day,
-      time,
-      active: true,
-    }));
-
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: 'WhatsApp service unavailable' };
-  }
+/**
+ * Disabled. Previously POSTed her phone number + message to the OpenWA gateway
+ * using a key that shipped in the public bundle, then wrote the number to
+ * localStorage under `sahtek_whatsapp`.
+ *
+ * Nothing is sent and nothing is stored. The ReminderPage never reaches this
+ * (it gates on checkWhatsAppAvailable), but it fails closed if it ever does.
+ */
+export async function sendWhatsAppConfirmation(): Promise<{ success: boolean; error?: string }> {
+  return { success: false, error: 'WhatsApp reminders are temporarily unavailable' };
 }
 
-export async function sendMonthlyReminder(
-  phoneNumber: string,
-  lang: string,
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const chatId = formatPhoneNumber(phoneNumber);
-    const text = getMonthlyReminderMessage(lang);
-
-    const response = await fetch(
-      `${OPENWA_URL}/sessions/${SESSION_ID}/messages/send-text`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': OPENWA_KEY,
-        },
-        body: JSON.stringify({ chatId, text }),
-      }
-    );
-
-    if (!response.ok) return { success: false };
-    return { success: true };
-  } catch {
-    return { success: false };
-  }
-}
-
+/**
+ * Always false while the credentials are out of the client. The ReminderPage
+ * renders the WhatsApp option disabled with its existing "unavailable" copy;
+ * email and browser push are unaffected.
+ *
+ * This makes NO network request — the old version pinged the gateway on every
+ * ReminderPage mount.
+ */
 export async function checkWhatsAppAvailable(): Promise<boolean> {
-  try {
-    const res = await fetch(`${OPENWA_URL}/sessions/${SESSION_ID}`, {
-      headers: { 'X-API-Key': OPENWA_KEY },
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
+  return false;
 }

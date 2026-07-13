@@ -63,37 +63,236 @@ export const en = {
     getStarted: 'Begin my journey',
   },
   home: {
-    badge: 'Made for Moroccan women',
-    heroTitle: 'Your health,',
-    heroHighlight: 'held with care',
+    badge: 'Guided awareness, designed with care',
+    heroTitle: 'Know the signs.',
+    heroHighlight: 'Feel steady in your own body.',
     heroSubtitle:
-      'Sahtek helps women learn, self-check and understand breast health with privacy, warmth and a connected AI guide.',
-    ctaPrimary: 'Start self-check',
+      'Sahtek walks with you, step by step: notice changes, follow a guided self-check, and know what to do next. No account, no tracking — your answers stay on your device.',
+    ctaPrimary: 'Start the guided self-check',
     ctaSecondary: 'Learn the signs',
+    /* The three signals under the hero. Each one is literally true today:
+       no auth exists, no analytics ship, and health state never leaves
+       localStorage (`sahtek:*`). Do not add a fourth that we cannot prove. */
+    heroTrust: ['No account', 'No tracking', 'Your answers stay on your device'],
+    previewAlt: 'A preview of the Sahtek app, showing the guided self-check screen.',
+    trustBarLabel: 'What Sahtek promises',
+    trustBar: [
+      'Private and respectful',
+      'Awareness first, never a diagnosis',
+      'Easy guided checks',
+      'Darija, French and English',
+      'Made for women in Morocco',
+    ],
+    helpsTitle: 'What Sahtek helps you do',
+    helpsSubtitle: 'Six calm ways to know your body better — and to act early, with confidence.',
+    helps: [
+      { title: 'Learn the signs', desc: 'The changes worth noticing, in plain, unhurried language.' },
+      { title: 'Follow a guided self-check', desc: 'Five gentle steps. Five minutes, once a month.' },
+      { title: 'Understand breast changes', desc: 'Most changes are not cancer. Learn which ones deserve a visit.' },
+      { title: 'Explore risk factors', desc: 'Awareness of risk factors — never a verdict on your body.' },
+      { title: 'Ask the assistant', desc: 'Calm answers to the questions that feel hard to ask.' },
+      { title: 'Know the next step', desc: 'When to see a doctor, and how to find one near you.' },
+    ],
+    /* The 12 signs. Our own wording, and taught by label + language — never by
+       drawing the sign onto a fruit or a body (CLAUDE.md HARD RULE 6). Each
+       `detail` says what to notice; it never says what it means. */
+    signs: {
+      eyebrow: 'The signs',
+      title: '12 changes worth knowing',
+      subtitle:
+        'Not to frighten you — to help you know what is normal for your body, so you notice quickly if something changes.',
+      cardCta: 'Learn more',
+      whatToNotice: 'What to notice',
+      nextStepTitle: 'The next step',
+      nextStepText:
+        'Most of these changes are not cancer. But if you notice a new change and it lasts more than two weeks, book an appointment with a doctor — not to worry, just to know.',
+      allCta: 'See all 12 signs in detail',
+      items: [
+        { label: 'A new lump', detail: 'A new lump or firmness in the breast, often painless. A lump that does not hurt deserves the same attention as one that does.' },
+        { label: 'Swelling in part of the breast', detail: 'Part of the breast looks swollen or fuller, even if you cannot feel a distinct lump.' },
+        { label: 'Dimpling of the skin', detail: 'The skin develops small dimples, like the peel of an orange, or pulls inward when you raise your arm.' },
+        { label: 'Redness or warmth', detail: 'The skin turns red or feels warm for no clear reason, and stays that way for days.' },
+        { label: 'A change in size or shape', detail: 'One breast becomes newly and visibly different from the other. A natural difference between them is normal — what is new is what matters.' },
+        { label: 'A nipple turning inward', detail: 'The nipple starts to pull inward when it used to point out. If it has always been that way, that is normal for you.' },
+        { label: 'Discharge from the nipple', detail: 'Discharge when you are not breastfeeding, especially if it is bloody or comes from one side only.' },
+        { label: 'Flaking or itching', detail: 'The skin around the nipple flakes, itches or thickens, and does not heal.' },
+        { label: 'Persistent pain in one spot', detail: 'Pain in one place that stays and does not come and go with your cycle. Pain alone is rarely a sign, but persistence matters.' },
+        { label: 'New prominent veins', detail: 'New, clearly visible veins on the skin of the breast that were not noticeable before.' },
+        { label: 'A lump under the arm', detail: 'Swelling or a lump in the armpit, even if the breast itself feels normal.' },
+        { label: 'Swelling above the collarbone', detail: 'Swelling above or below the collarbone with no clear cause.' },
+      ],
+    },
+    howItWorks: {
+      eyebrow: 'How it works',
+      title: 'Four steps, no rush',
+      subtitle: 'From the first time you learn the signs, to knowing exactly what to do next.',
+      steps: [
+        {
+          title: 'Discover',
+          desc: 'Learn the 12 changes worth knowing, in plain language and without fear.',
+          imageAlt: 'A simple illustration: a woman reading about breast-health signs.',
+        },
+        {
+          title: 'Check',
+          desc: 'Five minutes, once a month, with a self-check that guides you step by step.',
+          imageAlt: 'A simple illustration: a calm timer and the self-check steps.',
+        },
+        {
+          title: 'Understand',
+          desc: 'Explore your risk factors, and ask the assistant about anything unclear.',
+          imageAlt: 'A simple illustration: calm questions and answers about breast health.',
+        },
+        {
+          title: 'Act',
+          desc: 'Know when to see a doctor, and find one near you.',
+          imageAlt: 'A simple illustration: a doctor’s appointment and a small map.',
+        },
+      ],
+    },
+    selfCheckPreview: {
+      eyebrow: 'The self-check',
+      title: 'Five minutes, on your own, calmly',
+      subtitle: 'Sahtek walks you through it, step by step. No photos, no account, nothing sent anywhere.',
+      cta: 'Start the guided self-check',
+      steps: [
+        {
+          title: 'Find a calm moment',
+          desc: 'The best time is 3 to 5 days after your period ends. Choose a place where you feel comfortable.',
+          imageAlt: 'A Sahtek screen: starting the self-check and choosing the right time.',
+        },
+        {
+          title: 'Follow the steps',
+          desc: 'Five guided steps, one at a time, with a soft timer and no hurry.',
+          imageAlt: 'A Sahtek screen: one step of the self-check with the timer running.',
+        },
+        {
+          title: 'Log it, and remind yourself',
+          desc: 'Log your check and set a reminder for next month. Everything stays on your device.',
+          imageAlt: 'A Sahtek screen: confirming the check and setting a monthly reminder.',
+        },
+      ],
+    },
+    /* The assistant. Presented as a companion, never a clinician — it explains
+       and reassures, and it points at a doctor. The privacy line is literally
+       true: `services/aiChat.ts` answers from a bundled knowledge base and
+       transmits nothing. If chat is ever routed to a model, this copy is a lie
+       and must change in the same commit. */
+    companion: {
+      eyebrow: 'Your companion',
+      title: 'Ask without embarrassment, without judgement',
+      subtitle:
+        'The Sahtek assistant is not a doctor, and it will never give you a diagnosis. It explains, it reassures, and it tells you when to see someone.',
+      helpsWithTitle: 'What it helps with',
+      helpsWith: [
+        'Explains medical words in plain language',
+        'Answers the questions that feel hard to ask',
+        'Points you to the right next step',
+      ],
+      sampleTitle: 'Try asking',
+      safetyNote:
+        'Not a doctor, and not a diagnosis. The assistant offers educational information only — medical decisions stay with your doctor.',
+      privacyNote:
+        'Answers come from Sahtek itself, on your device. Your questions are not sent anywhere.',
+      cta: 'Open the chat',
+      mock: {
+        question: 'I found a small lump. Should I be scared?',
+        answer:
+          'Take a breath. Most lumps are not cancer. Keep an eye on it, and if it lasts more than two weeks or changes, book an appointment so a doctor can check it.',
+      },
+    },
+    riskFactorsSection: {
+      eyebrow: 'Risk factors',
+      title: 'Know them, without fearing them',
+      cta: 'Explore your risk factors',
+    },
+    nextSteps: {
+      eyebrow: 'What to do next',
+      title: 'You noticed something. Now what?',
+      subtitle: 'Not every change calls for the same step. Here is how to think about it, calmly.',
+      cards: [
+        {
+          state: 'Nothing unusual',
+          meaning: 'Your body feels the way it usually does.',
+          action: 'Keep the habit: one self-check a month. Set a reminder so you do not have to remember.',
+        },
+        {
+          state: 'A minor change',
+          meaning: 'Something feels a little different — tenderness that follows your cycle, for example.',
+          action: 'Watch it for two weeks and write down the day you noticed it. If it passes, good. If it stays, book an appointment.',
+        },
+        {
+          state: 'A change that lasted two weeks',
+          meaning: 'The change has not gone away, or it has become clearer.',
+          action: 'Book an appointment with a doctor. This is not an emergency — but do not wait any longer.',
+        },
+        {
+          state: 'A sign that needs prompt care',
+          meaning: 'Such as bloody discharge, a hard fixed lump, or a clear change in the skin or the nipple.',
+          action: 'See a doctor soon. Most of these turn out not to be serious — but they should be looked at now.',
+        },
+      ],
+      ctaDoctors: 'Find a doctor near you',
+      ctaReminder: 'Set a monthly reminder',
+      note: 'This guidance is general and is not a diagnosis. If you are worried, your doctor decides.',
+    },
+    credibility: {
+      eyebrow: 'How this content is made',
+      title: 'Trust is built by being clear',
+      subtitle: 'No invented credentials, no made-up reviews. Just what we do, and what we refuse to do.',
+      points: [
+        { title: 'Awareness, not diagnosis', desc: 'Sahtek never says “you have” or “you are fine”. It explains, and it tells you when to see a doctor.' },
+        { title: 'Private by design', desc: 'No account, no tracking, no analytics. Your answers stay in your browser.' },
+        { title: 'Darija first', desc: 'The words are written in Darija first, not machine-translated from English.' },
+      ],
+      methodTitle: 'Our method',
+      method: [
+        'We write in Darija first, then adapt to French and English.',
+        'We avoid clinical imagery and language designed to frighten.',
+        'We say “what to notice” and “what to do” — never “what you have”.',
+        'Every page that gives guidance carries a visible medical disclaimer.',
+      ],
+      reviewTitle: 'Medical review',
+    },
+    faq: {
+      eyebrow: 'Questions',
+      title: 'Asked all the time',
+      items: [
+        {
+          q: 'Is this a diagnosis tool?',
+          a: 'No. Sahtek gives awareness and guidance. It never diagnoses and never tells you whether you have a condition. Only a doctor can do that.',
+        },
+        {
+          q: 'Is my data private?',
+          a: 'Yes. There is no account, no tracking and no analytics. Your self-check and risk answers are stored in your own browser, and even the chat answers from inside the app — your questions are not sent anywhere.',
+        },
+        {
+          q: 'Can I use it in Darija?',
+          a: 'Yes, and Darija is our first language. French and English are available too, along with several other languages.',
+        },
+        {
+          q: 'When should I talk to a doctor?',
+          a: 'If you notice a new change that lasts more than two weeks, or if you have bloody discharge, a hard lump, or a clear change in the skin or the nipple — book an appointment. And if you are simply worried, that is reason enough.',
+        },
+        {
+          q: 'Can I use it without an account?',
+          a: 'Yes. Sahtek works with no account and no sign-up. We never ask for your name or your email to use it.',
+        },
+      ],
+    },
+    finalCta: {
+      title: 'Take five minutes for yourself',
+      text: 'A small monthly habit can make a real difference. Start now — no account, and nothing leaves your device.',
+      primary: 'Start the guided self-check',
+      secondary: 'Learn the signs',
+      note: 'If anything feels unusual, speak to a doctor.',
+    },
     statsTitle: 'Early awareness changes everything',
     stats: [
       { prefix: '1/', value: 8, suffix: '', label: 'women', caption: 'may face breast cancer in their lifetime' },
       { prefix: '', value: 99, suffix: '%', label: 'survival', caption: 'when breast cancer is found early' },
       { prefix: '', value: 5, suffix: ' min', label: 'monthly', caption: 'for a simple self-check habit' },
     ],
-    featuresTitle: 'A full awareness journey',
-    featuresSubtitle: 'Built for a hackathon demo: fast, emotional, private and useful.',
-    features: [
-      { title: 'Learn', desc: 'Symptoms, prevention and myths in simple language.' },
-      { title: 'Self-check', desc: 'Five guided steps with a soft timer.' },
-      { title: 'Risk profile', desc: 'Ten questions with an animated score.' },
-      { title: 'AI chat', desc: 'Offline answers for common breast-health questions.' },
-    ],
-    bannerTitle: 'Take five minutes for yourself',
-    bannerText: 'A small monthly habit can make a real difference. If anything feels unusual, speak to a doctor.',
-    bannerCta: 'Begin now',
-    testimonialsTitle: 'Voices from our community',
-    testimonials: [
-      { quote: 'I finally understood how to check myself without fear.', name: 'Khadija', role: 'Casablanca' },
-      { quote: 'I shared it with my mother and sisters. The Darija makes it feel close.', name: 'Salma', role: 'Fes' },
-      { quote: 'The assistant answered kindly when I was too scared to ask.', name: 'Naima', role: 'Marrakech' },
-    ],
-    trustNote: 'Connected to the live Sahtek backend for AI chat and risk assessment.',
+    trustNote: 'Everything stays on your device. No account, no tracking, no analytics.',
   },
   learn: {
     title: 'Learn breast health',
@@ -431,6 +630,11 @@ export const en = {
     voiceLabel: 'Voice input',
     listening: 'Listening...',
     voiceUnsupported: 'Voice recognition is not supported in this browser.',
+    micNoticeTitle: 'Before you use the microphone',
+    micNoticeBody:
+      'Voice typing does not happen on your device. Your browser records what you say and sends the audio to Google’s speech service to turn it into text. Sahtek never receives the recording, and you can always type instead.',
+    micNoticeAccept: 'I understand — use the microphone',
+    micNoticeDecline: 'No thanks, I’ll type',
     clear: 'Clear chat',
     relatedTopics: 'Related topics',
   },

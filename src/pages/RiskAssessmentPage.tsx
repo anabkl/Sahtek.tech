@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Download, FileText, Gauge, MapPin, Share2 } from 'lucide-react';
@@ -6,7 +6,6 @@ import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { useRiskAssessment } from '@/hooks/useRiskAssessment';
-import { analyzeRiskWithGroq } from '@/services/groqService';
 import type { RiskReportData } from '@/utils/reportGenerator';
 import { cn } from '@/utils/cn';
 
@@ -31,34 +30,19 @@ export function RiskAssessmentPage() {
   const navigate = useNavigate();
   const risk = useRiskAssessment();
   const [copied, setCopied] = useState(false);
-  // Optional AI personalization layered on top of the local score/level.
-  // Stays null (→ static copy) unless Groq returns a usable summary.
-  const [aiInsight, setAiInsight] = useState<{ summary: string; recommendations: string[] } | null>(null);
   const pct = risk.result?.risk_percentage ?? 0;
   const levelLabel = risk.result?.risk_level === 'high' ? t.risk.levelHigh : risk.result?.risk_level === 'moderate' ? t.risk.levelModerate : t.risk.levelLow;
 
-  // Once the local result is ready, ask Groq for a warmer, personalized
-  // summary + recommendations. Any failure silently keeps the static copy.
-  useEffect(() => {
-    if (risk.stage !== 'result' || !risk.result) {
-      setAiInsight(null);
-      return;
-    }
-    let cancelled = false;
-    void analyzeRiskWithGroq(risk.answers, lang).then((res) => {
-      if (!cancelled && res.summary) setAiInsight(res);
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [risk.stage, risk.result, lang]);
-
-  const summaryText = aiInsight?.summary || risk.result?.summary || t.disclaimer.short;
-  const recommendations =
-    aiInsight && aiInsight.recommendations.length > 0
-      ? aiInsight.recommendations
-      : [t.selfCheck.logBtn, t.learn.whenToSee, t.reminder.confirmBtn, t.home.ctaSecondary];
+  // The score, the summary and the recommendations are all computed LOCALLY
+  // (see services/riskService.ts). Her answers never leave the device.
+  //
+  // This page used to POST the full questionnaire — `JSON.stringify(answers)` —
+  // to a third-party LLM the instant this screen rendered, with no prompt and
+  // no way to refuse. That is gone. If a personalised AI summary comes back
+  // later via the backend proxy, it must be an explicit opt-in: she sees the
+  // complete local result first, and nothing is sent unless she asks for it.
+  const summaryText = risk.result?.summary || t.disclaimer.short;
+  const recommendations = [t.selfCheck.logBtn, t.learn.whenToSee, t.reminder.confirmBtn, t.home.ctaSecondary];
 
   const copy = async () => {
     if (!risk.result) return;
@@ -75,11 +59,8 @@ export function RiskAssessmentPage() {
         riskScore: risk.result.risk_score,
         maxScore: risk.result.max_score,
         riskPercentage: risk.result.risk_percentage,
-        summary: aiInsight?.summary || risk.result.summary,
-        recommendations:
-          aiInsight && aiInsight.recommendations.length > 0
-            ? aiInsight.recommendations
-            : risk.result.recommendations.map((r) => r.action),
+        summary: risk.result.summary,
+        recommendations: risk.result.recommendations.map((r) => r.action),
         riskFactors: risk.result.risk_factors_identified,
         protectiveFactors: risk.result.protective_factors_identified,
       }

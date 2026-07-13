@@ -2,13 +2,22 @@ import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'reac
 import { Bot, Mic, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
+import { SafetyNote } from '@/components/ui/SafetyNote';
 import { useToast } from '@/components/ui/toastStore';
 import { useLanguage } from '@/hooks/useLanguage';
 import { usePersistedState } from '@/hooks/usePersistedState';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
-import { askGroqChat } from '@/services/groqService';
+import { askChat } from '@/services/aiChat';
 import { formatTime } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
+
+/* Voice input is the one part of the chat that leaves the device: the browser
+   ships the audio to Google's speech service to transcribe it. She is told
+   that once, in plain language, and the mic cannot start until she agrees.
+   Only consent is remembered — declining just closes the notice, so she can
+   change her mind later without hunting for a setting. */
+const MIC_CONSENT_KEY = 'sahtek:mic-consent';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -103,6 +112,16 @@ export function ChatPage() {
     },
   });
 
+  // Consent for sending audio to Google's speech service. Persisted only when
+  // granted; a decline leaves no record, so the notice simply reappears.
+  const [micConsent, setMicConsent] = usePersistedState<boolean>(MIC_CONSENT_KEY, false);
+  const [micNoticeOpen, setMicNoticeOpen] = useState(false);
+
+  const startListening = () => {
+    voiceBaseRef.current = text.trim();
+    voice.start();
+  };
+
   // Click the mic: toggle listening; warn once if the API is missing.
   // Speech only fills the input — the user still presses Send themselves.
   const toggleVoice = () => {
@@ -114,8 +133,18 @@ export function ChatPage() {
       voice.stop();
       return;
     }
-    voiceBaseRef.current = text.trim();
-    voice.start();
+    // First use: explain where her voice goes, and wait. Never auto-activate.
+    if (!micConsent) {
+      setMicNoticeOpen(true);
+      return;
+    }
+    startListening();
+  };
+
+  const acceptMicNotice = () => {
+    setMicConsent(true);
+    setMicNoticeOpen(false);
+    startListening();
   };
 
   const send = async (value = text) => {
@@ -123,18 +152,15 @@ export function ChatPage() {
     if (!trimmed || typing) return;
     if (voice.listening) voice.stop();
 
-    // Snapshot the recent turns as context before appending the new message.
-    const history = messages.slice(-6).map((m) => ({ role: m.role, content: m.content }));
-
     setMessages((prev) => [...prev, { role: 'user' as const, content: trimmed, timestamp: Date.now() }].slice(-MAX_MESSAGES));
     setText('');
     setTyping(true);
 
     try {
-      const reply = await askGroqChat(trimmed, lang, history);
+      // Answered locally — the message never leaves the device.
+      const reply = await askChat(trimmed, lang);
       setMessages((prev) => [...prev, { role: 'assistant' as const, content: reply, timestamp: Date.now() }].slice(-MAX_MESSAGES));
     } catch {
-      // askGroqChat already falls back internally; this is a last-resort safety net.
       setMessages((prev) => [...prev, { role: 'assistant' as const, content: answerFor(trimmed, lang), timestamp: Date.now() }].slice(-MAX_MESSAGES));
     } finally {
       setTyping(false);
@@ -215,6 +241,21 @@ export function ChatPage() {
           </div>
         </form>
       </section>
+
+      {/* One-time notice before the microphone is ever switched on. */}
+      <Modal open={micNoticeOpen} onClose={() => setMicNoticeOpen(false)} title={t.chat.micNoticeTitle}>
+        <SafetyNote variant="privacy" title={t.chat.micNoticeTitle}>
+          {t.chat.micNoticeBody}
+        </SafetyNote>
+        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <Button variant="secondary" fullWidth onClick={() => setMicNoticeOpen(false)}>
+            {t.chat.micNoticeDecline}
+          </Button>
+          <Button fullWidth onClick={acceptMicNotice}>
+            {t.chat.micNoticeAccept}
+          </Button>
+        </div>
+      </Modal>
     </PageTransition>
   );
 }

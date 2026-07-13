@@ -1,26 +1,31 @@
-import { ShieldCheck } from 'lucide-react';
+import { SafetyNote } from '@/components/ui/SafetyNote';
 import { useLanguage } from '@/hooks/useLanguage';
-import { cn } from '@/utils/cn';
 
 interface DisclaimerProps {
   /** Show the longer paragraph instead of the one-liner. */
   full?: boolean;
+  /** Show the "Medical disclaimer" heading above the text. */
+  withTitle?: boolean;
   className?: string;
 }
 
-/** Medical disclaimer — required on every page that gives advice. */
-export function Disclaimer({ full, className }: DisclaimerProps) {
+/**
+ * The standing medical disclaimer, wired to i18n.
+ *
+ * REQUIRED on every page that educates, scores, guides or answers a question
+ * (CLAUDE.md HARD RULE 2). Use `full` where advice is most consequential — the
+ * risk result, the self-check outcome, the chat.
+ *
+ * @example
+ * <Disclaimer />              // one-liner, e.g. under a Learn section
+ * <Disclaimer full withTitle /> // the full note, e.g. on the risk result
+ */
+export function Disclaimer({ full, withTitle, className }: DisclaimerProps) {
   const { t } = useLanguage();
+
   return (
-    <div
-      className={cn(
-        'flex items-start gap-3 rounded-2xl border border-line bg-primary-50/60 px-4 py-3 dark:bg-primary-500/10',
-        className,
-      )}
-      role="note"
-    >
-      <ShieldCheck size={18} className="mt-0.5 shrink-0 text-primary-500" />
-      <p className="text-xs leading-relaxed text-muted">{full ? t.disclaimer.full : t.disclaimer.short}</p>
-    </div>
+    <SafetyNote variant="medical" title={withTitle ? t.disclaimer.title : undefined} className={className}>
+      {full ? t.disclaimer.full : t.disclaimer.short}
+    </SafetyNote>
   );
 }

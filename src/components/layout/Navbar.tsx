@@ -1,90 +1,90 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { HeartPulse, Languages, Moon, ShieldCheck, Sun } from 'lucide-react';
-import { LANGUAGE_META, SUPPORTED_LANGUAGES } from '@/config/constants';
+import { Menu, Moon, Sun } from 'lucide-react';
+import { MobileDrawer, type DrawerLink } from '@/components/layout/MobileDrawer';
+import { LanguageSwitch } from '@/components/ui/LanguageSwitch';
+import { LogoLockup } from '@/components/ui/LogoLockup';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/utils/cn';
 
-const navItems = [
+/* Desktop keeps the primary journey visible; the drawer carries everything. */
+const PRIMARY_LINKS: DrawerLink[] = [
   { to: '/', key: 'home' },
   { to: '/learn', key: 'learn' },
   { to: '/self-check', key: 'selfCheck' },
   { to: '/risk', key: 'risk' },
   { to: '/chat', key: 'chat' },
-  { to: '/doctors', key: 'doctors' },
-] as const;
+];
 
+const ALL_LINKS: DrawerLink[] = [
+  ...PRIMARY_LINKS,
+  { to: '/doctors', key: 'doctors' },
+  { to: '/reminder', key: 'reminder' },
+];
+
+/** Sticky top bar: logo lockup, primary links, language, theme, mobile drawer. */
 export function Navbar() {
-  const { t, lang, setLang } = useLanguage();
+  const { t } = useLanguage();
   const { resolved, toggle } = useTheme();
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const isDark = resolved === 'dark';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/50 bg-canvas/80 px-4 py-3 backdrop-blur-2xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-        <NavLink to="/" className="flex min-w-0 items-center gap-2">
-          {/* brand-cta, not rose-gradient: a white glyph on the decorative
-              gradient sits at 2.4:1, under the 3:1 floor for UI shapes. */}
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-cta text-white shadow-petal-lg">
-            <HeartPulse size={22} />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-lg font-black leading-tight text-ink">{t.app.name}</span>
-            <span className="hidden truncate text-xs font-semibold text-muted sm:block">{t.app.tagline}</span>
-          </span>
-        </NavLink>
+    <>
+      <header className="glass sticky top-0 z-40 border-x-0 border-t-0 border-b border-line px-4 pt-safe">
+        <div className="mx-auto flex h-16 max-w-content items-center justify-between gap-3">
+          {/* The link carries the accessible name; the lockup inside is decorative. */}
+          <NavLink to="/" aria-label={t.app.name} className="focus-ring rounded-2xl">
+            <LogoLockup showTagline />
+          </NavLink>
 
-        <nav className="hidden items-center gap-1 rounded-full border border-line bg-card/70 p-1 shadow-petal lg:flex">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                cn(
-                  'rounded-full px-4 py-2 text-sm font-bold text-muted transition',
-                  isActive && 'bg-primary-500 text-white shadow-petal',
-                )
-              }
+          <nav aria-label={t.common.menu} className="hidden items-center gap-1 lg:flex">
+            {PRIMARY_LINKS.map(({ to, key }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === '/'}
+                className={({ isActive }) =>
+                  cn(
+                    'focus-ring flex min-h-11 items-center rounded-pill px-4 text-body-sm font-bold transition',
+                    isActive ? 'bg-accent-soft text-accent-text' : 'text-muted hover:bg-sunken hover:text-ink',
+                  )
+                }
+              >
+                {t.nav[key]}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <LanguageSwitch />
+
+            <button
+              type="button"
+              onClick={toggle}
+              aria-pressed={isDark}
+              aria-label={`${t.settings.theme}: ${isDark ? t.settings.dark : t.settings.light}`}
+              title={isDark ? t.settings.light : t.settings.dark}
+              className="focus-ring grid h-11 w-11 shrink-0 place-items-center rounded-pill border border-line bg-card text-accent-text shadow-petal transition hover:border-primary-200 active:scale-95"
             >
-              {t.nav[item.key]}
-            </NavLink>
-          ))}
-        </nav>
+              {isDark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />}
+            </button>
 
-        <div className="flex items-center gap-2">
-          <span className="hidden items-center gap-1 rounded-full bg-primary-50 px-3 py-2 text-xs font-bold text-primary-700 sm:flex">
-            <ShieldCheck size={14} />
-            {t.common.demoMode}
-          </span>
-
-          <button
-            type="button"
-            onClick={toggle}
-            aria-pressed={isDark}
-            aria-label={`${t.settings.theme}: ${isDark ? t.settings.dark : t.settings.light}`}
-            title={isDark ? t.settings.light : t.settings.dark}
-            className="focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-card text-accent-text shadow-petal transition hover:border-primary-200 active:scale-95"
-          >
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-
-          <div className="relative">
-            <Languages className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-600" />
-            <select
-              value={lang}
-              onChange={(event) => setLang(event.target.value as typeof lang)}
-              className="h-10 rounded-full border border-line bg-card ps-9 pe-4 text-sm font-bold text-ink shadow-petal outline-none"
-              aria-label={t.settings.language}
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              aria-label={t.common.menu}
+              aria-expanded={drawerOpen}
+              className="focus-ring grid h-11 w-11 shrink-0 place-items-center rounded-pill border border-line bg-card text-ink shadow-petal transition hover:border-primary-200 active:scale-95 lg:hidden"
             >
-              {SUPPORTED_LANGUAGES.map((code) => (
-                <option key={code} value={code}>
-                  {LANGUAGE_META[code].native}
-                </option>
-              ))}
-            </select>
+              <Menu size={18} aria-hidden />
+            </button>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} links={ALL_LINKS} />
+    </>
   );
 }

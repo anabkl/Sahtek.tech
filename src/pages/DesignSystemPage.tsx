@@ -1,6 +1,25 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowRight, Bell, Check, Moon, Sun, Sparkles } from 'lucide-react';
+import {
+  ArrowRight,
+  Bell,
+  Bot,
+  Check,
+  Gauge,
+  HeartPulse,
+  LockKeyhole,
+  Moon,
+  Sun,
+  Sparkles,
+} from 'lucide-react';
+import { Accordion } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { IconCard } from '@/components/ui/IconCard';
+import { PhoneMockup } from '@/components/ui/PhoneMockup';
+import { SafetyNote } from '@/components/ui/SafetyNote';
+import { SectionHeading } from '@/components/ui/SectionHeading';
+import { TrustPill } from '@/components/ui/TrustPill';
 import { ZelligeAccent } from '@/components/ui/ZelligeAccent';
 import { cn } from '@/utils/cn';
 
@@ -462,18 +481,114 @@ export default function DesignSystemPage() {
           </div>
         </Section>
 
-        {/* -- Disclaimer pattern -- */}
+        {/* -- Component library -- */}
         <Section
-          title="The disclaimer — non-negotiable"
-          note="HARD RULE 2. Every page that educates, scores, guides or answers carries this. It is styled to reassure, not to alarm."
+          title="Component library"
+          note="The primitives pages compose from. Every interactive element has a ≥44px target, a visible focus ring, and a screen-reader name."
         >
-          <div className="flex items-start gap-3 rounded-2xl border border-line bg-accent-soft px-5 py-4">
-            <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-pill bg-brand-cta text-white">
-              <Check size={14} />
-            </span>
-            <p className="text-body-sm text-muted">
-              Sahtek offers awareness and guidance — it does not diagnose. If you notice a change, speak to a doctor.
-            </p>
+          <div className="space-y-8">
+            <div>
+              <code className="text-overline uppercase text-faint">SectionHeading</code>
+              <div className="mt-3 rounded-2xl border border-line bg-card p-6">
+                <SectionHeading
+                  as="h3"
+                  size="h2"
+                  eyebrow="Learn"
+                  title="Know what matters"
+                  subtitle="Five quiet minutes, once a month — that is the whole habit."
+                  accent
+                />
+              </div>
+            </div>
+
+            <div>
+              <code className="text-overline uppercase text-faint">IconCard</code>
+              <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <IconCard icon={HeartPulse} title="Self-check" description="Five guided minutes." tone="brand" />
+                <IconCard icon={Gauge} title="Risk factors" description="Awareness, not a verdict." tone="calm" />
+                <IconCard icon={Bot} title="Ask Sahtek" description="In Darija, any time." tone="info" />
+                <IconCard icon={Bell} title="Reminders" description="A monthly nudge." tone="gold" />
+              </div>
+            </div>
+
+            <div>
+              <code className="text-overline uppercase text-faint">TrustPill</code>
+              <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-card p-6">
+                <TrustPill icon={LockKeyhole} tone="calm">
+                  Stays on your device
+                </TrustPill>
+                <TrustPill tone="brand">No account needed</TrustPill>
+                <TrustPill tone="gold">Free</TrustPill>
+                <TrustPill tone="neutral">Darija, French, English</TrustPill>
+              </div>
+            </div>
+
+            <div>
+              <code className="text-overline uppercase text-faint">Accordion</code>
+              <div className="mt-3">
+                <Accordion
+                  headingLevel="h4"
+                  items={[
+                    {
+                      id: 'lump',
+                      question: 'Does a lump always mean cancer?',
+                      answer: 'No. Most lumps turn out to be benign — but any new change deserves a doctor’s look.',
+                    },
+                    {
+                      id: 'when',
+                      question: 'When should I do a self-check?',
+                      answer: 'A few days after your period ends, when the tissue is least tender.',
+                    },
+                    {
+                      id: 'private',
+                      question: 'Does Sahtek store my answers?',
+                      answer: 'They stay on your device. No account, no tracking.',
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div>
+              <code className="text-overline uppercase text-faint">SafetyNote — four variants</code>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <Disclaimer full withTitle />
+                <SafetyNote variant="privacy" title="Private by default">
+                  Your answers never leave this device.
+                </SafetyNote>
+                <SafetyNote variant="care" title="You are not alone">
+                  Feeling anxious is normal. Take it one step at a time.
+                </SafetyNote>
+                <SafetyNote variant="seeDoctor" title="Worth a visit">
+                  Noticed a change? Book a consultation — calm, not alarmed.
+                </SafetyNote>
+              </div>
+            </div>
+
+            <div>
+              <code className="text-overline uppercase text-faint">PhoneMockup + GlassCard</code>
+              <div className="mt-3 grid items-center gap-8 rounded-3xl bg-brand-cta p-8 md:grid-cols-2">
+                <PhoneMockup glow>
+                  <div className="flex h-full flex-col gap-3 p-5">
+                    <div className="h-3 w-20 rounded-pill bg-primary-200" />
+                    <div className="h-8 w-40 rounded-lg bg-primary-100" />
+                    <GlassCard tone="strong" className="mt-2">
+                      <p className="text-caption font-bold text-ink">Step 1 of 5</p>
+                      <p className="mt-1 text-body-sm text-muted">Look in the mirror.</p>
+                    </GlassCard>
+                    <div className="mt-auto h-11 rounded-pill bg-brand-cta" />
+                  </div>
+                </PhoneMockup>
+
+                <GlassCard tone="strong">
+                  <h3 className="text-h4 text-ink">GlassCard</h3>
+                  <p className="mt-2 text-body-sm text-muted">
+                    Selective, never stacked. Over a gradient it steps up to <code>tone=&quot;strong&quot;</code> so text
+                    stays legible.
+                  </p>
+                </GlassCard>
+              </div>
+            </div>
           </div>
         </Section>
 

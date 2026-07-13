@@ -2,6 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Volume2 } from 'lucide-react';
 import { BottomNav } from './BottomNav';
+import { Footer } from './Footer';
 import { Navbar } from './Navbar';
 import { NavArrows } from './NavArrows';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -61,6 +62,7 @@ export function Layout() {
       </div>
       <Navbar />
       <Outlet />
+      <Footer />
       {showGlobalArrows && (
         <NavArrows
           transitionKey={location.pathname}

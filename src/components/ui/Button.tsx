@@ -26,8 +26,9 @@ const VARIANTS: Record<Variant, string> = {
   danger: 'bg-risk-high text-white shadow-petal-lg hover:brightness-105',
 };
 
+/* Heights are tap targets first: 44px is the floor, so `sm` is h-11, not h-10. */
 const SIZES: Record<Size, string> = {
-  sm: 'h-10 px-4 text-sm gap-1.5',
+  sm: 'h-11 px-4 text-sm gap-1.5',
   md: 'h-12 px-6 text-[15px] gap-2',
   lg: 'h-14 px-8 text-base gap-2.5',
 };

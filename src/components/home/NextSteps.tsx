@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useLanguage } from '@/hooks/useLanguage';
+import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
 
 /* One lane per state, in i18n order: nothing unusual · a minor change · a
    change that lasted two weeks · a sign that needs prompt care.
@@ -48,20 +49,17 @@ export function NextSteps() {
 
       <motion.ol
         className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-        initial="rest"
+        variants={staggerContainer(0.07)}
+        initial="hidden"
         whileInView="shown"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={{ shown: { transition: { staggerChildren: 0.07 } } }}
+        viewport={VIEWPORT}
       >
         {section.cards.map((card, i) => {
           const { icon: Icon, tile, edge } = LANES[i];
           return (
             <motion.li
               key={card.state}
-              variants={{
-                rest: { opacity: 0, y: 18 },
-                shown: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
-              }}
+              variants={staggerItem}
               className={`flex flex-col rounded-3xl border border-t-4 border-line bg-card p-5 shadow-petal ${edge}`}
             >
               <span className={`grid h-11 w-11 place-items-center rounded-2xl ${tile}`}>

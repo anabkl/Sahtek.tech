@@ -220,7 +220,7 @@ export function ChatPage() {
             <input value={text} onChange={(e) => setText(e.target.value)} placeholder={t.chat.placeholder} className="min-w-0 flex-1 bg-transparent px-4 font-bold text-ink outline-none" />
             <div className="relative shrink-0">
               {voice.listening && (
-                <span className="pointer-events-none absolute inset-0 animate-pulse-ring rounded-full bg-rose-gradient" aria-hidden />
+                <span className="pointer-events-none absolute inset-0 motion-safe:animate-pulse-ring rounded-full bg-rose-gradient" aria-hidden />
               )}
               <button
                 type="button"

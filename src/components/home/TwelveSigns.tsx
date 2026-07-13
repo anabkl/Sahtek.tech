@@ -10,6 +10,7 @@ import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { SIGN_ICONS } from '@/data/signs';
 import { useLanguage } from '@/hooks/useLanguage';
+import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
 
 /**
  * The 12 signs — "Care Cards".
@@ -42,24 +43,17 @@ export function TwelveSigns() {
 
       <motion.ul
         className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4"
-        initial="rest"
+        variants={staggerContainer(0.04)}
+        initial="hidden"
         whileInView="shown"
-        /* `amount: 0.1` — reveal as soon as a sliver of the grid is on screen.
-           A stricter threshold (or an inset margin) risks a grid that is in
-           view but not "in view enough", which would leave the signature
-           section sitting at opacity 0. Fail toward showing the content. */
-        viewport={{ once: true, amount: 0.1 }}
-        variants={{ shown: { transition: { staggerChildren: 0.04 } } }}
+        viewport={VIEWPORT}
       >
         {signs.items.map((sign, i) => {
           const Icon = SIGN_ICONS[i];
           return (
             <motion.li
               key={sign.label}
-              variants={{
-                rest: { opacity: 0, y: 16 },
-                shown: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
-              }}
+              variants={staggerItem}
               className="flex"
             >
               <button

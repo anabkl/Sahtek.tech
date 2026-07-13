@@ -4,6 +4,7 @@ import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { EVIDENCE_SOURCES, MEDICAL_REVIEW } from '@/config/constants';
 import { useLanguage } from '@/hooks/useLanguage';
+import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
 
 /* In the order of `home.credibility.points`. */
 const POINT_ICONS: LucideIcon[] = [ShieldCheck, LockKeyhole, Languages];
@@ -40,20 +41,17 @@ export function Credibility() {
 
       <motion.ul
         className="mt-10 grid gap-4 sm:grid-cols-3"
-        initial="rest"
+        variants={staggerContainer(0.06)}
+        initial="hidden"
         whileInView="shown"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={{ shown: { transition: { staggerChildren: 0.06 } } }}
+        viewport={VIEWPORT}
       >
         {section.points.map((point, i) => {
           const Icon = POINT_ICONS[i] ?? ShieldCheck;
           return (
             <motion.li
               key={point.title}
-              variants={{
-                rest: { opacity: 0, y: 16 },
-                shown: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
-              }}
+              variants={staggerItem}
               className="rounded-3xl border border-line bg-card p-5 shadow-petal"
             >
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-text">

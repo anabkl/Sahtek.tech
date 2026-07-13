@@ -89,7 +89,7 @@ export function BodyMap() {
                   >
                     {/* Pulsing outer ring */}
                     <span
-                      className="absolute h-7 w-7 animate-pulse-dot rounded-full md:h-5 md:w-5"
+                      className="absolute h-7 w-7 motion-safe:animate-pulse-dot rounded-full md:h-5 md:w-5"
                       style={{ backgroundColor: color }}
                     />
                     {/* Solid inner dot */}

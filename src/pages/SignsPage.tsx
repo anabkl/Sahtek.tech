@@ -13,6 +13,7 @@ import { ZelligeAccent } from '@/components/ui/ZelligeAccent';
 import { useToast } from '@/components/ui/toastStore';
 import { SIGN_ICONS } from '@/data/signs';
 import { interpolate, useLanguage } from '@/hooks/useLanguage';
+import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
 
 /** Anchor id for a sign. Stable and 1-based, so /signs#sign-3 is shareable. */
 const signAnchor = (index: number) => `sign-${index + 1}`;
@@ -128,20 +129,17 @@ export function SignsPage() {
 
         <motion.ul
           className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4"
-          initial="rest"
-          whileInView="shown"
-          viewport={{ once: true, amount: 0.1 }}
-          variants={{ shown: { transition: { staggerChildren: 0.03 } } }}
+          variants={staggerContainer(0.03)}
+        initial="hidden"
+        whileInView="shown"
+        viewport={VIEWPORT}
         >
           {signs.items.map((sign, i) => {
             const Icon = SIGN_ICONS[i];
             return (
               <motion.li
                 key={sign.label}
-                variants={{
-                  rest: { opacity: 0, y: 14 },
-                  shown: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
-                }}
+                variants={staggerItem}
                 className="flex"
               >
                 <a

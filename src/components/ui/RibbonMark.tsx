@@ -25,7 +25,7 @@ export function RibbonMark({ size = 40, className, animated, tone = 'gradient' }
       width={size}
       height={size}
       viewBox="0 0 128 128"
-      className={cn(animated && 'animate-ribbon-float', className)}
+      className={cn(animated && 'motion-safe:animate-ribbon-float', className)}
       aria-hidden
       focusable="false"
     >

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useLanguage } from '@/hooks/useLanguage';
+import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
 
 /**
  * How it works — discover → check → understand → act.
@@ -29,10 +30,10 @@ export function HowItWorks() {
 
       <motion.ol
         className="relative mt-10 grid gap-8 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
-        initial="rest"
+        variants={staggerContainer(0.08)}
+        initial="hidden"
         whileInView="shown"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={{ shown: { transition: { staggerChildren: 0.08 } } }}
+        viewport={VIEWPORT}
       >
         {/* The rail. Decorative, so it is hidden from assistive tech — the
             <ol> already says "these are ordered steps". */}
@@ -44,10 +45,7 @@ export function HowItWorks() {
         {section.steps.map((step, i) => (
           <motion.li
             key={step.title}
-            variants={{
-              rest: { opacity: 0, y: 18 },
-              shown: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
-            }}
+            variants={staggerItem}
             className="relative flex flex-col"
           >
             <span className="relative z-10 grid h-12 w-12 place-items-center rounded-full border border-line bg-card font-serif text-h4 text-gold-text shadow-petal">

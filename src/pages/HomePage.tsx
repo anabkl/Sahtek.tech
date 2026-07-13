@@ -31,6 +31,7 @@ import { SectionHeading } from '@/components/ui/SectionHeading';
 import { TrustPill } from '@/components/ui/TrustPill';
 import { ZelligeAccent } from '@/components/ui/ZelligeAccent';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useParallax } from '@/hooks/useParallax';
 
 /* The three signals under the hero, in i18n order: no account · no tracking ·
    stays on your device. Each is a claim we can actually defend — there is no
@@ -55,16 +56,32 @@ const HELPS = [
 export function HomePage() {
   const { t, isRTL } = useLanguage();
 
+  /* Light hero parallax. 22px across the whole hero — enough to give the
+     atmosphere a sense of depth, not enough to notice as an effect. Frozen flat
+     under prefers-reduced-motion (see useParallax: MotionConfig cannot reach a
+     scroll-linked transform). */
+  const parallax = useParallax(22);
+
   return (
     <PageTransition>
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative isolate grid gap-10 py-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:py-14">
+      <section
+        ref={parallax.ref}
+        className="relative isolate grid gap-10 py-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:py-14"
+      >
         {/* Atmosphere. Air, not decoration — every layer stays faint (§4.3).
             The blooms are deliberately NOT clipped: a blur-3xl blob inside an
             overflow-hidden box gets sliced, and the cut edge reads as a solid
             pink panel. Unclipped, they fade to nothing on their own. Only the
             geometry is clipped, so it never runs into a hard corner. */}
-        <div aria-hidden className="pointer-events-none absolute -inset-x-6 -inset-y-4 -z-10">
+        {/* The atmosphere is what parallaxes — never the text. Moving type as
+            someone scrolls is the fastest way to make a page feel cheap and to
+            make a reader feel seasick. */}
+        <motion.div
+          aria-hidden
+          style={{ y: parallax.y }}
+          className="pointer-events-none absolute -inset-x-6 -inset-y-4 -z-10"
+        >
           <div className="absolute -start-10 -top-10 h-72 w-72 rounded-full bg-primary-300/25 blur-3xl" />
           <div className="absolute -end-16 bottom-0 h-80 w-80 rounded-full bg-calm/10 blur-3xl" />
 
@@ -78,7 +95,7 @@ export function HomePage() {
               className="absolute end-0 top-0 -scale-x-100"
             />
           </div>
-        </div>
+        </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <span className="mb-5 inline-flex items-center gap-2 rounded-pill border border-line bg-card/70 px-4 py-2 text-caption font-bold text-accent-text shadow-petal backdrop-blur-xl">

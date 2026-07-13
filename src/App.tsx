@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { useTheme } from '@/hooks/useTheme';
 import { REMINDER_STORAGE_KEY, scheduleNotificationCheck } from '@/utils/notificationScheduler';
@@ -51,8 +51,16 @@ export default function App() {
   }, []);
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes>
+    /* reducedMotion="user" is the MANDATORY guarantee, and it belongs here
+       rather than in each component: framer now drops every transform and
+       layout animation app-wide when the OS asks for reduced motion, and keeps
+       only the opacity fade. Nothing has to remember, and nothing new can
+       forget. The two things it cannot reach are guarded at source — CSS
+       keyframes by the `motion-safe:` prefix and the media query in index.css,
+       and scroll-linked parallax inside useParallax(). */
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence mode="wait">
+        <Routes>
         {/* Outside Layout: the preview owns its own chrome and theme toggle. */}
         <Route
           path="/design-system"
@@ -84,7 +92,8 @@ export default function App() {
           <Route path="home" element={<Navigate to="/" replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
-      </Routes>
-    </AnimatePresence>
+        </Routes>
+      </AnimatePresence>
+    </MotionConfig>
   );
 }

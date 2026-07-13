@@ -238,7 +238,7 @@ export function CompanionPage() {
 
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="py-10">
-        <div className="relative isolate overflow-hidden rounded-[2rem] bg-brand-cta p-8 text-center shadow-petal-xl sm:p-12">
+        <div className="relative isolate overflow-hidden rounded-[2rem] bg-brand-cta bg-[length:200%_200%] p-8 text-center shadow-petal-xl motion-safe:animate-gradient-pan sm:p-12">
           <ZelligeAccent variant="field" tone="current" opacity={0.07} className="text-white" />
 
           <div className="relative mx-auto flex max-w-xl flex-col items-center">

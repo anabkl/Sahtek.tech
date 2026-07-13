@@ -6,6 +6,7 @@ import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useLanguage } from '@/hooks/useLanguage';
+import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
 
 /* In the order of `learn.overview.riskFactors`: age · family history · weight
    and inactivity · smoking and alcohol · early periods or late menopause ·
@@ -43,20 +44,17 @@ export function RiskFactors() {
 
       <motion.ul
         className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        initial="rest"
+        variants={staggerContainer(0.05)}
+        initial="hidden"
         whileInView="shown"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={{ shown: { transition: { staggerChildren: 0.05 } } }}
+        viewport={VIEWPORT}
       >
         {factors.map((factor, i) => {
           const Icon = FACTOR_ICONS[i] ?? UserRound;
           return (
             <motion.li
               key={factor.title}
-              variants={{
-                rest: { opacity: 0, y: 16 },
-                shown: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
-              }}
+              variants={staggerItem}
               className="flex gap-4 rounded-3xl border border-line bg-card p-5 shadow-petal"
             >
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-text">

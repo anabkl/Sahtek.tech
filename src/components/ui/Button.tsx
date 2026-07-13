@@ -55,8 +55,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       disabled={disabled || loading}
       className={cn(
         'focus-ring relative inline-flex select-none items-center justify-center rounded-full font-semibold',
-        'transition-all duration-200 active:scale-[0.97]',
-        'disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100',
+        /* Microinteraction: a 1px lift on hover, a 3% press on tap. Both are
+           CSS transforms — composited, and neutralised by the reduced-motion
+           block in index.css, so they need no JS guard. The press is the one
+           that matters: it is the only feedback a touch device gets, since a
+           phone has no hover. */
+        'transition-all duration-base ease-soft hover:-translate-y-px active:translate-y-0 active:scale-[0.97]',
+        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100',
         VARIANTS[variant],
         SIZES[size],
         fullWidth && 'w-full',

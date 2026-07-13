@@ -7,25 +7,24 @@ import { Navbar } from './Navbar';
 import { NavArrows } from './NavArrows';
 import { ToastViewport } from '@/components/ui/Toast';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { useSpeech } from '@/hooks/useSpeech';
 
 export function Layout() {
-  const { t, dir, lang, fontClass } = useLanguage();
+  // lang/dir are no longer read here — useDocumentMeta() owns <html lang|dir>.
+  const { t, fontClass } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
 
   // Narration keeps playing across navigation (see useSpeech), so surface a
   // global Stop control whenever something is speaking — no matter the page.
   const { isSpeaking, stop } = useSpeech();
-  const stopAudioLabel =
-    lang === 'ar' ? 'وقفي الصوت' : lang === 'fr' ? 'Arrêter le son' :
-    lang === 'es' ? 'Detener audio' : lang === 'de' ? 'Audio stoppen' :
-    lang === 'ru' ? 'Остановить' : lang === 'pt' ? 'Parar áudio' : 'Stop audio';
+  const stopAudioLabel = t.common.stopAudio;
 
-  useEffect(() => {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = dir;
-  }, [dir, lang]);
+  /* Owns <title>, the meta description, og:*, and <html lang|dir> — all of them
+     following the active language and route. This replaces the lang/dir effect
+     that used to live here. */
+  useDocumentMeta();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

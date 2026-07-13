@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { cn } from '@/utils/cn';
 
 interface ModalProps {
@@ -14,6 +15,7 @@ interface ModalProps {
 
 /** Mobile-first bottom-sheet modal; centred dialog on larger screens. */
 export function Modal({ open, onClose, title, children, className }: ModalProps) {
+  const { t } = useLanguage();
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
@@ -58,7 +60,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
                 <h3 className="text-lg font-bold text-ink">{title}</h3>
                 <button
                   onClick={onClose}
-                  aria-label="Close"
+                  aria-label={t.common.close}
                   className="focus-ring rounded-full p-1.5 text-muted hover:bg-line"
                 >
                   <X size={20} />

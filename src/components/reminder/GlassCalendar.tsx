@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { addMonths } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 
@@ -23,6 +24,7 @@ interface GlassCalendarProps {
 
 /** Frosted monthly calendar with a horizontal, scroll-snapping day strip. */
 export function GlassCalendar({ selectedDate, onDateSelect, isRTL, months, weekdays, readOnly }: GlassCalendarProps) {
+  const { t } = useLanguage();
   const [viewDate, setViewDate] = useState(() => startOfMonth(selectedDate ?? new Date()));
   const selectedRef = useRef<HTMLButtonElement>(null);
 
@@ -44,7 +46,7 @@ export function GlassCalendar({ selectedDate, onDateSelect, isRTL, months, weekd
         <button
           type="button"
           onClick={() => setViewDate((d) => addMonths(d, -1))}
-          aria-label="Previous month"
+          aria-label={t.common.prevMonth}
           className="grid h-10 w-10 place-items-center rounded-full bg-primary-50 text-primary-600 transition hover:bg-primary-100"
         >
           <ChevronLeft size={20} className="rtl:-scale-x-100" />
@@ -65,7 +67,7 @@ export function GlassCalendar({ selectedDate, onDateSelect, isRTL, months, weekd
         <button
           type="button"
           onClick={() => setViewDate((d) => addMonths(d, 1))}
-          aria-label="Next month"
+          aria-label={t.common.nextMonth}
           className="grid h-10 w-10 place-items-center rounded-full bg-primary-50 text-primary-600 transition hover:bg-primary-100"
         >
           <ChevronRight size={20} className="rtl:-scale-x-100" />

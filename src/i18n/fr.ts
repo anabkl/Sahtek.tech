@@ -171,6 +171,7 @@ export const fr: Translation = {
       eyebrow: 'Facteurs de risque',
       title: 'Les connaître, sans les craindre',
       cta: 'Explorer vos facteurs de risque',
+      infographicAlt: 'Illustration sereine : les facteurs de risque que l’on peut changer, et ceux que l’on ne peut pas.',
     },
     nextSteps: {
       eyebrow: 'Que faire ensuite',
@@ -219,6 +220,7 @@ export const fr: Translation = {
         'Chaque page qui donne des repères porte un avertissement médical visible.',
       ],
       reviewTitle: 'Relecture médicale',
+      methodImageAlt: 'Illustration : les étapes d’écriture et de relecture du contenu de Sahtek.',
     },
     faq: {
       eyebrow: 'Questions',

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Baby, Cigarette, Clock, Pill, Scale, UserRound, Users, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -69,6 +70,17 @@ export function RiskFactors() {
           );
         })}
       </motion.ul>
+
+      {/* The soft infographic block. Reserved at 16:9 so the grid above does
+          not reflow when the real artwork lands. The alt is already written and
+          translated — swap the whole element for an <img alt={section.infographicAlt}>. */}
+      <div className="mt-6 aspect-[16/9] overflow-hidden rounded-3xl border border-line shadow-petal sm:aspect-[21/9]">
+        <ImagePlaceholder
+          spec="1680 × 720 px · 21:9 · SVG"
+          altNote={section.infographicAlt}
+          hint="Soft infographic: factors you can change vs. factors you cannot. No bodies, no clinical imagery."
+        />
+      </div>
 
       <div className="mt-8 flex flex-col items-center gap-5">
         <SafetyNote variant="care" className="w-full">

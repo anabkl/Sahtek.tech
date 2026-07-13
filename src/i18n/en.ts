@@ -204,6 +204,7 @@ export const en = {
       eyebrow: 'Risk factors',
       title: 'Know them, without fearing them',
       cta: 'Explore your risk factors',
+      infographicAlt: 'A calm illustration: the risk factors you can change, and the ones you cannot.',
     },
     nextSteps: {
       eyebrow: 'What to do next',
@@ -252,6 +253,7 @@ export const en = {
         'Every page that gives guidance carries a visible medical disclaimer.',
       ],
       reviewTitle: 'Medical review',
+      methodImageAlt: 'An illustration: the stages of writing and reviewing Sahtek’s content.',
     },
     faq: {
       eyebrow: 'Questions',

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { BookOpenCheck, ExternalLink, LockKeyhole, Languages, ShieldCheck, type LucideIcon } from 'lucide-react';
+import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { EVIDENCE_SOURCES, MEDICAL_REVIEW } from '@/config/constants';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -72,14 +73,26 @@ export function Credibility() {
           <BookOpenCheck size={20} className="text-accent-text" aria-hidden />
           {section.methodTitle}
         </h3>
-        <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
-          {section.method.map((rule) => (
-            <li key={rule} className="flex items-start gap-2.5 text-body-sm text-muted">
-              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" aria-hidden />
-              {rule}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 grid gap-5 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+          <ul className="grid gap-2.5">
+            {section.method.map((rule) => (
+              <li key={rule} className="flex items-start gap-2.5 text-body-sm text-muted">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" aria-hidden />
+                {rule}
+              </li>
+            ))}
+          </ul>
+
+          {/* The methodology preview. A diagram of how the words get made —
+              not a badge, and not a stock photo of a doctor. */}
+          <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-line sm:aspect-[16/9] lg:aspect-[4/3]">
+            <ImagePlaceholder
+              spec="960 × 720 px · 4:3 · SVG"
+              altNote={section.methodImageAlt}
+              hint="Editorial flow: write in Darija → adapt FR/EN → medical review → publish."
+            />
+          </div>
+        </div>
 
         {MEDICAL_REVIEW && (
           <div className="mt-6 border-t border-line pt-5">

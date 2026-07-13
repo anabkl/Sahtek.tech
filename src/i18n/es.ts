@@ -173,6 +173,7 @@ export const es: Translation = {
       eyebrow: 'Factores de riesgo',
       title: 'Conocerlos, sin temerlos',
       cta: 'Explorar tus factores de riesgo',
+      infographicAlt: 'Ilustración serena: los factores de riesgo que puedes cambiar y los que no.',
     },
     nextSteps: {
       eyebrow: 'Qué hacer después',
@@ -205,6 +206,7 @@ export const es: Translation = {
         'Cada página con orientación lleva un aviso médico visible.',
       ],
       reviewTitle: 'Revisión médica',
+      methodImageAlt: 'Ilustración: las etapas de redacción y revisión del contenido de Sahtek.',
     },
     faq: {
       eyebrow: 'Preguntas',

@@ -173,6 +173,7 @@ export const de: Translation = {
       eyebrow: 'Risikofaktoren',
       title: 'Kenne sie, ohne sie zu fürchten',
       cta: 'Deine Risikofaktoren erkunden',
+      infographicAlt: 'Eine ruhige Illustration: Risikofaktoren, die du ändern kannst, und solche, die du nicht ändern kannst.',
     },
     nextSteps: {
       eyebrow: 'Was als Nächstes',
@@ -205,6 +206,7 @@ export const de: Translation = {
         'Jede Seite mit Hinweisen trägt einen sichtbaren medizinischen Hinweis.',
       ],
       reviewTitle: 'Medizinische Prüfung',
+      methodImageAlt: 'Eine Illustration: die Schritte beim Schreiben und Prüfen der Sahtek-Inhalte.',
     },
     faq: {
       eyebrow: 'Fragen',

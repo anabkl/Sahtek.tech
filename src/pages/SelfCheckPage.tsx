@@ -1,17 +1,39 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { BellRing, CheckCircle2, Clock, MapPin, Pause, Play, RotateCcw, TimerReset } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import {
+  BellRing,
+  CalendarClock,
+  CircleCheck,
+  Clock,
+  Eye,
+  MapPin,
+  Pause,
+  Play,
+  RotateCcw,
+  SkipForward,
+  Stethoscope,
+  TimerReset,
+  Volume2,
+  type LucideIcon,
+} from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { Confetti } from '@/components/ui/Confetti';
-import { useLanguage } from '@/hooks/useLanguage';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { CircularProgress, Progress } from '@/components/ui/Progress';
+import { SafetyNote } from '@/components/ui/SafetyNote';
+import { SectionHeading } from '@/components/ui/SectionHeading';
+import { interpolate, useLanguage } from '@/hooks/useLanguage';
 import { useSelfCheck } from '@/hooks/useSelfCheck';
 import { useSpeech } from '@/hooks/useSpeech';
 import { formatDuration } from '@/utils/formatters';
 import type { SelfCheckStep } from '@/types/api';
 
-// Shared, language-independent metadata for the 5 self-check steps.
+/* Language-independent metadata. The WORDS live in `selfCheck.steps` in i18n —
+   they used to be a hardcoded per-language map in this file, which meant the
+   Darija copy could not be edited by anyone who edits Darija copy. */
 const STEP_META = [
   { step_number: 1, icon: 'mirror', duration_seconds: 60 },
   { step_number: 2, icon: 'arms', duration_seconds: 45 },
@@ -20,106 +42,52 @@ const STEP_META = [
   { step_number: 5, icon: 'alert', duration_seconds: 30 },
 ];
 
-type StepText = { title: string; instruction: string; tags: string[] };
-
-// Localized title / instruction / symptom tags for each step, in step order.
-// Every supported language is covered; unknown languages fall back to English.
-const STEP_TEXT: Record<string, StepText[]> = {
-  ar: [
-    { title: 'راقبي فالمرآة', instruction: 'وقفي قدام المرآة وشوفي واش كاين تغيير فالشكل، الحجم أو لون الجلد.', tags: ['تغيير فالحجم', 'تورم', 'تغيير فالجلد'] },
-    { title: 'رفعي يديك', instruction: 'رفعي يديك فوق راسك وراقبي نفس العلامات من زاوية جديدة.', tags: ['انكماش', 'اختلاف بين الجهتين'] },
-    { title: 'فحصي وانتي واقفة', instruction: 'استعملي أصابعك بحركات دائرية وضغط خفيف ثم متوسط.', tags: ['كتلة', 'ألم فبلاصة وحدة'] },
-    { title: 'فحصي وانتي مستلقية', instruction: 'حطي وسادة تحت الكتف وكرري الحركات على كل ثدي.', tags: ['فرق بين الثديين', 'صلابة'] },
-    { title: 'راقبي الحلمة', instruction: 'ضغطي بلطف وشوفي واش كاين إفراز غير عادي.', tags: ['إفرازات', 'دم', 'تغيير فالشكل'] },
-  ],
-  fr: [
-    { title: 'Observer au miroir', instruction: 'Regardez la forme, la taille et la peau.', tags: ['Forme', 'Taille', 'Peau'] },
-    { title: 'Lever les bras', instruction: 'Levez les bras et observez encore.', tags: ['Gonflement', 'Changements du mamelon'] },
-    { title: 'Examiner debout', instruction: 'Faites des cercles avec les doigts, doucement.', tags: ['Masse', 'Dureté', 'Douleur'] },
-    { title: 'Examiner allongée', instruction: 'Allongez-vous et répétez sur chaque sein.', tags: ['Différences', 'Texture'] },
-    { title: 'Vérifier le mamelon', instruction: 'Pressez doucement et observez.', tags: ['Écoulement', 'Sang', 'Forme'] },
-  ],
-  en: [
-    { title: 'Look in the mirror', instruction: 'Look for changes in shape, size or skin.', tags: ['Shape', 'Size', 'Skin'] },
-    { title: 'Raise your arms', instruction: 'Raise your arms and look again from a new angle.', tags: ['Swelling', 'Nipple changes'] },
-    { title: 'Examine standing', instruction: 'Use circular finger motions with gentle pressure.', tags: ['Lump', 'Hardness', 'Pain'] },
-    { title: 'Examine lying down', instruction: 'Lie down and repeat the same pattern on each breast.', tags: ['Differences', 'Texture'] },
-    { title: 'Check the nipple', instruction: 'Gently squeeze and check for unusual discharge.', tags: ['Discharge', 'Blood', 'Shape'] },
-  ],
-  es: [
-    { title: 'Observar en el espejo', instruction: 'Frente al espejo, observa la forma, el tamaño y la piel.', tags: ['Forma', 'Tamaño', 'Piel'] },
-    { title: 'Levantar los brazos', instruction: 'Levanta los brazos y observa de nuevo desde otro ángulo.', tags: ['Hinchazón', 'Cambios en el pezón'] },
-    { title: 'Examen de pie', instruction: 'Haz movimientos circulares con los dedos, con presión suave.', tags: ['Bulto', 'Dureza', 'Dolor'] },
-    { title: 'Examen acostada', instruction: 'Acuéstate y repite el mismo patrón en cada seno.', tags: ['Diferencias', 'Textura'] },
-    { title: 'Revisar el pezón', instruction: 'Presiona suavemente y revisa si hay secreción inusual.', tags: ['Secreción', 'Sangre', 'Forma'] },
-  ],
-  de: [
-    { title: 'Im Spiegel betrachten', instruction: 'Achte im Spiegel auf Form, Größe und Haut.', tags: ['Form', 'Größe', 'Haut'] },
-    { title: 'Arme heben', instruction: 'Hebe die Arme und betrachte alles aus einem neuen Winkel.', tags: ['Schwellung', 'Veränderung der Brustwarze'] },
-    { title: 'Im Stehen untersuchen', instruction: 'Taste mit kreisenden Fingerbewegungen und sanftem Druck.', tags: ['Knoten', 'Verhärtung', 'Schmerz'] },
-    { title: 'Im Liegen untersuchen', instruction: 'Lege dich hin und wiederhole das Muster an jeder Brust.', tags: ['Unterschiede', 'Struktur'] },
-    { title: 'Brustwarze prüfen', instruction: 'Drücke sanft und prüfe auf ungewöhnlichen Ausfluss.', tags: ['Ausfluss', 'Blut', 'Form'] },
-  ],
-  ru: [
-    { title: 'Осмотр в зеркале', instruction: 'Перед зеркалом обратите внимание на форму, размер и кожу.', tags: ['Форма', 'Размер', 'Кожа'] },
-    { title: 'Поднимите руки', instruction: 'Поднимите руки и осмотрите снова под новым углом.', tags: ['Отёк', 'Изменения соска'] },
-    { title: 'Осмотр стоя', instruction: 'Круговыми движениями пальцев с лёгким нажимом ощупайте грудь.', tags: ['Уплотнение', 'Твёрдость', 'Боль'] },
-    { title: 'Осмотр лёжа', instruction: 'Лягте и повторите те же движения на каждой груди.', tags: ['Различия', 'Текстура'] },
-    { title: 'Проверьте сосок', instruction: 'Слегка сожмите и проверьте, нет ли необычных выделений.', tags: ['Выделения', 'Кровь', 'Форма'] },
-  ],
-  pt: [
-    { title: 'Observar no espelho', instruction: 'Em frente ao espelho, observe a forma, o tamanho e a pele.', tags: ['Forma', 'Tamanho', 'Pele'] },
-    { title: 'Levantar os braços', instruction: 'Levante os braços e observe novamente de um novo ângulo.', tags: ['Inchaço', 'Alterações no mamilo'] },
-    { title: 'Exame em pé', instruction: 'Faça movimentos circulares com os dedos, com pressão suave.', tags: ['Nódulo', 'Rigidez', 'Dor'] },
-    { title: 'Exame deitada', instruction: 'Deite-se e repita o mesmo padrão em cada mama.', tags: ['Diferenças', 'Textura'] },
-    { title: 'Verificar o mamilo', instruction: 'Pressione suavemente e verifique se há secreção incomum.', tags: ['Secreção', 'Sangue', 'Forma'] },
-  ],
-};
-
-function stepsFor(lang: string): SelfCheckStep[] {
-  const text = STEP_TEXT[lang] ?? STEP_TEXT.en;
-  return STEP_META.map((meta, i) => ({
-    step_number: meta.step_number,
-    icon: meta.icon,
-    duration_seconds: meta.duration_seconds,
-    title: text[i].title,
-    instruction: text[i].instruction,
-    what_to_look_for: text[i].tags,
-    image_url: '',
-  }));
-}
+/* The four lanes of `home.nextSteps`, reused verbatim on the completion screen.
+   Escalation is carried by icon and words, never colour — there is no red lane. */
+const LANE_ICONS: LucideIcon[] = [CircleCheck, Eye, CalendarClock, Stethoscope];
+const LANE_TILES = [
+  'bg-calm-soft text-calm-text',
+  'bg-accent-soft text-accent-text',
+  'bg-info-soft text-info-text',
+  'bg-gold-soft text-gold-text',
+];
 
 export function SelfCheckPage() {
   const { t, lang } = useLanguage();
-  // Memoize so the steps array keeps a stable identity across renders —
-  // otherwise the timer's reset effect refires every render and freezes the countdown.
-  const guide = useMemo(() => stepsFor(lang), [lang]);
+  const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
+
+  // Memoised so the array keeps a stable identity — otherwise the timer's reset
+  // effect refires every render and the countdown freezes.
+  const guide = useMemo<SelfCheckStep[]>(
+    () =>
+      STEP_META.map((meta, i) => {
+        const copy = t.selfCheck.steps[i];
+        return {
+          step_number: meta.step_number,
+          icon: meta.icon,
+          duration_seconds: meta.duration_seconds,
+          title: copy.title,
+          instruction: copy.instruction,
+          what_to_look_for: copy.lookFor,
+          image_url: '',
+        };
+      }),
+    [t.selfCheck.steps],
+  );
+
   const check = useSelfCheck(guide);
   const { speak, activeId, stop, voicesLoaded, hasVoice } = useSpeech();
-  const navigate = useNavigate();
   const [showReminderCta, setShowReminderCta] = useState(false);
   const ctaTimer = useRef<number | null>(null);
-  const radius = 72;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - check.stepProgress);
 
-  // Narration (text-to-speech) for the active step. Read check.current into a
-  // string here so the click handler doesn't depend on TS narrowing the
-  // possibly-undefined current step inside a closure.
   const speechId = `step-${check.index}`;
   const isNarrating = activeId === speechId;
   const narrationText = check.current ? check.current.instruction || check.current.title : '';
-  // Only offer narration once voices are loaded and one exists for this language.
-  // voicesLoaded re-renders the page when voices arrive so hasVoice re-evaluates.
   const canNarrate = voicesLoaded && hasVoice(lang);
-  const listenLabel =
-    lang === 'ar' ? 'سمعي' : lang === 'fr' ? 'Écouter' : lang === 'es' ? 'Escuchar' :
-    lang === 'de' ? 'Anhören' : lang === 'ru' ? 'Слушать' : lang === 'pt' ? 'Ouvir' : 'Listen';
-  const pauseLabel =
-    lang === 'ar' ? 'وقفي' : lang === 'fr' ? 'Pause' : lang === 'es' ? 'Pausa' :
-    lang === 'de' ? 'Pause' : lang === 'ru' ? 'Пауза' : lang === 'pt' ? 'Pausa' : 'Pause';
 
-  // Reveal the reminder nudge ~2s after the user finishes the guide.
+  // Reveal the reminder nudge a beat after she finishes — not the instant she
+  // lands, which would read as an upsell rather than a kindness.
   useEffect(() => {
     if (check.stage !== 'done') {
       setShowReminderCta(false);
@@ -131,135 +99,256 @@ export function SelfCheckPage() {
     };
   }, [check.stage]);
 
-  // Stop any narration when the active step changes.
   useEffect(() => {
     stop();
   }, [check.index, stop]);
 
+  /* Framer animates via inline transforms in JS, so the `prefers-reduced-motion`
+     block in index.css does NOT reach it. Honour the preference explicitly:
+     the step still changes, it just does not slide. */
+  const stepMotion = reduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
+    : {
+        initial: { opacity: 0, x: check.direction * 24 },
+        animate: { opacity: 1, x: 0 },
+        exit: { opacity: 0, x: check.direction * -24 },
+      };
+
   return (
     <PageTransition>
+      {/* ── INTRO ────────────────────────────────────────────────────────── */}
       {check.stage === 'intro' && (
-        <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div>
-            <h1 className="text-4xl font-black text-ink">{t.selfCheck.title}</h1>
-            <p className="mt-3 text-lg font-medium leading-8 text-muted">{t.selfCheck.subtitle}</p>
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-3xl bg-card/80 p-5 shadow-petal"><Clock className="text-primary-500" /><p className="mt-2 text-sm font-bold text-muted">{t.selfCheck.bestTime}</p><p className="font-black text-ink">3-5 days</p></div>
-              <div className="rounded-3xl bg-card/80 p-5 shadow-petal"><TimerReset className="text-primary-500" /><p className="mt-2 text-sm font-bold text-muted">{t.selfCheck.duration}</p><p className="font-black text-ink">5 min</p></div>
+        <section className="mx-auto max-w-2xl">
+          <h1 className="text-balance text-h1 text-ink">{t.selfCheck.title}</h1>
+          <p className="mt-3 text-body-lg text-muted">{t.selfCheck.subtitle}</p>
+
+          {/* Privacy first. She is about to touch her own body in front of a
+              phone; she should know what the phone is doing before she starts. */}
+          <SafetyNote variant="privacy" className="mt-6">
+            {t.selfCheck.privacyNote}
+          </SafetyNote>
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-3xl border border-line bg-card p-5 shadow-petal">
+              <Clock size={22} className="text-accent-text" aria-hidden />
+              <p className="mt-2 text-caption font-bold text-muted">{t.selfCheck.bestTime}</p>
+              <p className="text-body-sm font-bold text-ink">{t.selfCheck.bestTimeValue}</p>
             </div>
-            <p className="mt-5 rounded-3xl border border-primary-100 bg-primary-50 p-5 font-medium leading-7 text-primary-900">{t.selfCheck.intro}</p>
-            <Button className="mt-6" size="lg" fullWidth onClick={check.start}>{t.selfCheck.startBtn}</Button>
+            <div className="rounded-3xl border border-line bg-card p-5 shadow-petal">
+              <TimerReset size={22} className="text-accent-text" aria-hidden />
+              <p className="mt-2 text-caption font-bold text-muted">{t.selfCheck.duration}</p>
+              <p className="text-body-sm font-bold text-ink">{t.selfCheck.durationValue}</p>
+            </div>
           </div>
-          <div className="rounded-[2rem] border border-white/70 bg-card/80 p-5 shadow-petal-xl">
-            <div className="grid gap-3">
-              {guide.map((step) => (
-                <div key={step.step_number} className="flex items-center gap-4 rounded-2xl bg-white/55 p-4">
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-brand-cta text-lg font-black text-white">{step.step_number}</span>
-                  <div><h3 className="font-black text-ink">{step.title}</h3><p className="text-sm font-medium text-muted">{formatDuration(step.duration_seconds)}</p></div>
+
+          <p className="mt-4 rounded-3xl border border-line bg-sunken p-5 text-body text-muted">
+            {t.selfCheck.intro}
+          </p>
+
+          <ol className="mt-6 grid gap-2">
+            {guide.map((step) => (
+              <li
+                key={step.step_number}
+                className="flex items-center gap-4 rounded-2xl border border-line bg-card p-4 shadow-petal"
+              >
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-cta font-serif text-body font-bold text-white">
+                  {step.step_number}
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-h4 text-ink">{step.title}</h2>
+                  <p className="text-caption text-muted">{formatDuration(step.duration_seconds)}</p>
                 </div>
-              ))}
-            </div>
-          </div>
+              </li>
+            ))}
+          </ol>
+
+          <Button className="mt-6" size="lg" fullWidth onClick={check.start}>
+            {t.selfCheck.startBtn}
+          </Button>
+
+          <Disclaimer className="mt-6" />
         </section>
       )}
 
+      {/* ── ACTIVE ───────────────────────────────────────────────────────── */}
       {check.stage === 'active' && check.current && (
         <section className="mx-auto max-w-2xl">
-          <div className="rounded-[2rem] border border-white/70 bg-card/85 p-5 text-center shadow-petal-xl">
-            <p className="font-black text-primary-700">{t.common.step} {check.index + 1} {t.common.of} {check.total}</p>
-            <h1 className="mt-2 text-3xl font-black text-ink">{check.current.title}</h1>
-            <div className="relative mx-auto my-8 h-44 w-44">
-              <svg className="-rotate-90" width="176" height="176">
-                <circle cx="88" cy="88" r={radius} fill="none" stroke="rgba(214,51,132,0.12)" strokeWidth="16" />
-                <motion.circle cx="88" cy="88" r={radius} fill="none" stroke="#D63384" strokeWidth="16" strokeLinecap="round" strokeDasharray={circumference} animate={{ strokeDashoffset: offset }} />
-              </svg>
-              <div className="absolute inset-0 grid place-items-center text-4xl font-black text-ink">{formatDuration(check.remaining)}</div>
-            </div>
-            <p className="text-lg font-medium leading-8 text-muted">{check.current.instruction}</p>
-            {canNarrate && (
-              <div className="mt-4 flex justify-center">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    speak(narrationText, lang, speechId);
-                  }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    background: isNarrating ? '#D63384' : 'white',
-                    color: isNarrating ? 'white' : '#D63384',
-                    border: '2px solid #D63384',
-                    borderRadius: 999,
-                    padding: '6px 14px',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  <span style={{ fontSize: 16 }}>{isNarrating ? '⏸️' : '🔊'}</span>
-                  {isNarrating ? pauseLabel : listenLabel}
-                </button>
-              </div>
-            )}
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
-              {check.current.what_to_look_for.map((item) => <span key={item} className="rounded-full bg-primary-50 px-3 py-2 text-sm font-bold text-primary-700">{item}</span>)}
-            </div>
-            <div className="mt-7 grid grid-cols-2 gap-3">
-              <Button variant="secondary" onClick={check.togglePause} leftIcon={check.paused ? <Play size={18} /> : <Pause size={18} />}>{check.paused ? t.selfCheck.resume : t.selfCheck.pause}</Button>
-              <Button variant="outline" onClick={check.skipTimer}>{t.selfCheck.timerSkip}</Button>
-              <Button variant="secondary" disabled={check.isFirst} onClick={check.prev}>{t.selfCheck.prevStep}</Button>
-              <Button onClick={check.next}>{check.isLast ? t.selfCheck.finishBtn : t.selfCheck.nextStep}</Button>
-            </div>
+          {/* The progress indicator is about the JOURNEY (step 3 of 5), not the
+              countdown. The ring below is the timer; conflating the two left her
+              with no idea how much of the check was left. */}
+          <div className="mb-6">
+            <p className="mb-2 text-caption font-bold text-muted">
+              {interpolate(t.selfCheck.progressLabel, {
+                n: check.index + 1,
+                total: check.total,
+              })}
+            </p>
+            <Progress value={((check.index + 1) / check.total) * 100} />
           </div>
+
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={check.index}
+              {...stepMotion}
+              transition={{ duration: reduceMotion ? 0.15 : 0.3, ease: 'easeOut' }}
+              className="rounded-[2rem] border border-line bg-card p-5 text-center shadow-petal-xl sm:p-7"
+            >
+              <h1 className="text-h2 text-ink">{check.current.title}</h1>
+
+              {/* The gentle illustration for this step. */}
+              <div className="mx-auto mt-5 aspect-[4/3] max-w-sm overflow-hidden rounded-2xl border border-line">
+                <ImagePlaceholder
+                  spec="960 × 720 px · 4:3 · SVG"
+                  altNote={t.selfCheck.steps[check.index].imageAlt}
+                  hint="Gentle, symbolic. A calm figure or a hand — never clinical, never explicit."
+                />
+              </div>
+
+              <p className="mx-auto mt-5 max-w-prose text-body-lg text-muted">
+                {check.current.instruction}
+              </p>
+
+              <div className="mt-6 flex justify-center">
+                <CircularProgress value={check.stepProgress * 100} size={132} strokeWidth={12}>
+                  <span className="text-h3 text-ink" aria-live="off">
+                    {formatDuration(check.remaining)}
+                  </span>
+                </CircularProgress>
+              </div>
+
+              {canNarrate && (
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    variant={isNarrating ? 'primary' : 'outline'}
+                    size="sm"
+                    leftIcon={isNarrating ? <Pause size={16} /> : <Volume2 size={16} />}
+                    onClick={() => speak(narrationText, lang, speechId)}
+                  >
+                    {isNarrating ? t.selfCheck.listenPause : t.selfCheck.listen}
+                  </Button>
+                </div>
+              )}
+
+              <div className="mt-6">
+                <h2 className="text-overline uppercase text-accent-text">
+                  {t.selfCheck.whatToLookFor}
+                </h2>
+                <ul className="mt-2 flex flex-wrap justify-center gap-2">
+                  {check.current.what_to_look_for.map((item) => (
+                    <li
+                      key={item}
+                      className="rounded-pill bg-accent-soft px-3 py-1.5 text-caption font-bold text-accent-text"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Buttons only — no inputs, nothing to fill in, nothing to get
+                  wrong. She is following along, not filling a form. */}
+              <div className="mt-7 grid grid-cols-2 gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={check.togglePause}
+                  leftIcon={check.paused ? <Play size={18} /> : <Pause size={18} />}
+                >
+                  {check.paused ? t.selfCheck.resume : t.selfCheck.pause}
+                </Button>
+                <Button variant="outline" onClick={check.skipTimer} leftIcon={<SkipForward size={18} />}>
+                  {t.selfCheck.timerSkip}
+                </Button>
+                <Button variant="secondary" disabled={check.isFirst} onClick={check.prev}>
+                  {t.selfCheck.prevStep}
+                </Button>
+                <Button onClick={check.next}>
+                  {check.isLast ? t.selfCheck.finishBtn : t.selfCheck.nextStep}
+                </Button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <Disclaimer className="mt-6" />
         </section>
       )}
 
+      {/* ── DONE ─────────────────────────────────────────────────────────── */}
       {check.stage === 'done' && (
-        <section className="relative mx-auto max-w-xl overflow-hidden rounded-[2rem] border border-white/70 bg-card/85 p-6 text-center shadow-petal-xl">
-          <Confetti />
-          <CheckCircle2 className="mx-auto text-accent-teal" size={56} />
-          <h1 className="mt-4 text-3xl font-black text-ink sm:text-4xl">{t.selfCheck.celebrateTitle}</h1>
-          <p className="mt-3 font-medium leading-7 text-muted">{t.selfCheck.completeText}</p>
-          <p className="mt-4 rounded-2xl bg-primary-50 p-4 text-sm font-bold text-primary-800">{t.selfCheck.importantNote}</p>
+        <section className="mx-auto max-w-3xl">
+          <div className="relative overflow-hidden rounded-[2rem] border border-line bg-card p-6 text-center shadow-petal-xl sm:p-8">
+            {/* Confetti already no-ops under prefers-reduced-motion. */}
+            <Confetti />
+            <CircleCheck size={52} className="mx-auto text-calm" aria-hidden />
+            <h1 className="mt-4 text-balance text-h1 text-ink">{t.selfCheck.celebrateTitle}</h1>
+            <p className="mx-auto mt-3 max-w-prose text-body text-muted">{t.selfCheck.completeText}</p>
+          </div>
 
-          <div className="mt-6 rounded-[1.75rem] border border-accent-blue/20 bg-blue-50/60 p-5 text-start dark:bg-accent-blue/10">
-            <h2 className="text-lg font-black text-ink">{t.selfCheck.doctorsCtaTitle}</h2>
-            <Button
-              className="mt-3"
-              fullWidth
-              variant="secondary"
-              onClick={() => navigate('/doctors')}
-              leftIcon={<MapPin size={18} className="text-accent-blue" />}
-            >
-              {t.selfCheck.doctorsCtaBtn}
-            </Button>
+          {/* Route her into the decision logic. Finishing a check is not the end
+              of anything — the question she actually has is "so what now?", and
+              this is the same four-lane logic the homepage teaches. No score, no
+              verdict: the lane is chosen by HER, from what she noticed. */}
+          <div className="mt-10">
+            <SectionHeading as="h2" size="h2" title={t.selfCheck.nextStepsTitle} accent />
+
+            <ol className="mt-6 grid gap-4 sm:grid-cols-2">
+              {t.home.nextSteps.cards.map((card, i) => {
+                const Icon = LANE_ICONS[i];
+                return (
+                  <li
+                    key={card.state}
+                    className="flex flex-col rounded-3xl border border-line bg-card p-5 text-start shadow-petal"
+                  >
+                    <span className={`grid h-11 w-11 place-items-center rounded-2xl ${LANE_TILES[i]}`}>
+                      <Icon size={20} aria-hidden />
+                    </span>
+                    <h3 className="mt-4 text-h4 text-ink">{card.state}</h3>
+                    <p className="mt-1.5 text-body-sm text-muted">{card.meaning}</p>
+                    <p className="mt-4 border-t border-line pt-3 text-body-sm font-semibold text-ink">
+                      {card.action}
+                    </p>
+                  </li>
+                );
+              })}
+            </ol>
+
+            <SafetyNote variant="seeDoctor" className="mt-6">
+              {t.selfCheck.importantNote}
+            </SafetyNote>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Link to="/doctors">
+                <Button size="lg" fullWidth leftIcon={<MapPin size={18} />}>
+                  {t.home.nextSteps.ctaDoctors}
+                </Button>
+              </Link>
+              <Link to="/signs">
+                <Button size="lg" variant="secondary" fullWidth leftIcon={<Eye size={18} />}>
+                  {t.home.signs.allCta}
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <AnimatePresence>
             {showReminderCta && (
               <motion.div
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 28 }}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
+                animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="mt-6 rounded-[1.75rem] bg-brand-cta p-5 text-start text-white shadow-petal-xl"
+                className="mt-8 rounded-[2rem] bg-brand-cta p-6 text-start text-white shadow-petal-xl"
               >
                 <div className="flex items-center gap-2">
-                  <BellRing size={22} />
-                  <h2 className="text-xl font-black">{t.selfCheck.reminderCtaTitle}</h2>
+                  <BellRing size={22} aria-hidden />
+                  <h2 className="text-h3">{t.selfCheck.reminderCtaTitle}</h2>
                 </div>
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
                   <Button variant="secondary" fullWidth onClick={() => navigate('/reminder')}>
                     {t.selfCheck.reminderCtaYes}
                   </Button>
                   <Button
-                    variant="ghost"
                     fullWidth
-                    className="text-white hover:bg-white/15"
+                    className="border-2 border-white/70 bg-transparent text-white shadow-none hover:bg-white/10"
                     onClick={() => setShowReminderCta(false)}
                   >
                     {t.selfCheck.reminderCtaNo}
@@ -269,9 +358,17 @@ export function SelfCheckPage() {
             )}
           </AnimatePresence>
 
-          <Button className="mt-6" fullWidth variant="secondary" onClick={check.restart} leftIcon={<RotateCcw size={18} />}>
+          <Button
+            className="mt-8"
+            fullWidth
+            variant="secondary"
+            onClick={check.restart}
+            leftIcon={<RotateCcw size={18} />}
+          >
             {t.selfCheck.restart}
           </Button>
+
+          <Disclaimer className="mt-6" />
         </section>
       )}
     </PageTransition>

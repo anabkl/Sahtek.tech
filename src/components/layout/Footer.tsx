@@ -10,9 +10,13 @@ import { useLanguage } from '@/hooks/useLanguage';
 import type { Translation } from '@/i18n';
 
 const EXPLORE: { to: string; key: keyof Translation['nav'] }[] = [
+  { to: '/signs', key: 'signs' },
+  { to: '/when-to-seek-help', key: 'whenToSeek' },
   { to: '/learn', key: 'learn' },
   { to: '/self-check', key: 'selfCheck' },
+  { to: '/risk-factors', key: 'riskFactors' },
   { to: '/risk', key: 'risk' },
+  { to: '/companion', key: 'companion' },
   { to: '/chat', key: 'chat' },
   { to: '/doctors', key: 'doctors' },
   { to: '/reminder', key: 'reminder' },

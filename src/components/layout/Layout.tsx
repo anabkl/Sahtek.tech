@@ -5,6 +5,7 @@ import { BottomNav } from './BottomNav';
 import { Footer } from './Footer';
 import { Navbar } from './Navbar';
 import { NavArrows } from './NavArrows';
+import { ToastViewport } from '@/components/ui/Toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useSpeech } from '@/hooks/useSpeech';
 
@@ -34,6 +35,7 @@ export function Layout() {
   // own hybrid tab+page arrows, so the global ones step aside there.
   const pageOrder = [
     { path: '/', label: t.nav.home },
+    { path: '/signs', label: t.nav.signs },
     { path: '/learn', label: t.nav.learn },
     { path: '/self-check', label: t.nav.selfCheck },
     { path: '/risk', label: t.nav.risk },
@@ -61,6 +63,9 @@ export function Layout() {
         <div className="absolute bottom-20 right-[-20%] h-80 w-80 rounded-full bg-accent-teal/15 blur-3xl" />
       </div>
       <Navbar />
+      {/* ToastViewport was written but never mounted, so every toast() call in
+          the app (Chat, Reminder, Self-check) raised a toast into the void. */}
+      <ToastViewport />
       <Outlet />
       <Footer />
       {showGlobalArrows && (

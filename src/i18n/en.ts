@@ -6,7 +6,11 @@ export const en = {
   },
   nav: {
     home: 'Home',
+    signs: 'Signs',
     learn: 'Learn',
+    riskFactors: 'Risk factors',
+    companion: 'The assistant',
+    whenToSeek: 'When to seek help',
     selfCheck: 'Self-check',
     risk: 'Risk',
     chat: 'Chat',
@@ -296,6 +300,188 @@ export const en = {
     ],
     trustNote: 'Everything stays on your device. No account, no tracking, no analytics.',
   },
+  signsPage: {
+    eyebrow: '12 signs',
+    title: 'The changes worth knowing',
+    intro:
+      'Not to frighten you. This page helps you learn what is normal for your body, so you notice quickly if something changes. Most of these changes are not cancer — but each one deserves a look.',
+    jumpTitle: 'Jump to a sign',
+    shareCta: 'Share this page',
+    shareCopied: 'Link copied ✅',
+    shareFailed: 'Could not copy the link. You can copy it from the address bar.',
+    copySignLink: 'Copy a link to this sign',
+    whenToSeekTitle: 'When to seek help',
+    ctaSelfCheck: 'Start the guided self-check',
+    ctaHelp: 'When to seek help',
+    imageAltTemplate: 'A calm illustration of the sign: {label}',
+    ogAlt: 'Sahtek — 12 breast changes worth knowing.',
+  },
+  riskFactorsPage: {
+    eyebrow: 'Risk factors',
+    title: 'Know the risk factors, without fearing them',
+    intro:
+      'A risk factor slightly raises a probability — it is not a verdict and it is not a prediction. Many women have several and never develop breast cancer, and many women who are diagnosed had none at all. This page exists to help you understand, not to worry you.',
+    changeableLabel: 'You can influence this',
+    notChangeableLabel: 'Not something you can change',
+    keyNote:
+      'Knowing your risk factors does not tell you whether you will develop the disease. It helps you understand your body, and speak to a doctor with clear information.',
+    ctaAssessment: 'Take the awareness check',
+    ctaDoctors: 'Talk to a doctor',
+    groups: [
+      {
+        title: 'Age',
+        note: 'Risk rises with age, but breast cancer can happen at any age.',
+        factors: [
+          { title: 'Getting older', desc: 'Most cases are diagnosed after the age of 50.' },
+          { title: 'Being a woman', desc: 'This is the single largest factor. Men can be affected too, but in fewer than 1% of cases.' },
+        ],
+      },
+      {
+        title: 'Family history',
+        note: '85% of women who are diagnosed have no family history at all. It does not have to run in the family.',
+        factors: [
+          { title: 'A first-degree relative', desc: 'A mother, sister or daughter who had breast cancer.' },
+          { title: 'Several cases, or one when young', desc: 'More than one relative affected, or one diagnosed at an early age.' },
+          { title: 'Inherited gene changes', desc: 'Such as BRCA1 and BRCA2. Rare, but they raise risk considerably.' },
+        ],
+      },
+      {
+        title: 'Personal history',
+        note: 'Medical things you have already lived through that can raise risk a little.',
+        factors: [
+          { title: 'A previous breast cancer', desc: 'Anyone previously diagnosed needs regular follow-up.' },
+          { title: 'Certain benign breast changes', desc: 'Some non-cancerous changes found on a biopsy raise risk slightly.' },
+          { title: 'Chest radiation when young', desc: 'Radiation treatment to the chest before the age of 30.' },
+        ],
+      },
+      {
+        title: 'Hormonal and reproductive factors',
+        note: 'These relate to how long the body is exposed to hormones. Most are not a choice.',
+        factors: [
+          { title: 'Periods starting early', desc: 'A first period before the age of 12.' },
+          { title: 'Late menopause', desc: 'Menopause after the age of 55.' },
+          { title: 'First birth after 30', desc: 'Or never having given birth.' },
+          { title: 'Never having breastfed', desc: 'Breastfeeding offers some natural protection.' },
+          { title: 'Long-term hormone therapy', desc: 'Hormone replacement therapy after menopause, taken over a long period.' },
+        ],
+      },
+      {
+        title: 'Lifestyle',
+        note: 'These are the factors you can actually act on. Even a small change counts.',
+        factors: [
+          { title: 'Alcohol', desc: 'Risk rises with the amount.' },
+          { title: 'Smoking', desc: 'Linked to higher risk over time.' },
+          { title: 'Excess weight', desc: 'Especially after menopause.' },
+          { title: 'Little physical activity', desc: 'Regular movement lowers risk.' },
+        ],
+      },
+      {
+        title: 'Other factors',
+        note: 'Other things doctors take into account.',
+        factors: [
+          { title: 'Dense breast tissue', desc: 'Dense breasts make a mammogram harder to read, and raise risk slightly.' },
+          { title: 'No identifiable cause', desc: 'Many cases happen in women with no known risk factor at all.' },
+        ],
+      },
+    ],
+  },
+  /* The explainer page for the assistant. The order is the argument: what it
+     can do, then what it CANNOT do, then its limits, then where the words go.
+     The privacy copy distinguishes typing (local — `services/aiChat.ts` answers
+     from a bundled knowledge base and transmits nothing) from the microphone
+     (the browser's SpeechRecognition ships audio to a third party). Saying
+     "nothing ever leaves your device" would be a lie about the mic. */
+  companionPage: {
+    eyebrow: 'The Sahtek assistant',
+    title: 'A companion that explains — not a doctor that diagnoses',
+    intro:
+      'The Sahtek assistant helps you understand breast health in plain language, without embarrassment and without judgement. But you should know exactly what it can do — and what it will never do — before you start.',
+    canTitle: 'What it can do',
+    can: [
+      'Explain medical words in plain language',
+      'Clarify what is worth noticing on your body',
+      'Answer the questions that feel hard to ask a person',
+      'Tell you when to book an appointment with a doctor',
+      'Talk with you in Darija, French or English',
+    ],
+    cannotTitle: 'What it will never do',
+    cannot: [
+      'It does not diagnose. Never “you have” and never “you are fine”',
+      'It does not prescribe anything or give personal medical advice',
+      'It cannot see or examine your body',
+      'It does not replace a doctor or a mammogram',
+      'It is not built for emergencies',
+    ],
+    examplesTitle: 'Try asking it',
+    examples: [
+      'What signs should I watch for?',
+      'How do I do a self-check?',
+      'I found a small lump — what now?',
+      'Does family history matter?',
+      'What is a mammogram?',
+      'I am scared, help me',
+    ],
+    safetyTitle: 'Its limits',
+    safetyNote:
+      'If you ask it whether you have cancer, it will not answer — and that is deliberate. Only a doctor can diagnose, after a real examination. The assistant points you to one; it does not take their place.',
+    emergencyNote:
+      'If this is an emergency, or you need help right now, do not rely on the app — contact a doctor or emergency services.',
+    privacyTitle: 'Where your questions go',
+    typedLabel: 'Typing',
+    privacyTyped:
+      'When you type: the answers come from inside Sahtek, on your device. Your questions are not sent to any server.',
+    privacyVoice:
+      'When you use the microphone: the browser sends your voice to a speech-recognition service to turn it into text. Sahtek never receives the recording, and you can always type instead of speaking.',
+    cta: 'Open the chat',
+    ctaSecondary: 'Learn the signs',
+    mock: {
+      question: 'Is this cancer?',
+      answer:
+        'I cannot answer that — only a doctor can diagnose, after an examination. What I can do: explain what is worth noticing, and tell you when to book an appointment.',
+    },
+  },
+  /* The urgency levels themselves are `home.nextSteps.cards` — one set of words,
+     reused, so the guidance can never drift between the homepage, the self-check
+     completion screen and this page. This block is the page around them. */
+  whenToSeekPage: {
+    eyebrow: 'When to seek help',
+    title: 'When to see a doctor',
+    intro:
+      'Most breast changes are not cancer — that is a fact, not a consolation. But some changes should not be ignored. This page tells you plainly what to watch, what to do, and how soon.',
+    reassureNote:
+      'Booking an appointment is not admitting that something is wrong. It is simply the only way to know — and most of the time, it reassures.',
+    urgencyTitle: 'Simple levels, without fear',
+    timeframes: [
+      'Keep the monthly habit',
+      'Watch it for two weeks',
+      'Book within the next few weeks',
+      'See a doctor soon',
+    ],
+    doNotIgnoreTitle: 'Changes that should not be ignored',
+    doNotIgnoreNote:
+      'None of these means cancer. Each one means only this: it should be looked at by a doctor, rather than waited out.',
+    doNotIgnore: [
+      'A new lump that lasts more than two weeks',
+      'Discharge from the nipple, especially bloody or from one side',
+      'A nipple that has newly begun to turn inward',
+      'Dimpling of the skin, or an orange-peel texture',
+      'Redness or warmth that stays for days',
+      'A lump under the arm or above the collarbone',
+      'Skin around the nipple that flakes or thickens and does not heal',
+    ],
+    seeAllSigns: 'See all 12 signs',
+    prepareTitle: 'Getting ready for the appointment',
+    prepareNote: 'A few small things make the visit far more useful.',
+    prepare: [
+      'Write down the day you first noticed the change',
+      'Note which side, and whether it has changed since',
+      'Say whether it changes with your cycle',
+      'Bring any previous scans or test results',
+      'You do not need to photograph yourself — the doctor will examine you',
+    ],
+    ctaDoctors: 'Find a doctor near you',
+    ctaSelfCheck: 'Start the guided self-check',
+  },
   learn: {
     title: 'Learn breast health',
     subtitle: 'Clear information, emotional support and practical next steps.',
@@ -565,6 +751,20 @@ export const en = {
     resumeSubtitle: 'You were on step {step} of {total}',
     resumeYes: 'Continue the check ▶️',
     resumeNo: 'Start over 🔄',
+    progressLabel: 'Step {n} of {total}',
+    privacyNote: 'This all happens on your device. We never ask for a photo, nothing is recorded, and nothing is sent anywhere.',
+    bestTimeValue: '3 to 5 days after your period',
+    durationValue: 'About 5 minutes',
+    listen: 'Listen',
+    listenPause: 'Pause',
+    nextStepsTitle: 'What now?',
+    steps: [
+      { title: 'Look in the mirror', instruction: 'Stand in front of the mirror with your shoulders relaxed. Look for any change in shape, size or skin.', lookFor: ['Shape', 'Size', 'Skin'], imageAlt: 'A simple illustration: a woman standing calmly in front of a mirror.' },
+      { title: 'Raise your arms', instruction: 'Raise your arms above your head. Look again, from a new angle.', lookFor: ['Swelling', 'Nipple changes'], imageAlt: 'A simple illustration: a woman with her arms raised above her head.' },
+      { title: 'Check while standing', instruction: 'Use small circular motions with your fingers. Light pressure first, then a little firmer.', lookFor: ['Lump', 'Pain in one spot'], imageAlt: 'A simple illustration: a hand making soft circular motions.' },
+      { title: 'Check while lying down', instruction: 'Lie down, put a pillow under your shoulder, and repeat the same motions on each side.', lookFor: ['Differences', 'Firmness'], imageAlt: 'A simple illustration: a woman lying down calmly, a pillow under her shoulder.' },
+      { title: 'Check the nipple', instruction: 'Press gently and look for any discharge that is not usual for you.', lookFor: ['Discharge', 'Blood', 'Shape'], imageAlt: 'A soft, symbolic illustration about checking the nipple.' },
+    ],
   },
   risk: {
     title: 'Personal risk awareness',

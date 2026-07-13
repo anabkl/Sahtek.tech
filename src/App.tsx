@@ -6,9 +6,13 @@ import { useTheme } from '@/hooks/useTheme';
 import { REMINDER_STORAGE_KEY, scheduleNotificationCheck } from '@/utils/notificationScheduler';
 import { HomePage } from '@/pages/HomePage';
 import { LearnPage } from '@/pages/LearnPage';
+import { SignsPage } from '@/pages/SignsPage';
+import { WhenToSeekHelpPage } from '@/pages/WhenToSeekHelpPage';
 import { SelfCheckPage } from '@/pages/SelfCheckPage';
 import { RiskAssessmentPage } from '@/pages/RiskAssessmentPage';
+import { RiskFactorsPage } from '@/pages/RiskFactorsPage';
 import { ChatPage } from '@/pages/ChatPage';
+import { CompanionPage } from '@/pages/CompanionPage';
 import { ReminderPage } from '@/pages/ReminderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -60,9 +64,13 @@ export default function App() {
         />
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
+          <Route path="signs" element={<SignsPage />} />
+          <Route path="when-to-seek-help" element={<WhenToSeekHelpPage />} />
           <Route path="learn" element={<LearnPage />} />
           <Route path="self-check" element={<SelfCheckPage />} />
+          <Route path="risk-factors" element={<RiskFactorsPage />} />
           <Route path="risk" element={<RiskAssessmentPage />} />
+          <Route path="companion" element={<CompanionPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route
             path="doctors"

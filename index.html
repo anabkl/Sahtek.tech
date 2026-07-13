@@ -17,6 +17,35 @@
 
     <title>صحّتك - Sahtek | التوعية بسرطان الثدي</title>
 
+    <!-- Social sharing (Open Graph + Twitter).
+
+         SCOPE — READ BEFORE RELYING ON THIS: these tags are STATIC and apply to
+         every URL. Sahtek is a client-rendered SPA, so /signs cannot serve its
+         own og:title or og:image — the crawlers that build link previews
+         (Facebook, WhatsApp, LinkedIn, iMessage) do not execute JavaScript, so
+         anything React sets at runtime is invisible to them. A share of /signs
+         gets the site-wide preview below, not a 12-Signs-specific one.
+         To give /signs its own card, the page has to be prerendered or served
+         by an edge function that injects the tags per-route. That is a build
+         change, not a component change.
+
+         ASSET — /og/sahtek-og.png DOES NOT EXIST YET. See public/og/README.md
+         for the spec (1200x630). Until it is produced, shares render with no
+         image, which is the honest failure: no broken picture, just no picture. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sahtek" />
+    <meta property="og:title" content="صحّتك - Sahtek | التوعية بسرطان الثدي" />
+    <meta
+      property="og:description"
+      content="صحّتك - رفيقتك الرقمية للتوعية بسرطان الثدي. فحص ذاتي، تقييم المخاطر، ودردشة ذكية."
+    />
+    <meta property="og:image" content="/og/sahtek-og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="صحّتك — 12 تغيير فصحة الثدي خاصك تعرفيهم." />
+    <meta property="og:locale" content="ar_MA" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <!-- Resolve the theme before first paint so dark users never see a white
          flash. Mirrors useTheme(); the store is the source of truth after boot. -->
     <script>

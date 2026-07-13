@@ -87,7 +87,10 @@ export function RiskFactors() {
           {t.risk.intro}
         </SafetyNote>
 
-        <Link to="/risk">
+        {/* /risk-factors, not /risk: this section teaches, so its CTA should
+            keep teaching. The questionnaire is one click further on, from the
+            bottom of that page — learn first, then assess. */}
+        <Link to="/risk-factors">
           <Button
             variant="secondary"
             size="lg"

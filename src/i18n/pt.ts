@@ -8,7 +8,11 @@ export const pt: Translation = {
   },
   nav: {
     home: 'Início',
+    signs: 'Sinais',
     learn: 'Aprender',
+    riskFactors: 'Fatores de risco',
+    companion: 'A assistente',
+    whenToSeek: 'Quando procurar ajuda',
     selfCheck: 'Autoexame',
     risk: 'Risco',
     chat: 'Chat',
@@ -227,6 +231,179 @@ export const pt: Translation = {
       note: 'Se algo parecer incomum, fale com um médico.',
     },
     trustNote: 'Tudo fica no seu aparelho. Sem conta, sem rastreamento, sem análises.',
+  },
+  signsPage: {
+    eyebrow: '12 sinais',
+    title: 'As mudanças que vale a pena conhecer',
+    intro:
+      'Não para assustar. Esta página ajuda você a saber o que é normal no seu corpo, para perceber rápido se algo mudar. A maioria dessas mudanças não é câncer — mas cada uma merece um olhar.',
+    jumpTitle: 'Ir direto a um sinal',
+    shareCta: 'Compartilhar esta página',
+    shareCopied: 'Link copiado ✅',
+    shareFailed: 'Não foi possível copiar o link. Você pode copiá-lo da barra de endereços.',
+    copySignLink: 'Copiar o link deste sinal',
+    whenToSeekTitle: 'Quando procurar ajuda',
+    ctaSelfCheck: 'Começar o autoexame guiado',
+    ctaHelp: 'Quando procurar ajuda',
+    imageAltTemplate: 'Ilustração serena do sinal: {label}',
+    ogAlt: 'Sahtek — 12 mudanças na mama que vale a pena conhecer.',
+  },
+  riskFactorsPage: {
+    eyebrow: 'Fatores de risco',
+    title: 'Conhecer os fatores de risco, sem temê-los',
+    intro:
+      'Um fator de risco aumenta ligeiramente uma probabilidade — não é um veredito nem uma previsão. Muitas mulheres têm vários e nunca desenvolvem câncer, e muitas diagnosticadas não tinham nenhum. Esta página existe para entender, não para preocupar.',
+    changeableLabel: 'Você pode influenciar isto',
+    notChangeableLabel: 'Não é possível mudar',
+    keyNote:
+      'Conhecer seus fatores de risco não diz se você vai desenvolver a doença. Ajuda a entender seu corpo e a falar com um médico com informação clara.',
+    ctaAssessment: 'Fazer a avaliação de conscientização',
+    ctaDoctors: 'Falar com um médico',
+    groups: [
+      {
+        title: 'Idade',
+        note: 'O risco aumenta com a idade, mas o câncer de mama pode surgir em qualquer idade.',
+        factors: [
+          { title: 'Envelhecer', desc: 'A maioria dos casos é diagnosticada depois dos 50 anos.' },
+          { title: 'Ser mulher', desc: 'É o maior fator isolado. Homens também podem ser afetados, mas em menos de 1% dos casos.' },
+        ],
+      },
+      {
+        title: 'História familiar',
+        note: '85% das mulheres diagnosticadas não tinham nenhuma história familiar.',
+        factors: [
+          { title: 'Parente de primeiro grau', desc: 'Mãe, irmã ou filha com câncer de mama.' },
+          { title: 'Vários casos, ou um caso jovem', desc: 'Mais de uma parente afetada, ou um diagnóstico em idade precoce.' },
+          { title: 'Alterações genéticas herdadas', desc: 'Como BRCA1 e BRCA2. Raras, mas aumentam bastante o risco.' },
+        ],
+      },
+      {
+        title: 'História pessoal',
+        note: 'Situações médicas já vividas que podem elevar um pouco o risco.',
+        factors: [
+          { title: 'Um câncer de mama anterior', desc: 'Quem já foi diagnosticada precisa de acompanhamento regular.' },
+          { title: 'Certas alterações benignas', desc: 'Algumas alterações benignas encontradas em biópsia elevam levemente o risco.' },
+          { title: 'Radiação no tórax quando jovem', desc: 'Radioterapia no tórax antes dos 30 anos.' },
+        ],
+      },
+      {
+        title: 'Fatores hormonais e reprodutivos',
+        note: 'Ligados a quanto tempo o corpo fica exposto a hormônios. Quase nenhum é uma escolha.',
+        factors: [
+          { title: 'Menstruação precoce', desc: 'Primeira menstruação antes dos 12 anos.' },
+          { title: 'Menopausa tardia', desc: 'Menopausa depois dos 55 anos.' },
+          { title: 'Primeiro parto após os 30', desc: 'Ou nunca ter tido filhos.' },
+          { title: 'Nunca ter amamentado', desc: 'A amamentação oferece alguma proteção natural.' },
+          { title: 'Terapia hormonal prolongada', desc: 'Terapia de reposição hormonal após a menopausa, por longo período.' },
+        ],
+      },
+      {
+        title: 'Estilo de vida',
+        note: 'São os fatores sobre os quais você realmente pode agir. Até uma pequena mudança conta.',
+        factors: [
+          { title: 'Álcool', desc: 'O risco aumenta com a quantidade.' },
+          { title: 'Tabaco', desc: 'Associado a maior risco ao longo do tempo.' },
+          { title: 'Excesso de peso', desc: 'Sobretudo depois da menopausa.' },
+          { title: 'Pouca atividade física', desc: 'Mover-se regularmente reduz o risco.' },
+        ],
+      },
+      {
+        title: 'Outros fatores',
+        note: 'Outras coisas que os médicos levam em conta.',
+        factors: [
+          { title: 'Tecido mamário denso', desc: 'Mamas densas dificultam a leitura da mamografia e elevam levemente o risco.' },
+          { title: 'Sem causa identificável', desc: 'Muitos casos ocorrem em mulheres sem nenhum fator de risco conhecido.' },
+        ],
+      },
+    ],
+  },
+  companionPage: {
+    eyebrow: 'A assistente do Sahtek',
+    title: 'Uma companheira que explica, não uma médica que diagnostica',
+    intro:
+      'A assistente do Sahtek ajuda você a entender a saúde da mama em linguagem simples, sem vergonha e sem julgamento. Mas convém saber exatamente o que ela pode fazer — e o que nunca fará — antes de começar.',
+    canTitle: 'O que ela pode fazer',
+    can: [
+      'Explicar palavras médicas em linguagem simples',
+      'Esclarecer o que vale a pena observar no seu corpo',
+      'Responder às perguntas difíceis de fazer a alguém',
+      'Dizer quando marcar uma consulta com um médico',
+      'Falar com você em darija, francês ou inglês',
+    ],
+    cannotTitle: 'O que ela nunca fará',
+    cannot: [
+      'Ela não diagnostica. Nunca diz “você tem” nem “está tudo bem”',
+      'Ela não receita nada nem dá conselho médico pessoal',
+      'Ela não pode ver nem examinar o seu corpo',
+      'Ela não substitui um médico nem uma mamografia',
+      'Ela não foi feita para emergências',
+    ],
+    examplesTitle: 'Experimente perguntar',
+    examples: [
+      'Que sinais devo observar?',
+      'Como faço um autoexame?',
+      'Encontrei um nódulo pequeno — e agora?',
+      'A história familiar importa?',
+      'O que é uma mamografia?',
+      'Estou com medo, me ajude',
+    ],
+    safetyTitle: 'Os limites dela',
+    safetyNote:
+      'Se você perguntar se tem câncer, ela não vai responder — e isso é proposital. Só um médico pode diagnosticar, depois de um exame de verdade. A assistente aponta o caminho até ele; não ocupa o lugar dele.',
+    emergencyNote:
+      'Se for uma emergência ou você precisar de ajuda agora, não dependa do app — procure um médico ou o serviço de emergência.',
+    privacyTitle: 'Para onde vão suas perguntas',
+    typedLabel: 'Digitar',
+    privacyTyped:
+      'Quando você digita: as respostas vêm de dentro do Sahtek, no seu aparelho. Suas perguntas não são enviadas a nenhum servidor.',
+    privacyVoice:
+      'Quando você usa o microfone: o navegador envia sua voz a um serviço de reconhecimento de fala para transformá-la em texto. O Sahtek nunca recebe a gravação, e você sempre pode digitar em vez de falar.',
+    cta: 'Abrir o chat',
+    ctaSecondary: 'Aprender os sinais',
+    mock: {
+      question: 'Isto é câncer?',
+      answer:
+        'Não posso responder a isso — só um médico diagnostica, após um exame. O que eu posso fazer: explicar o que vale a pena observar e dizer quando marcar uma consulta.',
+    },
+  },
+  whenToSeekPage: {
+    eyebrow: 'Quando procurar ajuda',
+    title: 'Quando procurar um médico',
+    intro:
+      'A maioria das mudanças na mama não é câncer — isso é um fato, não um consolo. Mas algumas mudanças não devem ser ignoradas. Esta página diz com clareza o que observar, o que fazer e em quanto tempo.',
+    reassureNote:
+      'Marcar uma consulta não é admitir que algo está errado. É simplesmente a única forma de saber — e na maioria das vezes, tranquiliza.',
+    urgencyTitle: 'Níveis simples, sem medo',
+    timeframes: [
+      'Mantenha o hábito mensal',
+      'Observe por duas semanas',
+      'Marque nas próximas semanas',
+      'Procure um médico em breve',
+    ],
+    doNotIgnoreTitle: 'Mudanças que não devem ser ignoradas',
+    doNotIgnoreNote:
+      'Nenhuma delas significa câncer. Cada uma significa apenas isto: deve ser avaliada por um médico, em vez de esperar.',
+    doNotIgnore: [
+      'Um nódulo novo que dura mais de duas semanas',
+      'Secreção no mamilo, sobretudo com sangue ou de um lado só',
+      'Um mamilo que começou a afundar e antes não afundava',
+      'Covinhas na pele ou textura de casca de laranja',
+      'Vermelhidão ou calor que permanece por dias',
+      'Um nódulo na axila ou acima da clavícula',
+      'Pele ao redor do mamilo que descama ou engrossa e não cicatriza',
+    ],
+    seeAllSigns: 'Ver os 12 sinais',
+    prepareTitle: 'Preparar a consulta',
+    prepareNote: 'Algumas coisas simples tornam a visita muito mais útil.',
+    prepare: [
+      'Anote o dia em que notou a mudança pela primeira vez',
+      'Diga de que lado e se mudou desde então',
+      'Conte se muda junto com o seu ciclo',
+      'Leve exames ou imagens anteriores',
+      'Você não precisa se fotografar — o médico vai examinar você',
+    ],
+    ctaDoctors: 'Encontrar um médico perto de você',
+    ctaSelfCheck: 'Começar o autoexame guiado',
   },
   learn: {
     title: 'Aprenda sobre a saúde da mama',
@@ -497,6 +674,20 @@ export const pt: Translation = {
     resumeSubtitle: 'Você estava no passo {step} de {total}',
     resumeYes: 'Continuar o exame ▶️',
     resumeNo: 'Começar de novo 🔄',
+    progressLabel: 'Passo {n} de {total}',
+    privacyNote: 'Tudo acontece no seu aparelho. Nunca pedimos foto, nada é gravado e nada é enviado.',
+    bestTimeValue: 'De 3 a 5 dias depois da menstruação',
+    durationValue: 'Cerca de 5 minutos',
+    listen: 'Ouvir',
+    listenPause: 'Pausa',
+    nextStepsTitle: 'E agora?',
+    steps: [
+      { title: 'Observar no espelho', instruction: 'Fique diante do espelho com os ombros relaxados. Veja se mudou a forma, o tamanho ou a pele.', lookFor: ['Forma', 'Tamanho', 'Pele'], imageAlt: 'Ilustração simples: uma mulher serena diante de um espelho.' },
+      { title: 'Levantar os braços', instruction: 'Levante os braços acima da cabeça. Observe de novo, de um novo ângulo.', lookFor: ['Inchaço', 'Alterações no mamilo'], imageAlt: 'Ilustração simples: uma mulher com os braços levantados.' },
+      { title: 'Exame em pé', instruction: 'Com os dedos, faça pequenos círculos. Pressão leve primeiro, depois um pouco mais firme.', lookFor: ['Nódulo', 'Dor num ponto'], imageAlt: 'Ilustração simples: uma mão fazendo movimentos circulares suaves.' },
+      { title: 'Exame deitada', instruction: 'Deite-se, coloque um travesseiro sob o ombro e repita os mesmos movimentos de cada lado.', lookFor: ['Diferenças', 'Rigidez'], imageAlt: 'Ilustração simples: uma mulher deitada, com um travesseiro sob o ombro.' },
+      { title: 'Verificar o mamilo', instruction: 'Pressione suavemente e veja se há alguma secreção incomum para você.', lookFor: ['Secreção', 'Sangue', 'Forma'], imageAlt: 'Ilustração suave e simbólica sobre verificar o mamilo.' },
+    ],
   },
   risk: {
     title: 'Conscientização do risco pessoal',

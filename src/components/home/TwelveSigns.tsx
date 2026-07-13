@@ -1,48 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  ArrowDownToDot,
-  CircleDashed,
-  CircleDot,
-  Droplet,
-  Flame,
-  Grip,
-  PersonStanding,
-  Shapes,
-  Spline,
-  Target,
-  Waves,
-  Waypoints,
-  type LucideIcon,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Disclaimer } from '@/components/ui/Disclaimer';
 import { Modal } from '@/components/ui/Modal';
 import { PetalMark } from '@/components/ui/PetalMark';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
+import { SIGN_ICONS } from '@/data/signs';
 import { useLanguage } from '@/hooks/useLanguage';
-
-/* One icon per sign, in i18n order. Calm, neutral glyphs — they mark the
-   quality to notice (a shape, a texture, a warmth), never a wound. */
-const SIGN_ICONS: LucideIcon[] = [
-  CircleDot, // a new lump
-  CircleDashed, // swelling in part of the breast
-  Grip, // dimpling of the skin
-  Flame, // redness or warmth
-  Shapes, // a change in size or shape
-  ArrowDownToDot, // a nipple turning inward
-  Droplet, // discharge
-  Waves, // flaking or itching
-  Target, // persistent pain in one spot
-  Waypoints, // new prominent veins
-  PersonStanding, // a lump under the arm
-  // Not a bone glyph: a skeletal icon is exactly the clinical register
-  // HARD RULE 3 rules out. A soft curve stands in for the collarbone line.
-  Spline, // swelling above the collarbone
-];
 
 /**
  * The 12 signs — "Care Cards".
@@ -129,7 +96,7 @@ export function TwelveSigns() {
       </motion.ul>
 
       <div className="mt-8 flex justify-center">
-        <Link to="/learn">
+        <Link to="/signs">
           <Button
             variant="secondary"
             size="lg"

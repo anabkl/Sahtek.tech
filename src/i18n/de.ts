@@ -8,7 +8,11 @@ export const de: Translation = {
   },
   nav: {
     home: 'Start',
+    signs: 'Anzeichen',
     learn: 'Lernen',
+    riskFactors: 'Risikofaktoren',
+    companion: 'Die Assistentin',
+    whenToSeek: 'Wann Hilfe suchen',
     selfCheck: 'Selbstuntersuchung',
     risk: 'Risiko',
     chat: 'Chat',
@@ -227,6 +231,179 @@ export const de: Translation = {
       note: 'Wenn sich etwas ungewöhnlich anfühlt, sprich mit einer Ärztin oder einem Arzt.',
     },
     trustNote: 'Alles bleibt auf deinem Gerät. Kein Konto, kein Tracking, keine Analyse.',
+  },
+  signsPage: {
+    eyebrow: '12 Anzeichen',
+    title: 'Die Veränderungen, die du kennen solltest',
+    intro:
+      'Nicht um dir Angst zu machen. Diese Seite hilft dir zu wissen, was für deinen Körper normal ist, damit du schnell merkst, wenn sich etwas ändert. Die meisten dieser Veränderungen sind kein Krebs — aber jede verdient einen Blick.',
+    jumpTitle: 'Direkt zu einem Anzeichen',
+    shareCta: 'Diese Seite teilen',
+    shareCopied: 'Link kopiert ✅',
+    shareFailed: 'Der Link konnte nicht kopiert werden. Du kannst ihn aus der Adressleiste kopieren.',
+    copySignLink: 'Link zu diesem Anzeichen kopieren',
+    whenToSeekTitle: 'Wann du Hilfe suchst',
+    ctaSelfCheck: 'Geführte Selbstuntersuchung starten',
+    ctaHelp: 'Wann du Hilfe suchst',
+    imageAltTemplate: 'Eine ruhige Illustration des Anzeichens: {label}',
+    ogAlt: 'Sahtek — 12 Veränderungen der Brust, die du kennen solltest.',
+  },
+  riskFactorsPage: {
+    eyebrow: 'Risikofaktoren',
+    title: 'Risikofaktoren kennen, ohne sie zu fürchten',
+    intro:
+      'Ein Risikofaktor erhöht eine Wahrscheinlichkeit leicht — er ist kein Urteil und keine Vorhersage. Viele Frauen haben mehrere und erkranken nie, und viele Erkrankte hatten keinen einzigen. Diese Seite ist zum Verstehen da, nicht zum Sorgen.',
+    changeableLabel: 'Darauf kannst du Einfluss nehmen',
+    notChangeableLabel: 'Nicht veränderbar',
+    keyNote:
+      'Deine Risikofaktoren zu kennen sagt nicht, ob du erkranken wirst. Es hilft dir, deinen Körper zu verstehen und mit einer Ärztin klar darüber zu sprechen.',
+    ctaAssessment: 'Aufklärungs-Check machen',
+    ctaDoctors: 'Mit einer Ärztin sprechen',
+    groups: [
+      {
+        title: 'Alter',
+        note: 'Das Risiko steigt mit dem Alter, aber Brustkrebs kann in jedem Alter auftreten.',
+        factors: [
+          { title: 'Älter werden', desc: 'Die meisten Fälle werden nach dem 50. Lebensjahr diagnostiziert.' },
+          { title: 'Eine Frau sein', desc: 'Der größte einzelne Faktor. Männer können ebenfalls betroffen sein, aber in unter 1% der Fälle.' },
+        ],
+      },
+      {
+        title: 'Familiengeschichte',
+        note: '85% der diagnostizierten Frauen hatten überhaupt keine Familiengeschichte.',
+        factors: [
+          { title: 'Verwandte ersten Grades', desc: 'Mutter, Schwester oder Tochter mit Brustkrebs.' },
+          { title: 'Mehrere Fälle oder einer in jungen Jahren', desc: 'Mehr als eine betroffene Verwandte, oder eine früh gestellte Diagnose.' },
+          { title: 'Vererbte Genveränderungen', desc: 'Etwa BRCA1 und BRCA2. Selten, aber sie erhöhen das Risiko deutlich.' },
+        ],
+      },
+      {
+        title: 'Persönliche Vorgeschichte',
+        note: 'Medizinisches, das du bereits erlebt hast und das das Risiko etwas erhöhen kann.',
+        factors: [
+          { title: 'Früherer Brustkrebs', desc: 'Wer bereits erkrankt war, braucht regelmäßige Nachsorge.' },
+          { title: 'Bestimmte gutartige Veränderungen', desc: 'Manche gutartigen Befunde aus einer Biopsie erhöhen das Risiko leicht.' },
+          { title: 'Bestrahlung des Brustkorbs in jungen Jahren', desc: 'Strahlentherapie am Brustkorb vor dem 30. Lebensjahr.' },
+        ],
+      },
+      {
+        title: 'Hormonelle und reproduktive Faktoren',
+        note: 'Sie hängen davon ab, wie lange der Körper Hormonen ausgesetzt ist. Die meisten sind keine Entscheidung.',
+        factors: [
+          { title: 'Frühe erste Regel', desc: 'Erste Periode vor dem 12. Lebensjahr.' },
+          { title: 'Späte Menopause', desc: 'Menopause nach dem 55. Lebensjahr.' },
+          { title: 'Erste Geburt nach 30', desc: 'Oder gar keine Geburt.' },
+          { title: 'Nie gestillt', desc: 'Stillen bietet einen gewissen natürlichen Schutz.' },
+          { title: 'Langjährige Hormontherapie', desc: 'Hormonersatztherapie nach der Menopause über lange Zeit.' },
+        ],
+      },
+      {
+        title: 'Lebensstil',
+        note: 'Das sind die Faktoren, bei denen du tatsächlich handeln kannst. Auch eine kleine Änderung zählt.',
+        factors: [
+          { title: 'Alkohol', desc: 'Das Risiko steigt mit der Menge.' },
+          { title: 'Rauchen', desc: 'Mit der Zeit mit höherem Risiko verbunden.' },
+          { title: 'Übergewicht', desc: 'Besonders nach der Menopause.' },
+          { title: 'Wenig Bewegung', desc: 'Regelmäßige Bewegung senkt das Risiko.' },
+        ],
+      },
+      {
+        title: 'Weitere Faktoren',
+        note: 'Anderes, das Ärztinnen mit einbeziehen.',
+        factors: [
+          { title: 'Dichtes Brustgewebe', desc: 'Dichte Brüste erschweren das Ablesen der Mammografie und erhöhen das Risiko leicht.' },
+          { title: 'Ohne erkennbare Ursache', desc: 'Viele Fälle treten bei Frauen ganz ohne bekannten Risikofaktor auf.' },
+        ],
+      },
+    ],
+  },
+  companionPage: {
+    eyebrow: 'Die Sahtek-Assistentin',
+    title: 'Eine Begleiterin, die erklärt — keine Ärztin, die diagnostiziert',
+    intro:
+      'Die Sahtek-Assistentin hilft dir, Brustgesundheit in klarer Sprache zu verstehen, ohne Scham und ohne Urteil. Aber du solltest genau wissen, was sie kann — und was sie nie tun wird — bevor du anfängst.',
+    canTitle: 'Was sie kann',
+    can: [
+      'Medizinische Wörter einfach erklären',
+      'Klarmachen, worauf du an deinem Körper achtest',
+      'Fragen beantworten, die man einem Menschen schwer stellt',
+      'Dir sagen, wann du einen Termin vereinbaren solltest',
+      'Mit dir auf Darija, Französisch oder Englisch sprechen',
+    ],
+    cannotTitle: 'Was sie nie tun wird',
+    cannot: [
+      'Sie diagnostiziert nicht. Nie „du hast“ und nie „alles in Ordnung“',
+      'Sie verschreibt nichts und gibt keinen persönlichen medizinischen Rat',
+      'Sie kann deinen Körper weder sehen noch untersuchen',
+      'Sie ersetzt weder eine Ärztin noch eine Mammografie',
+      'Sie ist nicht für Notfälle gebaut',
+    ],
+    examplesTitle: 'Frag sie zum Beispiel',
+    examples: [
+      'Auf welche Anzeichen soll ich achten?',
+      'Wie mache ich eine Selbstuntersuchung?',
+      'Ich habe einen kleinen Knoten gefunden — was nun?',
+      'Spielt die Familiengeschichte eine Rolle?',
+      'Was ist eine Mammografie?',
+      'Ich habe Angst, hilf mir',
+    ],
+    safetyTitle: 'Ihre Grenzen',
+    safetyNote:
+      'Wenn du sie fragst, ob du Krebs hast, wird sie nicht antworten — und das ist Absicht. Nur eine Ärztin kann nach einer echten Untersuchung diagnostizieren. Die Assistentin weist dir den Weg dorthin; sie nimmt nicht ihren Platz ein.',
+    emergencyNote:
+      'Wenn es ein Notfall ist oder du sofort Hilfe brauchst, verlass dich nicht auf die App — wende dich an eine Ärztin oder den Notdienst.',
+    privacyTitle: 'Wohin deine Fragen gehen',
+    typedLabel: 'Tippen',
+    privacyTyped:
+      'Wenn du tippst: Die Antworten kommen aus Sahtek selbst, auf deinem Gerät. Deine Fragen gehen an keinen Server.',
+    privacyVoice:
+      'Wenn du das Mikrofon nutzt: Der Browser schickt deine Stimme an einen Spracherkennungsdienst, um sie in Text umzuwandeln. Sahtek bekommt die Aufnahme nie, und du kannst statt zu sprechen immer tippen.',
+    cta: 'Chat öffnen',
+    ctaSecondary: 'Die Anzeichen lernen',
+    mock: {
+      question: 'Ist das Krebs?',
+      answer:
+        'Das kann ich nicht beantworten — nur eine Ärztin kann nach einer Untersuchung diagnostizieren. Was ich kann: erklären, worauf du achtest, und dir sagen, wann du einen Termin machst.',
+    },
+  },
+  whenToSeekPage: {
+    eyebrow: 'Wann du Hilfe suchst',
+    title: 'Wann du zur Ärztin gehst',
+    intro:
+      'Die meisten Veränderungen der Brust sind kein Krebs — das ist eine Tatsache, kein Trost. Aber manche Veränderungen sollten nicht ignoriert werden. Diese Seite sagt dir klar, worauf du achtest, was du tust und wie schnell.',
+    reassureNote:
+      'Einen Termin zu machen heißt nicht zuzugeben, dass etwas nicht stimmt. Es ist schlicht der einzige Weg, es zu wissen — und meistens beruhigt es.',
+    urgencyTitle: 'Einfache Stufen, ohne Angst',
+    timeframes: [
+      'Behalte die monatliche Gewohnheit bei',
+      'Beobachte es zwei Wochen',
+      'Vereinbare in den nächsten Wochen einen Termin',
+      'Geh bald zur Ärztin',
+    ],
+    doNotIgnoreTitle: 'Veränderungen, die nicht ignoriert werden sollten',
+    doNotIgnoreNote:
+      'Keine davon bedeutet Krebs. Jede bedeutet nur eines: Sie sollte von einer Ärztin angesehen werden, statt abgewartet zu werden.',
+    doNotIgnore: [
+      'Ein neuer Knoten, der länger als zwei Wochen bleibt',
+      'Ausfluss aus der Brustwarze, besonders blutig oder einseitig',
+      'Eine Brustwarze, die sich neuerdings nach innen zieht',
+      'Eingezogene Haut oder eine Orangenhaut-Struktur',
+      'Rötung oder Wärme, die tagelang bleibt',
+      'Ein Knoten unter dem Arm oder über dem Schlüsselbein',
+      'Haut um die Brustwarze, die schuppt oder sich verdickt und nicht abheilt',
+    ],
+    seeAllSigns: 'Alle 12 Anzeichen ansehen',
+    prepareTitle: 'Auf den Termin vorbereiten',
+    prepareNote: 'Ein paar Kleinigkeiten machen den Besuch deutlich nützlicher.',
+    prepare: [
+      'Notiere den Tag, an dem dir die Veränderung zuerst auffiel',
+      'Halte fest, welche Seite und ob sie sich seitdem verändert hat',
+      'Sag, ob sie sich mit deinem Zyklus verändert',
+      'Bring frühere Aufnahmen oder Befunde mit',
+      'Du musst dich nicht fotografieren — die Ärztin untersucht dich',
+    ],
+    ctaDoctors: 'Eine Ärztin in deiner Nähe finden',
+    ctaSelfCheck: 'Geführte Selbstuntersuchung starten',
   },
   learn: {
     title: 'Brustgesundheit lernen',
@@ -497,6 +674,20 @@ export const de: Translation = {
     resumeSubtitle: 'Du warst bei Schritt {step} von {total}',
     resumeYes: 'Untersuchung fortsetzen ▶️',
     resumeNo: 'Neu beginnen 🔄',
+    progressLabel: 'Schritt {n} von {total}',
+    privacyNote: 'Alles passiert auf deinem Gerät. Wir fragen nie nach einem Foto, nichts wird aufgezeichnet und nichts verschickt.',
+    bestTimeValue: '3 bis 5 Tage nach der Periode',
+    durationValue: 'Etwa 5 Minuten',
+    listen: 'Anhören',
+    listenPause: 'Pause',
+    nextStepsTitle: 'Und jetzt?',
+    steps: [
+      { title: 'Im Spiegel betrachten', instruction: 'Stell dich mit entspannten Schultern vor den Spiegel. Achte auf Veränderungen von Form, Größe oder Haut.', lookFor: ['Form', 'Größe', 'Haut'], imageAlt: 'Einfache Illustration: eine Frau steht ruhig vor einem Spiegel.' },
+      { title: 'Arme heben', instruction: 'Hebe die Arme über den Kopf. Schau noch einmal, aus einem neuen Winkel.', lookFor: ['Schwellung', 'Veränderung der Brustwarze'], imageAlt: 'Einfache Illustration: eine Frau mit über den Kopf erhobenen Armen.' },
+      { title: 'Im Stehen prüfen', instruction: 'Taste mit den Fingern in kleinen Kreisen. Erst sanft, dann etwas fester.', lookFor: ['Knoten', 'Schmerz an einer Stelle'], imageAlt: 'Einfache Illustration: eine Hand macht sanfte kreisende Bewegungen.' },
+      { title: 'Im Liegen prüfen', instruction: 'Leg dich hin, ein Kissen unter die Schulter, und wiederhole dieselben Bewegungen auf jeder Seite.', lookFor: ['Unterschiede', 'Verhärtung'], imageAlt: 'Einfache Illustration: eine Frau liegt ruhig, ein Kissen unter der Schulter.' },
+      { title: 'Brustwarze prüfen', instruction: 'Drücke sanft und schau, ob Ausfluss auftritt, der für dich ungewöhnlich ist.', lookFor: ['Ausfluss', 'Blut', 'Form'], imageAlt: 'Eine sanfte, symbolische Illustration zum Prüfen der Brustwarze.' },
+    ],
   },
   risk: {
     title: 'Persönliche Risiko-Aufklärung',

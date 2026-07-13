@@ -8,17 +8,30 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/utils/cn';
 
-/* Desktop keeps the primary journey visible; the drawer carries everything. */
+/* Desktop keeps the primary journey visible; the drawer carries everything.
+   /signs sits second, right after Home: recognizing a change is the first of
+   the four verbs, and it is the page most likely to be shared into the app
+   from outside. It is deliberately NOT in BottomNav — that grid is already
+   seven columns wide, and an eighth cell on a 390px phone drops every tab
+   below a comfortable tap target. Mobile reaches it through the drawer. */
 const PRIMARY_LINKS: DrawerLink[] = [
   { to: '/', key: 'home' },
+  { to: '/signs', key: 'signs' },
   { to: '/learn', key: 'learn' },
   { to: '/self-check', key: 'selfCheck' },
   { to: '/risk', key: 'risk' },
   { to: '/chat', key: 'chat' },
 ];
 
+/* The drawer carries the pages the desktop bar has no room for. /risk-factors
+   lives here rather than in PRIMARY_LINKS: it is the educational companion to
+   /risk, and putting both in the top bar would ask her to tell "Risk" and
+   "Risk factors" apart at a glance, which is a coin toss. */
 const ALL_LINKS: DrawerLink[] = [
   ...PRIMARY_LINKS,
+  { to: '/when-to-seek-help', key: 'whenToSeek' },
+  { to: '/risk-factors', key: 'riskFactors' },
+  { to: '/companion', key: 'companion' },
   { to: '/doctors', key: 'doctors' },
   { to: '/reminder', key: 'reminder' },
 ];

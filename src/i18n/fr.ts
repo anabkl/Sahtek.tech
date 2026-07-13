@@ -2,7 +2,7 @@ import type { Translation } from './en';
 
 export const fr: Translation = {
   app: { name: 'Sahtek', latinName: 'Sahtek', tagline: 'Votre compagne IA pour la santé du sein' },
-  nav: { home: 'Accueil', learn: 'Apprendre', selfCheck: 'Auto-examen', risk: 'Risque', chat: 'Chat', doctors: 'Médecins', reminder: 'Rappel' },
+  nav: { home: 'Accueil', signs: 'Signes', learn: 'Apprendre', riskFactors: 'Facteurs de risque', companion: 'L’assistante', whenToSeek: 'Quand consulter', selfCheck: 'Auto-examen', risk: 'Risque', chat: 'Chat', doctors: 'Médecins', reminder: 'Rappel' },
   common: {
     start: 'Commencer', next: 'Suivant', previous: 'Précédent', back: 'Retour', finish: 'Terminer', retry: 'Réessayer',
     close: 'Fermer', loading: 'Chargement...', send: 'Envoyer', copy: 'Copier', copied: 'Copié', you: 'Vous',
@@ -257,6 +257,179 @@ export const fr: Translation = {
     },
     trustNote: 'Tout reste sur votre appareil. Sans compte, sans traceur, sans analyse d’audience.',
   },
+  signsPage: {
+    eyebrow: '12 signes',
+    title: 'Les changements à connaître',
+    intro:
+      'Non pas pour vous faire peur. Cette page vous aide à connaître ce qui est normal pour votre corps, afin de remarquer vite si quelque chose change. La plupart de ces changements ne sont pas un cancer — mais chacun mérite un regard.',
+    jumpTitle: 'Aller directement à un signe',
+    shareCta: 'Partager cette page',
+    shareCopied: 'Lien copié ✅',
+    shareFailed: 'Impossible de copier le lien. Vous pouvez le copier depuis la barre d’adresse.',
+    copySignLink: 'Copier le lien de ce signe',
+    whenToSeekTitle: 'Quand consulter',
+    ctaSelfCheck: 'Commencer l’auto-examen guidé',
+    ctaHelp: 'Quand consulter',
+    imageAltTemplate: 'Illustration sereine du signe : {label}',
+    ogAlt: 'Sahtek — 12 changements du sein à connaître.',
+  },
+  riskFactorsPage: {
+    eyebrow: 'Facteurs de risque',
+    title: 'Connaître les facteurs de risque, sans les craindre',
+    intro:
+      'Un facteur de risque augmente légèrement une probabilité — ce n’est ni un verdict, ni une prédiction. Beaucoup de femmes cumulent des facteurs sans jamais tomber malades, et beaucoup de femmes diagnostiquées n’en avaient aucun. Cette page est là pour comprendre, pas pour s’inquiéter.',
+    changeableLabel: 'Vous pouvez agir dessus',
+    notChangeableLabel: 'Cela ne se change pas',
+    keyNote:
+      'Connaître les facteurs de risque ne dit pas si vous développerez la maladie. Cela vous aide à comprendre votre corps et à en parler clairement avec un médecin.',
+    ctaAssessment: 'Faire le bilan de sensibilisation',
+    ctaDoctors: 'Parler à un médecin',
+    groups: [
+      {
+        title: 'L’âge',
+        note: 'Le risque augmente avec l’âge, mais un cancer du sein peut survenir à tout âge.',
+        factors: [
+          { title: 'Avancer en âge', desc: 'La plupart des cas sont diagnostiqués après 50 ans.' },
+          { title: 'Être une femme', desc: 'C’est le principal facteur. Les hommes sont concernés, mais dans moins de 1 % des cas.' },
+        ],
+      },
+      {
+        title: 'Antécédents familiaux',
+        note: '85 % des femmes diagnostiquées n’avaient aucun antécédent familial.',
+        factors: [
+          { title: 'Parente au premier degré', desc: 'Mère, sœur ou fille ayant eu un cancer du sein.' },
+          { title: 'Plusieurs cas, ou un cas jeune', desc: 'Plusieurs parentes touchées, ou un diagnostic à un âge précoce.' },
+          { title: 'Mutations génétiques héritées', desc: 'Comme BRCA1 et BRCA2. Rares, mais elles augmentent nettement le risque.' },
+        ],
+      },
+      {
+        title: 'Antécédents personnels',
+        note: 'Des situations médicales déjà vécues qui peuvent élever un peu le risque.',
+        factors: [
+          { title: 'Un cancer du sein antérieur', desc: 'Un suivi régulier est alors nécessaire.' },
+          { title: 'Certaines lésions bénignes', desc: 'Certains changements bénins trouvés à la biopsie élèvent un peu le risque.' },
+          { title: 'Radiothérapie du thorax jeune', desc: 'Une irradiation du thorax avant 30 ans.' },
+        ],
+      },
+      {
+        title: 'Facteurs hormonaux et reproductifs',
+        note: 'Liés à la durée d’exposition du corps aux hormones. La plupart ne relèvent pas d’un choix.',
+        factors: [
+          { title: 'Règles précoces', desc: 'Premières règles avant 12 ans.' },
+          { title: 'Ménopause tardive', desc: 'Ménopause après 55 ans.' },
+          { title: 'Première grossesse après 30 ans', desc: 'Ou absence de grossesse.' },
+          { title: 'Ne pas avoir allaité', desc: 'L’allaitement apporte une protection partielle.' },
+          { title: 'Traitement hormonal prolongé', desc: 'Traitement hormonal substitutif après la ménopause, sur une longue durée.' },
+        ],
+      },
+      {
+        title: 'Mode de vie',
+        note: 'Ce sont les facteurs sur lesquels vous pouvez agir. Même un petit changement compte.',
+        factors: [
+          { title: 'Alcool', desc: 'Le risque augmente avec la quantité.' },
+          { title: 'Tabac', desc: 'Associé à un risque plus élevé avec le temps.' },
+          { title: 'Surpoids', desc: 'Surtout après la ménopause.' },
+          { title: 'Sédentarité', desc: 'Une activité physique régulière réduit le risque.' },
+        ],
+      },
+      {
+        title: 'Autres facteurs',
+        note: 'D’autres éléments dont les médecins tiennent compte.',
+        factors: [
+          { title: 'Densité mammaire', desc: 'Des seins denses rendent la mammographie plus difficile à lire et élèvent un peu le risque.' },
+          { title: 'Sans cause identifiable', desc: 'Beaucoup de cas surviennent chez des femmes sans aucun facteur de risque connu.' },
+        ],
+      },
+    ],
+  },
+  companionPage: {
+    eyebrow: 'L’assistante Sahtek',
+    title: 'Une compagne qui explique, pas une médecin qui diagnostique',
+    intro:
+      'L’assistante Sahtek vous aide à comprendre la santé du sein simplement, sans gêne et sans jugement. Mais vous devez savoir exactement ce qu’elle peut faire — et ce qu’elle ne fera jamais — avant de commencer.',
+    canTitle: 'Ce qu’elle peut faire',
+    can: [
+      'Expliquer les mots médicaux simplement',
+      'Clarifier ce qu’il faut observer sur votre corps',
+      'Répondre aux questions difficiles à poser à quelqu’un',
+      'Vous dire quand prendre rendez-vous avec un médecin',
+      'Vous parler en darija, en français ou en anglais',
+    ],
+    cannotTitle: 'Ce qu’elle ne fera jamais',
+    cannot: [
+      'Elle ne diagnostique pas. Jamais « vous avez » ni « tout va bien »',
+      'Elle ne prescrit rien et ne donne aucun avis médical personnel',
+      'Elle ne peut ni voir ni examiner votre corps',
+      'Elle ne remplace ni un médecin ni une mammographie',
+      'Elle n’est pas faite pour les urgences',
+    ],
+    examplesTitle: 'Essayez de lui demander',
+    examples: [
+      'Quels signes dois-je surveiller ?',
+      'Comment faire un auto-examen ?',
+      'J’ai trouvé une petite boule, que faire ?',
+      'L’hérédité compte-t-elle ?',
+      'Qu’est-ce qu’une mammographie ?',
+      'J’ai peur, aidez-moi',
+    ],
+    safetyTitle: 'Ses limites',
+    safetyNote:
+      'Si vous lui demandez si vous avez un cancer, elle ne répondra pas — et c’est voulu. Seul un médecin peut poser un diagnostic, après un vrai examen. L’assistante vous oriente vers lui ; elle ne prend pas sa place.',
+    emergencyNote:
+      'En cas d’urgence ou si vous avez besoin d’aide immédiatement, ne comptez pas sur l’application : contactez un médecin ou les urgences.',
+    privacyTitle: 'Où vont vos questions',
+    typedLabel: 'Écrire',
+    privacyTyped:
+      'Quand vous écrivez : les réponses viennent de Sahtek, sur votre appareil. Vos questions ne sont envoyées à aucun serveur.',
+    privacyVoice:
+      'Quand vous utilisez le micro : le navigateur envoie votre voix à un service de reconnaissance vocale pour la transcrire. Sahtek ne reçoit pas l’enregistrement, et vous pouvez toujours écrire plutôt que parler.',
+    cta: 'Ouvrir le chat',
+    ctaSecondary: 'Apprendre les signes',
+    mock: {
+      question: 'Est-ce un cancer ?',
+      answer:
+        'Je ne peux pas répondre à cette question — seul un médecin pose un diagnostic, après un examen. Ce que je peux faire : vous expliquer ce qu’il faut observer, et vous dire quand prendre rendez-vous.',
+    },
+  },
+  whenToSeekPage: {
+    eyebrow: 'Quand consulter',
+    title: 'Quand consulter un médecin',
+    intro:
+      'La plupart des changements du sein ne sont pas un cancer — c’est un fait, pas une consolation. Mais certains changements ne doivent pas être ignorés. Cette page vous dit clairement quoi surveiller, quoi faire, et dans quel délai.',
+    reassureNote:
+      'Prendre rendez-vous n’est pas admettre qu’il y a un problème. C’est simplement la seule façon de savoir — et le plus souvent, cela rassure.',
+    urgencyTitle: 'Des niveaux simples, sans peur',
+    timeframes: [
+      'Gardez l’habitude mensuelle',
+      'Surveillez pendant deux semaines',
+      'Prenez rendez-vous dans les prochaines semaines',
+      'Consultez rapidement',
+    ],
+    doNotIgnoreTitle: 'Des changements à ne pas ignorer',
+    doNotIgnoreNote:
+      'Aucun de ces signes ne signifie « cancer ». Il signifie seulement : à faire examiner par un médecin, sans attendre.',
+    doNotIgnore: [
+      'Une boule nouvelle qui dure plus de deux semaines',
+      'Un écoulement du mamelon, surtout sanglant ou d’un seul côté',
+      'Un mamelon qui se rétracte alors qu’il ne le faisait pas',
+      'Un capitonnage de la peau ou un aspect de peau d’orange',
+      'Une rougeur ou une chaleur qui persiste plusieurs jours',
+      'Une boule sous le bras ou au-dessus de la clavicule',
+      'Une peau qui pèle ou s’épaissit autour du mamelon et ne guérit pas',
+    ],
+    seeAllSigns: 'Voir les 12 signes',
+    prepareTitle: 'Préparer le rendez-vous',
+    prepareNote: 'Quelques petites choses rendent la consultation bien plus utile.',
+    prepare: [
+      'Notez le jour où vous avez remarqué le changement',
+      'Précisez de quel côté, et s’il a évolué depuis',
+      'Dites s’il change avec votre cycle',
+      'Apportez vos examens ou imageries précédents',
+      'Inutile de vous photographier — le médecin vous examinera',
+    ],
+    ctaDoctors: 'Trouver un médecin près de chez vous',
+    ctaSelfCheck: 'Commencer l’auto-examen guidé',
+  },
   learn: {
     title: 'Comprendre la santé du sein', subtitle: 'Information claire, soutien et prochaines étapes.',
     tabs: { overview: 'Aperçu', symptoms: 'Symptômes', prevention: 'Prévention', myths: 'Mythes' },
@@ -504,6 +677,20 @@ export const fr: Translation = {
     resumeSubtitle: 'Vous étiez à l’étape {step} sur {total}',
     resumeYes: 'Continuer l’examen ▶️',
     resumeNo: 'Recommencer 🔄',
+    progressLabel: 'Étape {n} sur {total}',
+    privacyNote: 'Tout se passe sur votre appareil. Aucune photo demandée, rien n’est enregistré, rien n’est envoyé.',
+    bestTimeValue: '3 à 5 jours après les règles',
+    durationValue: 'Environ 5 minutes',
+    listen: 'Écouter',
+    listenPause: 'Pause',
+    nextStepsTitle: 'Et maintenant ?',
+    steps: [
+      { title: 'Observer au miroir', instruction: 'Placez-vous devant le miroir, épaules détendues. Regardez si la forme, la taille ou la peau ont changé.', lookFor: ['Forme', 'Taille', 'Peau'], imageAlt: 'Illustration simple : une femme debout, sereine, devant un miroir.' },
+      { title: 'Lever les bras', instruction: 'Levez les bras au-dessus de la tête. Regardez à nouveau, sous un autre angle.', lookFor: ['Gonflement', 'Changements du mamelon'], imageAlt: 'Illustration simple : une femme les bras levés au-dessus de la tête.' },
+      { title: 'Examiner debout', instruction: 'Avec les doigts, faites de petits cercles. Pression légère, puis un peu plus ferme.', lookFor: ['Masse', 'Douleur à un endroit'], imageAlt: 'Illustration simple : une main faisant de doux mouvements circulaires.' },
+      { title: 'Examiner allongée', instruction: 'Allongez-vous, placez un coussin sous l’épaule et répétez les mêmes gestes de chaque côté.', lookFor: ['Différences', 'Fermeté'], imageAlt: 'Illustration simple : une femme allongée, un coussin sous l’épaule.' },
+      { title: 'Vérifier le mamelon', instruction: 'Pressez doucement et regardez s’il y a un écoulement inhabituel pour vous.', lookFor: ['Écoulement', 'Sang', 'Forme'], imageAlt: 'Illustration douce et symbolique sur la vérification du mamelon.' },
+    ],
   },
   risk: {
     title: 'Sensibilisation au risque', subtitle: 'Dix questions privées et un score éducatif simple.',

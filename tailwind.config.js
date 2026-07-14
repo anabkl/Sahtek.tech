@@ -125,7 +125,7 @@ export default {
 
       fontFamily: {
         arabic: ['IBM Plex Sans Arabic', 'Plus Jakarta Sans', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'Noto Sans', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         serif: ['Fraunces', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },

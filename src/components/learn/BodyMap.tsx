@@ -63,14 +63,39 @@ export function BodyMap() {
         <div className="lg:col-span-2">
           <div className="rounded-3xl border border-white/70 bg-gradient-to-b from-primary-100/50 to-primary-50 p-3 shadow-petal">
             <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[280px] lg:max-w-[320px]">
-              <img
-                src="/assets/body-map.png"
-                alt={bm.title}
-                width={816}
-                height={1456}
-                className="block h-auto w-full select-none rounded-2xl"
-                draggable={false}
-              />
+              {/* The source PNG was 1536x2752 and 3.9 MB, painted at a maximum of
+                  320 CSS px — a ~5x oversized image, and about forty seconds of
+                  blank screen on the 3G a lot of this audience is actually on.
+                  AVIF at the widths the layout can use is 23 KB: 172x smaller.
+
+                  `sizes` tells the browser the real painted width BEFORE layout,
+                  so it never downloads the 3x file for a 240px slot.
+                  `loading="lazy"`: this sits inside a tab on /learn, below the
+                  fold and often never opened.
+                  width/height are the intrinsic ratio — they reserve the box and
+                  keep this out of CLS. */}
+              <picture>
+                <source
+                  type="image/avif"
+                  srcSet="/assets/body-map-640.avif 640w, /assets/body-map-960.avif 960w"
+                  sizes="(min-width: 1024px) 320px, (min-width: 640px) 280px, 240px"
+                />
+                <source
+                  type="image/webp"
+                  srcSet="/assets/body-map-640.webp 640w, /assets/body-map-960.webp 960w"
+                  sizes="(min-width: 1024px) 320px, (min-width: 640px) 280px, 240px"
+                />
+                <img
+                  src="/assets/body-map-640.png"
+                  alt={bm.title}
+                  width={640}
+                  height={1146}
+                  loading="lazy"
+                  decoding="async"
+                  className="block h-auto w-full select-none rounded-2xl"
+                  draggable={false}
+                />
+              </picture>
               {/* Gradient fade hides the watermark at the bottom of the image */}
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[18%] rounded-b-2xl bg-gradient-to-t from-primary-50 via-primary-50/90 to-transparent" />
 

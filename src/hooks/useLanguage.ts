@@ -1,5 +1,5 @@
 import { useLanguageStore } from '@/stores/languageStore';
-import { translations, type Translation } from '@/i18n';
+import { useTranslation, type Translation } from '@/i18n';
 import type { Language } from '@/types/api';
 
 interface UseLanguage {
@@ -19,7 +19,7 @@ export function useLanguage(): UseLanguage {
 
   const isRTL = lang === 'ar';
   return {
-    t: translations[lang],
+    t: useTranslation(lang),
     lang,
     setLang,
     isRTL,

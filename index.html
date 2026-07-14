@@ -15,6 +15,18 @@
          disclosed each visitor's IP and User-Agent before she clicked anything.
          There are no external font requests. Do not add a font <link> here. -->
 
+    <!-- LCP: the hero <h1>. Default locale is Darija, so the heading paints in
+         IBM Plex Sans Arabic. Preloading the one face it needs turns a
+         three-hop discovery (html -> css -> font) into a single early fetch.
+         `crossorigin` is REQUIRED even same-origin: fonts are fetched in CORS
+         mode, and without it the browser downloads the file twice. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/ibm-plex-sans-arabic-700-normal-arabic.woff2"
+      crossorigin
+    />
     <title>صحّتك - Sahtek | التوعية بسرطان الثدي</title>
 
     <!-- Social sharing (Open Graph + Twitter).

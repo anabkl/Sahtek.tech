@@ -51,7 +51,13 @@
   /* -- Semantic text ------------------------------------------------ */
   --ink: 45 31 45; /* 15.6:1 [AAA] — primary            */
   --muted: 122 100 115; /*  5.0:1 [AA]  — secondary          */
-  --faint: 154 127 143; /*  3.4:1 [AA]  — LARGE TEXT / UI ONLY, never body */
+  /* 3.4:1 — CLEARS AA FOR GRAPHICS (3:1) AND LARGE TEXT (18.66px+ bold /
+     24px+). It FAILS AA for anything smaller: normal text needs 4.5:1.
+     An audit found it on 11px overlines and 13px captions in the footer and
+     drawer — 3.54:1, a real WCAG 1.4.3 failure. Those are now `text-muted`.
+     If you are about to put `text-faint` on text under 24px, you want
+     `text-muted`. This token is for icons, hairlines and decoration. */
+  --faint: 154 127 143;
   --on-brand: 255 255 255; /*  4.5:1 on --brand-500 [AA]        */
 
   /* -- Accent: brand as an interactive colour ----------------------- */

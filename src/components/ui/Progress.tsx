@@ -4,6 +4,13 @@ import { cn } from '@/utils/cn';
 interface ProgressProps {
   /** 0–100. */
   value: number;
+  /**
+   * What is progressing. REQUIRED for screen readers: `role="progressbar"`
+   * without a name is announced as "progress bar, 20%" — 20% of *what*?
+   * (WCAG 4.1.2). Pass the same sentence the sighted user reads, e.g.
+   * `interpolate(t.selfCheck.progressLabel, { n, total })`.
+   */
+  label: string;
   className?: string;
   tone?: 'primary' | 'low' | 'moderate' | 'high';
 }
@@ -16,12 +23,13 @@ const TONE_FILL: Record<NonNullable<ProgressProps['tone']>, string> = {
 };
 
 /** Horizontal progress bar with an animated fill. */
-export function Progress({ value, className, tone = 'primary' }: ProgressProps) {
+export function Progress({ value, label, className, tone = 'primary' }: ProgressProps) {
   const clamped = Math.max(0, Math.min(100, value));
   return (
     <div
       className={cn('h-2.5 w-full overflow-hidden rounded-full bg-line', className)}
       role="progressbar"
+      aria-label={label}
       aria-valuenow={Math.round(clamped)}
       aria-valuemin={0}
       aria-valuemax={100}

@@ -134,7 +134,7 @@ export function MobileDrawer({ open, onClose, links }: MobileDrawerProps) {
 
             <div className="space-y-4 border-t border-line px-5 py-5">
               <div>
-                <p className="mb-2 text-overline uppercase text-faint">{t.settings.language}</p>
+                <p className="mb-2 text-overline uppercase text-muted">{t.settings.language}</p>
                 <LanguageSwitch variant="inline" />
               </div>
 

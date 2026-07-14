@@ -70,7 +70,7 @@ export function Footer() {
 
           {/* Explore */}
           <nav aria-labelledby="footer-explore">
-            <h2 id="footer-explore" className="text-overline uppercase text-faint">
+            <h2 id="footer-explore" className="text-overline uppercase text-muted">
               {t.footer.explore}
             </h2>
             <ul className="mt-3 space-y-0.5">
@@ -86,7 +86,7 @@ export function Footer() {
 
           {/* Legal + contact */}
           <nav aria-labelledby="footer-legal">
-            <h2 id="footer-legal" className="text-overline uppercase text-faint">
+            <h2 id="footer-legal" className="text-overline uppercase text-muted">
               {t.footer.legal}
             </h2>
             <ul className="mt-3 space-y-0.5">
@@ -107,7 +107,7 @@ export function Footer() {
 
             {socials.length > 0 && (
               <>
-                <h2 className="mt-6 text-overline uppercase text-faint">{t.footer.followUs}</h2>
+                <h2 className="mt-6 text-overline uppercase text-muted">{t.footer.followUs}</h2>
                 <ul className="mt-3 flex gap-2">
                   {socials.map(({ id, url }) => {
                     const Icon = SOCIAL_ICONS[id];
@@ -143,7 +143,7 @@ export function Footer() {
             <p className="text-caption text-muted">
               © {year} {APP.latinName}. {t.footer.rights}
             </p>
-            <p className="text-caption text-faint">{t.footer.madeIn}</p>
+            <p className="text-caption text-muted">{t.footer.madeIn}</p>
           </div>
           <LanguageSwitch variant="inline" className="justify-start sm:justify-end" />
         </div>

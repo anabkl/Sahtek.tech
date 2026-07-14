@@ -81,6 +81,11 @@ export function SelfCheckPage() {
   const [showReminderCta, setShowReminderCta] = useState(false);
   const ctaTimer = useRef<number | null>(null);
 
+  const stepProgressLabel = interpolate(t.selfCheck.progressLabel, {
+    n: check.index + 1,
+    total: check.total,
+  });
+
   const speechId = `step-${check.index}`;
   const isNarrating = activeId === speechId;
   const narrationText = check.current ? check.current.instruction || check.current.title : '';
@@ -177,13 +182,13 @@ export function SelfCheckPage() {
               countdown. The ring below is the timer; conflating the two left her
               with no idea how much of the check was left. */}
           <div className="mb-6">
-            <p className="mb-2 text-caption font-bold text-muted">
-              {interpolate(t.selfCheck.progressLabel, {
-                n: check.index + 1,
-                total: check.total,
-              })}
-            </p>
-            <Progress value={((check.index + 1) / check.total) * 100} />
+            <p className="mb-2 text-caption font-bold text-muted">{stepProgressLabel}</p>
+            {/* The screen reader hears the same sentence the sighted user reads,
+                rather than a nameless "progress bar, 20%". */}
+            <Progress
+              value={((check.index + 1) / check.total) * 100}
+              label={stepProgressLabel}
+            />
           </div>
 
           <AnimatePresence mode="wait" initial={false}>

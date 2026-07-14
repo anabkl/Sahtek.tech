@@ -256,7 +256,7 @@ export default function DesignSystemPage() {
           <div className="overflow-x-auto rounded-2xl border border-line bg-card">
             <table className="w-full text-start text-body-sm">
               <thead>
-                <tr className="border-b border-line text-overline uppercase text-faint">
+                <tr className="border-b border-line text-overline uppercase text-muted">
                   <th className="p-4 text-start">Token</th>
                   <th className="p-4 text-start">Sample</th>
                   <th className="p-4 text-start">On card</th>
@@ -341,13 +341,13 @@ export default function DesignSystemPage() {
           <div className="space-y-6 rounded-2xl border border-line bg-card p-8">
             {TYPE_SAMPLES.map(({ cls, token, sample, body }) => (
               <div key={token} className="flex flex-col gap-1 border-b border-line pb-5 last:border-0 last:pb-0">
-                <code className="text-overline uppercase text-faint">text-{token}</code>
+                <code className="text-overline uppercase text-muted">text-{token}</code>
                 <p className={cn(cls, body ? 'text-muted' : 'text-ink')}>{sample}</p>
               </div>
             ))}
 
             <div className="rounded-xl bg-sunken p-6">
-              <code className="text-overline uppercase text-faint">Arabic / Darija — font-arabic</code>
+              <code className="text-overline uppercase text-muted">Arabic / Darija — font-arabic</code>
               <p dir="rtl" className="mt-3 font-arabic text-h2 text-ink">
                 صحّتك — رفيقتك الرقمية
               </p>
@@ -357,7 +357,7 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="rounded-xl bg-sunken p-6">
-              <code className="text-overline uppercase text-faint">font-serif — Fraunces, one accent per page</code>
+              <code className="text-overline uppercase text-muted">font-serif — Fraunces, one accent per page</code>
               <p className="mt-3 font-serif text-h2 text-ink">Early is everything.</p>
             </div>
           </div>
@@ -488,7 +488,7 @@ export default function DesignSystemPage() {
         >
           <div className="space-y-8">
             <div>
-              <code className="text-overline uppercase text-faint">SectionHeading</code>
+              <code className="text-overline uppercase text-muted">SectionHeading</code>
               <div className="mt-3 rounded-2xl border border-line bg-card p-6">
                 <SectionHeading
                   as="h3"
@@ -502,7 +502,7 @@ export default function DesignSystemPage() {
             </div>
 
             <div>
-              <code className="text-overline uppercase text-faint">IconCard</code>
+              <code className="text-overline uppercase text-muted">IconCard</code>
               <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <IconCard icon={HeartPulse} title="Self-check" description="Five guided minutes." tone="brand" />
                 <IconCard icon={Gauge} title="Risk factors" description="Awareness, not a verdict." tone="calm" />
@@ -512,7 +512,7 @@ export default function DesignSystemPage() {
             </div>
 
             <div>
-              <code className="text-overline uppercase text-faint">TrustPill</code>
+              <code className="text-overline uppercase text-muted">TrustPill</code>
               <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-card p-6">
                 <TrustPill icon={LockKeyhole} tone="calm">
                   Stays on your device
@@ -524,7 +524,7 @@ export default function DesignSystemPage() {
             </div>
 
             <div>
-              <code className="text-overline uppercase text-faint">Accordion</code>
+              <code className="text-overline uppercase text-muted">Accordion</code>
               <div className="mt-3">
                 <Accordion
                   headingLevel="h4"
@@ -550,7 +550,7 @@ export default function DesignSystemPage() {
             </div>
 
             <div>
-              <code className="text-overline uppercase text-faint">SafetyNote — four variants</code>
+              <code className="text-overline uppercase text-muted">SafetyNote — four variants</code>
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 <Disclaimer full withTitle />
                 <SafetyNote variant="privacy" title="Private by default">
@@ -566,7 +566,7 @@ export default function DesignSystemPage() {
             </div>
 
             <div>
-              <code className="text-overline uppercase text-faint">PhoneMockup + GlassCard</code>
+              <code className="text-overline uppercase text-muted">PhoneMockup + GlassCard</code>
               <div className="mt-3 grid items-center gap-8 rounded-3xl bg-brand-cta p-8 md:grid-cols-2">
                 <PhoneMockup glow>
                   <div className="flex h-full flex-col gap-3 p-5">
@@ -593,7 +593,7 @@ export default function DesignSystemPage() {
         </Section>
 
         <div className="hairline mt-16" />
-        <p className="py-8 text-center text-caption text-faint">
+        <p className="py-8 text-center text-caption text-muted">
           Sahtek.tech — tokens live in src/styles/tokens.css · surfaced by tailwind.config.js
         </p>
       </div>

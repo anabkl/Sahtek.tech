@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { BookOpenCheck, ExternalLink, LockKeyhole, Languages, ShieldCheck, type LucideIcon } from 'lucide-react';
-import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { BrandImage } from '@/components/ui/BrandImage';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { EVIDENCE_SOURCES, MEDICAL_REVIEW } from '@/config/constants';
@@ -84,12 +84,8 @@ export function Credibility() {
 
           {/* The methodology preview. A diagram of how the words get made —
               not a badge, and not a stock photo of a doctor. */}
-          <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-line sm:aspect-[16/9] lg:aspect-[4/3]">
-            <ImagePlaceholder
-              spec="960 × 720 px · 4:3 · SVG"
-              altNote={section.methodImageAlt}
-              hint="Editorial flow: write in Darija → adapt FR/EN → medical review → publish."
-            />
+          <div className="overflow-hidden rounded-2xl border border-line">
+            <BrandImage name="method-flow" alt={section.methodImageAlt} width={960} height={720} />
           </div>
         </div>
 

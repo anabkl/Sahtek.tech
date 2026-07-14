@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { AppScreenshot } from '@/components/ui/BrandImage';
 import { PhoneMockup } from '@/components/ui/PhoneMockup';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -14,6 +14,10 @@ import { useLanguage } from '@/hooks/useLanguage';
  * not a physical one, so the alternation survives the RTL flip untouched —
  * no `lg:left-*` anywhere.
  */
+/* Real screens, in the order of `home.selfCheckPreview.steps`:
+   find a calm moment -> follow the steps -> log it and set a reminder. */
+const PREVIEW_SCREENS = ['self-check-intro', 'self-check-step', 'reminder'];
+
 export function SelfCheckPreview() {
   const { t, isRTL } = useLanguage();
   const section = t.home.selfCheckPreview;
@@ -52,11 +56,7 @@ export function SelfCheckPreview() {
 
               <div className={deviceFirst ? 'lg:order-1' : undefined}>
                 <PhoneMockup glow>
-                  <ImagePlaceholder
-                    spec="1170 × 2532 px · 9:19.5 · PNG"
-                    altNote={step.imageAlt}
-                    hint={`Self-check screen, step ${i + 1} of the flow.`}
-                  />
+                  <AppScreenshot name={PREVIEW_SCREENS[i]} alt={step.imageAlt} />
                 </PhoneMockup>
               </div>
             </motion.li>

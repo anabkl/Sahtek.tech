@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { BrandImage } from '@/components/ui/BrandImage';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useLanguage } from '@/hooks/useLanguage';
 import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
@@ -13,6 +13,9 @@ import { VIEWPORT, staggerContainer, staggerItem } from '@/motion/motion';
  * steps simply stack — a vertical rail next to a stacked column reads as a
  * checklist, which is the wrong feeling for a first-time visitor.
  */
+/* In the order of `home.howItWorks.steps`: discover -> check -> understand -> act. */
+const HOW_SCENES = ['how-discover', 'how-check', 'how-understand', 'how-act'];
+
 export function HowItWorks() {
   const { t } = useLanguage();
   const section = t.home.howItWorks;
@@ -53,8 +56,8 @@ export function HowItWorks() {
             </span>
 
             <div className="mt-4 flex flex-1 flex-col rounded-3xl border border-line bg-card p-4 shadow-petal">
-              <div className="aspect-[4/3] overflow-hidden rounded-2xl">
-                <ImagePlaceholder spec="960 × 720 px · 4:3" altNote={step.imageAlt} />
+              <div className="overflow-hidden rounded-2xl border border-line">
+                <BrandImage name={HOW_SCENES[i]} alt={step.imageAlt} width={960} height={720} />
               </div>
 
               <h3 className="mt-4 text-h4 text-ink">{step.title}</h3>

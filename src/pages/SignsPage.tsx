@@ -5,7 +5,7 @@ import { ArrowRight, BellRing, Link2, MapPin, Share2, Stethoscope } from 'lucide
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { Disclaimer } from '@/components/ui/Disclaimer';
-import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { BrandImage } from '@/components/ui/BrandImage';
 import { PetalMark } from '@/components/ui/PetalMark';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
@@ -208,11 +208,12 @@ export function SignsPage() {
               </div>
 
               <div className={imageFirst ? 'lg:order-1' : undefined}>
-                <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-line shadow-petal">
-                  <ImagePlaceholder
-                    spec="1200 × 900 px · 4:3 · SVG"
-                    altNote={interpolate(page.imageAltTemplate, { label: sign.label })}
-                    hint="Symbolic only: soft ceramic / petal forms. No anatomy, no clinical photography."
+                <div className="overflow-hidden rounded-3xl border border-line shadow-petal">
+                  <BrandImage
+                    name={`sign-${String(i + 1).padStart(2, '0')}`}
+                    alt={interpolate(page.imageAltTemplate, { label: sign.label })}
+                    width={1200}
+                    height={900}
                   />
                 </div>
               </div>

@@ -21,7 +21,7 @@ import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { Confetti } from '@/components/ui/Confetti';
 import { Disclaimer } from '@/components/ui/Disclaimer';
-import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { BrandImage } from '@/components/ui/BrandImage';
 import { CircularProgress, Progress } from '@/components/ui/Progress';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
@@ -201,11 +201,12 @@ export function SelfCheckPage() {
               <h1 className="text-h2 text-ink">{check.current.title}</h1>
 
               {/* The gentle illustration for this step. */}
-              <div className="mx-auto mt-5 aspect-[4/3] max-w-sm overflow-hidden rounded-2xl border border-line">
-                <ImagePlaceholder
-                  spec="960 × 720 px · 4:3 · SVG"
-                  altNote={t.selfCheck.steps[check.index].imageAlt}
-                  hint="Gentle, symbolic. A calm figure or a hand — never clinical, never explicit."
+              <div className="mx-auto mt-5 max-w-sm overflow-hidden rounded-2xl border border-line">
+                <BrandImage
+                  name={`step-${check.index + 1}`}
+                  alt={t.selfCheck.steps[check.index].imageAlt}
+                  width={960}
+                  height={720}
                 />
               </div>
 

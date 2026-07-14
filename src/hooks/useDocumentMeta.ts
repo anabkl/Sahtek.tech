@@ -125,32 +125,67 @@ export function useDocumentMeta() {
  * Makes the language addressable: `/signs?lang=fr` renders French.
  *
  * Without this the seven locales share one URL, which means hreflang has nothing
- * to point at and Google can only ever index the Darija. Reading the param on
- * navigation is what turns "a site with a language switch" into "a site with
- * language variants".
+ * to point at and Google can only ever index the Darija. Reading the param is
+ * what turns "a site with a language switch" into "a site with language
+ * variants".
+ *
+ * STRICTLY ONE-WAY: url -> store. It does NOT write the URL back.
+ *
+ * The first version mirrored in both directions and it broke the back button:
+ * on a back navigation the URL reverted to `?lang=en` while the store still held
+ * `fr`, both effects fired at once, and the store-to-URL one won — silently
+ * undoing the navigation and leaving the address bar disagreeing with the page.
+ * Two effects writing to each other is a fight, and the user loses it.
+ *
+ * The URL is now the source of truth; `useSetLanguage` (below) is the only thing
+ * that writes it.
  */
 export function useLanguageFromUrl() {
-  const [params, setParams] = useSearchParams();
+  const [params] = useSearchParams();
   const { lang, setLang } = useLanguage();
 
   const requested = params.get('lang') as Language | null;
 
   useEffect(() => {
+    /* `?lang` is an OVERRIDE, not the sole source of truth.
+     *
+     * The absence of the param must NOT mean "reset to Darija". Internal links
+     * are plain `/faq`, so treating a missing param as the default threw an
+     * English reader back into Darija on every click inside the app — a far
+     * worse bug than the one it was meant to fix.
+     *
+     * So: a valid param wins (deep links, hreflang alternates, Back onto a
+     * `?lang=` entry). No param means "carry on in whatever she chose", which is
+     * held in the persisted store. A crawler has no store, so it always gets the
+     * Darija default — which is exactly what the canonical and x-default say.
+     */
     if (requested && SUPPORTED_LANGUAGES.includes(requested) && requested !== lang) {
       setLang(requested);
     }
   }, [requested, lang, setLang]);
+}
 
-  /* Keep the URL honest after an in-app switch, so the address bar is always a
-     shareable link to what she is actually looking at. The default locale drops
-     the param rather than carrying `?lang=ar` everywhere. */
-  useEffect(() => {
-    if (requested === lang) return;
-    if (lang === DEFAULT_LOCALE && !requested) return;
+/**
+ * Switch language: updates the store AND the URL, in one user-initiated action.
+ *
+ * This is the ONLY writer of `?lang`. Use it everywhere a language is chosen —
+ * never call `setLang` directly from UI, or the address bar will drift out of
+ * step with the page and the link she shares will open in the wrong language.
+ *
+ * The default locale drops the param rather than carrying `?lang=ar` around.
+ * `replace: true` keeps a language switch out of the history stack: it is a
+ * preference, not a place, and Back should return to the previous *page*.
+ */
+export function useSetLanguage() {
+  const [params, setParams] = useSearchParams();
+  const { setLang } = useLanguage();
+
+  return (code: Language) => {
+    setLang(code);
 
     const next = new URLSearchParams(params);
-    if (lang === DEFAULT_LOCALE) next.delete('lang');
-    else next.set('lang', lang);
+    if (code === DEFAULT_LOCALE) next.delete('lang');
+    else next.set('lang', code);
     setParams(next, { replace: true });
-  }, [lang, requested, params, setParams]);
+  };
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Languages } from 'lucide-react';
 import { LANGUAGE_META, SUPPORTED_LANGUAGES } from '@/config/constants';
+import { useSetLanguage } from '@/hooks/useDocumentMeta';
 import { useLanguage } from '@/hooks/useLanguage';
 import type { Language } from '@/types/api';
 import { cn } from '@/utils/cn';
@@ -27,7 +28,10 @@ interface LanguageSwitchProps {
  * <LanguageSwitch variant="inline" />    // drawer / footer
  */
 export function LanguageSwitch({ variant = 'menu', className }: LanguageSwitchProps) {
-  const { t, lang, setLang } = useLanguage();
+  const { t, lang } = useLanguage();
+  /* Writes the store AND the URL together. Calling setLang() directly here
+     would leave the address bar showing the old language. */
+  const setLang = useSetLanguage();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 

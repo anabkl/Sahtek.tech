@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { BookOpenCheck, ExternalLink, LockKeyhole, Languages, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
+import { SafetyNote } from '@/components/ui/SafetyNote';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { EVIDENCE_SOURCES, MEDICAL_REVIEW } from '@/config/constants';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -92,33 +93,57 @@ export function Credibility() {
           </div>
         </div>
 
-        {MEDICAL_REVIEW && (
-          <div className="mt-6 border-t border-line pt-5">
-            <h4 className="text-overline uppercase text-accent-text">{section.reviewTitle}</h4>
-            <p className="mt-1.5 text-body-sm text-ink">
-              {MEDICAL_REVIEW.name} — {MEDICAL_REVIEW.credential}
-            </p>
-            <p className="text-caption text-muted">{MEDICAL_REVIEW.reviewedOn}</p>
-          </div>
-        )}
+        {/* The review block.
+         *
+         * It used to render NOTHING when unconfigured — which is worse than it
+         * sounds. A page that talks at length about its editorial method and
+         * then says nothing about review lets a reader assume review happened.
+         * Silence is not honesty; it is just a quieter claim.
+         *
+         * So the block is always present, and it states the truth either way:
+         * the reviewer's name when there is one, and plainly "not yet reviewed"
+         * when there is not. Nobody has to trust us about which — they can read
+         * which one it says. */}
+        <div className="mt-6 border-t border-line pt-5">
+          <h4 className="text-overline uppercase text-accent-text">{section.reviewTitle}</h4>
 
-        {EVIDENCE_SOURCES.length > 0 && (
-          <ul className="mt-5 flex flex-wrap gap-2 border-t border-line pt-5">
-            {EVIDENCE_SOURCES.map((source) => (
-              <li key={source.url}>
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line bg-card px-3.5 text-caption font-bold text-muted transition hover:text-accent-text"
-                >
-                  {source.label}
-                  <ExternalLink size={12} aria-hidden />
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
+          {MEDICAL_REVIEW ? (
+            <>
+              <p className="mt-1.5 text-body-sm text-ink">
+                {MEDICAL_REVIEW.name} — {MEDICAL_REVIEW.credential}
+              </p>
+              <p className="text-caption text-muted">{MEDICAL_REVIEW.reviewedOn}</p>
+            </>
+          ) : (
+            <SafetyNote variant="medical" title={section.reviewPendingTitle} className="mt-2">
+              {section.reviewPendingBody}
+            </SafetyNote>
+          )}
+        </div>
+
+        <div className="mt-5 border-t border-line pt-5">
+          <h4 className="text-overline uppercase text-accent-text">{section.sourcesTitle}</h4>
+
+          {EVIDENCE_SOURCES.length > 0 ? (
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {EVIDENCE_SOURCES.map((source) => (
+                <li key={source.url}>
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line bg-card px-3.5 text-caption font-bold text-muted transition hover:text-accent-text"
+                  >
+                    {source.label}
+                    <ExternalLink size={12} aria-hidden />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-body-sm text-muted">{section.sourcesPending}</p>
+          )}
+        </div>
       </div>
     </section>
   );

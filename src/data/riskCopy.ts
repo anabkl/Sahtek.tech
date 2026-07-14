@@ -107,41 +107,77 @@ export const FACTOR_COPY: Record<
   },
 };
 
+/**
+ * The result summary.
+ *
+ * NEVER a verdict on her body. These sentences used to read "Your risk is low.
+ * You are taking good care of yourself" — a conclusion about her chance of
+ * disease, drawn from ten questions, and the most dangerous sentence in the
+ * product: a woman who later finds a lump and remembers being told her risk was
+ * low may wait. HARD RULE 1 forbids exactly this.
+ *
+ * Every branch now describes the FACTORS SHE TICKED, never her risk of cancer.
+ * The `low` branch carries the line that makes it safe to read — most women who
+ * are diagnosed had no clear risk factor — so a low count can never be heard as
+ * permission to ignore a change. "Do not panic" is gone from `high`: it is a
+ * phrase that plants the panic it denies.
+ */
 export const RISK_SUMMARY: Record<Language, Record<RiskLevel, string>> = {
   ar: {
-    low: 'المخاطر ديالك منخفضة 💚. راكي كتهتمّي مزيان بصحتك — كملّي هكا وحافظي على الفحص الذاتي المنتظم.',
-    moderate: 'المخاطر ديالك متوسطة 🧡. من الأحسن تزيدي الاهتمام بصحتك وتديري الفحص الذاتي بانتظام، وتستشيري الطبيب.',
-    high: 'المخاطر ديالك مرتفعة نسبياً ❤️. ما تخافيش — هادشي معناه غير خاصك تكوني أكثر يقظة وتحجزي موعد عند الطبيب.',
+    low:
+      'قليل من العوامل اللي سولناك عليهم كينطبقو عليك. هادشي ماشي ضمانة: أغلب النساء اللي تشخصو ما كان عندهم حتى عامل خطر واضح. كملي الفحص الذاتي كل شهر، وإلا لاحظتي شي تغيير جديد سيري للطبيب — مهما كانت هاد النتيجة.',
+    moderate:
+      'شي عوامل من اللي سولناك عليهم كينطبقو عليك. العوامل ماشي توقّع، غير حوايج كتستاهل نقاش. هضري عليهم مع طبيب فأول موعد، وكملي الفحص الذاتي.',
+    high:
+      'بزاف من العوامل اللي سولناك عليهم كينطبقو عليك. هادشي ما كيعنيش أنك غادي تمرضي — كيعني غير أن نقاش مع طبيب على المتابعة يستاهل. حجزي موعد باش تهضري معاه.',
   },
   fr: {
-    low: 'Votre risque est faible 💚. Vous prenez bien soin de vous — continuez ainsi et gardez un auto-examen régulier.',
-    moderate: 'Votre risque est modéré 🧡. Mieux vaut renforcer votre suivi, faire l’auto-examen régulièrement et consulter un médecin.',
-    high: 'Votre risque est relativement élevé ❤️. Ne paniquez pas — cela signifie simplement plus de vigilance et un rendez-vous médical.',
+    low:
+      'Peu des facteurs sur lesquels nous vous avons interrogée s’appliquent à vous. Ce n’est pas une garantie : la plupart des femmes diagnostiquées n’avaient aucun facteur de risque évident. Gardez l’auto-examen mensuel et, si vous remarquez un changement nouveau, consultez — quel que soit ce résultat.',
+    moderate:
+      'Certains des facteurs s’appliquent à vous. Un facteur n’est pas une prédiction, c’est un sujet de conversation. Parlez-en à un médecin lors de votre prochain rendez-vous et gardez l’auto-examen.',
+    high:
+      'Plusieurs des facteurs s’appliquent à vous. Cela ne signifie pas que vous développerez un cancer : cela signifie qu’une conversation avec un médecin sur votre suivi en vaut la peine. Prenez rendez-vous pour en parler.',
   },
   en: {
-    low: 'Your risk is low 💚. You are taking good care of yourself — keep it up and maintain a regular self-check.',
-    moderate: 'Your risk is moderate 🧡. It is best to strengthen your follow-up, self-check regularly and consult a doctor.',
-    high: 'Your risk is relatively elevated ❤️. Do not panic — it simply means more vigilance and a medical appointment.',
+    low:
+      'Few of the factors we asked about apply to you. That is not a guarantee: most women who are diagnosed had no clear risk factor at all. Keep the monthly self-check, and if you notice a new change, see a doctor — whatever this result says.',
+    moderate:
+      'Some of the factors we asked about apply to you. A factor is not a prediction; it is something worth discussing. Raise them with a doctor at your next appointment, and keep the self-check.',
+    high:
+      'Several of the factors we asked about apply to you. This does not mean you will develop breast cancer. It means a conversation with a doctor about follow-up is worth having. Book an appointment to talk it through.',
   },
   es: {
-    low: 'Tu riesgo es bajo 💚. Te cuidas bien — sigue así y mantén un autoexamen regular.',
-    moderate: 'Tu riesgo es moderado 🧡. Conviene reforzar tu seguimiento, autoexaminarte con regularidad y consultar a un médico.',
-    high: 'Tu riesgo es relativamente elevado ❤️. No te asustes — simplemente significa más vigilancia y una cita médica.',
+    low:
+      'Pocos de los factores por los que preguntamos se aplican a ti. No es una garantía: la mayoría de las mujeres diagnosticadas no tenía ningún factor de riesgo claro. Mantén el autoexamen mensual y, si notas un cambio nuevo, consulta — diga lo que diga este resultado.',
+    moderate:
+      'Algunos de los factores se aplican a ti. Un factor no es una predicción; es algo que conviene comentar. Háblalo con un médico en tu próxima cita y mantén el autoexamen.',
+    high:
+      'Varios de los factores se aplican a ti. Esto no significa que vayas a desarrollar cáncer de mama. Significa que vale la pena hablar del seguimiento con un médico. Pide una cita para comentarlo.',
   },
   de: {
-    low: 'Dein Risiko ist niedrig 💚. Du kümmerst dich gut um dich — mach weiter so und behalte eine regelmäßige Selbstuntersuchung bei.',
-    moderate: 'Dein Risiko ist mäßig 🧡. Am besten verstärkst du deine Nachsorge, untersuchst dich regelmäßig und konsultierst eine Ärztin.',
-    high: 'Dein Risiko ist relativ erhöht ❤️. Keine Panik — es bedeutet einfach mehr Wachsamkeit und einen Arzttermin.',
+    low:
+      'Nur wenige der abgefragten Faktoren treffen auf dich zu. Das ist keine Garantie: Die meisten diagnostizierten Frauen hatten überhaupt keinen klaren Risikofaktor. Behalte die monatliche Selbstuntersuchung bei, und wenn dir etwas Neues auffällt, geh zur Ärztin — unabhängig von diesem Ergebnis.',
+    moderate:
+      'Einige der abgefragten Faktoren treffen auf dich zu. Ein Faktor ist keine Vorhersage, sondern ein Gesprächsthema. Sprich sie beim nächsten Termin an und behalte die Selbstuntersuchung bei.',
+    high:
+      'Mehrere der abgefragten Faktoren treffen auf dich zu. Das heißt nicht, dass du erkranken wirst. Es heißt, dass ein Gespräch mit einer Ärztin über die Nachsorge sich lohnt. Vereinbare einen Termin dafür.',
   },
   ru: {
-    low: 'Ваш риск низкий 💚. Вы хорошо заботитесь о себе — продолжайте так и сохраняйте регулярное самообследование.',
-    moderate: 'Ваш риск умеренный 🧡. Лучше усилить наблюдение, регулярно делать самообследование и обратиться к врачу.',
-    high: 'Ваш риск относительно повышен ❤️. Не паникуйте — это просто означает больше внимания и визит к врачу.',
+    low:
+      'Немногие из факторов, о которых мы спрашивали, относятся к вам. Это не гарантия: у большинства заболевших женщин не было ни одного явного фактора риска. Сохраняйте ежемесячное самообследование, а если заметите новое изменение — обратитесь к врачу, независимо от этого результата.',
+    moderate:
+      'Некоторые из факторов относятся к вам. Фактор — это не предсказание, а повод для разговора. Обсудите их с врачом на ближайшем приёме и продолжайте самообследование.',
+    high:
+      'Несколько факторов относятся к вам. Это не значит, что вы заболеете. Это значит, что разговор с врачом о наблюдении имеет смысл. Запишитесь, чтобы обсудить это.',
   },
   pt: {
-    low: 'Seu risco é baixo 💚. Você se cuida bem — continue assim e mantenha um autoexame regular.',
-    moderate: 'Seu risco é moderado 🧡. É melhor reforçar o acompanhamento, fazer o autoexame com regularidade e consultar um médico.',
-    high: 'Seu risco é relativamente elevado ❤️. Não entre em pânico — significa apenas mais vigilância e uma consulta médica.',
+    low:
+      'Poucos dos fatores sobre os quais perguntamos se aplicam a você. Isso não é garantia: a maioria das mulheres diagnosticadas não tinha nenhum fator de risco claro. Mantenha o autoexame mensal e, se notar uma mudança nova, procure um médico — independentemente deste resultado.',
+    moderate:
+      'Alguns dos fatores se aplicam a você. Um fator não é uma previsão; é algo que vale a pena conversar. Comente com um médico na próxima consulta e mantenha o autoexame.',
+    high:
+      'Vários dos fatores se aplicam a você. Isso não significa que você vai desenvolver câncer de mama. Significa que vale a pena conversar com um médico sobre acompanhamento. Marque uma consulta para falar disso.',
   },
 };
 

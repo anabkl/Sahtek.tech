@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, CheckCircle2, Pencil } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
+import { Disclaimer } from '@/components/ui/Disclaimer';
 import { Button } from '@/components/ui/Button';
 import { Confetti } from '@/components/ui/Confetti';
 import { GlassCalendar } from '@/components/reminder/GlassCalendar';
@@ -820,6 +821,7 @@ export function ReminderPage() {
             </StepCard>
           )}
         </AnimatePresence>
+        <Disclaimer className="mt-8" />
       </div>
     </PageTransition>
   );

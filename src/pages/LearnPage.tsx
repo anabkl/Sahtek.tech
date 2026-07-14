@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Baby, Calendar, Cigarette, Clock, Heart, Pill, Scale, Users } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
+import { Disclaimer } from '@/components/ui/Disclaimer';
 import { NavArrows } from '@/components/layout/NavArrows';
 import { PreventionTracker } from '@/components/learn/PreventionTracker';
 import { MythsWall } from '@/components/learn/MythsWall';
@@ -168,6 +169,10 @@ export function LearnPage() {
 
       {tab === 'myths' && <MythsWall />}
       </div>
+
+      {/* HARD RULE 2: this page educates on every tab, so it carries the
+          disclaimer. It had none — only the Footer's. */}
+      <Disclaimer className="mt-8" />
 
       <NavArrows transitionKey={`learn-${tab}`} prev={prevTarget} next={nextTarget} />
     </PageTransition>

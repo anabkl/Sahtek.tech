@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Download, FileText, Gauge, MapPin, Share2 } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { SafetyNote } from '@/components/ui/SafetyNote';
 import { useLanguage, interpolate } from '@/hooks/useLanguage';
 import { useRiskAssessment } from '@/hooks/useRiskAssessment';
 import type { RiskReportData } from '@/utils/reportGenerator';
@@ -46,7 +48,13 @@ export function RiskAssessmentPage() {
 
   const copy = async () => {
     if (!risk.result) return;
-    await navigator.clipboard?.writeText(`${t.risk.yourScore}: ${pct}% - ${levelLabel}. ${t.disclaimer.short}`);
+    /* This text is handed to a DOCTOR. It used to read "Awareness score: 68% -
+       Elevated", which a clinician could reasonably read as a risk probability
+       this app had calculated. It now states what the number is and what it is
+       not, and carries the disclaimer. */
+    await navigator.clipboard?.writeText(
+      `${t.risk.yourScore}: ${pct} — ${t.risk.scoreCaption}. ${t.risk.riskLevelLabel}: ${levelLabel}.\n${t.risk.notAProbability}\n${t.disclaimer.short}`,
+    );
     setCopied(true);
   };
 
@@ -74,7 +82,17 @@ export function RiskAssessmentPage() {
           <h1 className="mt-4 text-4xl font-black text-ink">{t.risk.title}</h1>
           <p className="mt-3 text-lg font-medium leading-8 text-muted">{t.risk.subtitle}</p>
           <p className="mt-5 rounded-3xl bg-primary-50 p-5 font-bold leading-7 text-primary-800">{t.risk.intro}</p>
+
+          {/* She is about to answer ten questions about her own body. She should
+              know where those answers go BEFORE she answers them. */}
+          <SafetyNote variant="privacy" className="mt-4">
+            {t.risk.privacyNote}
+          </SafetyNote>
+
           <Button className="mt-6" size="lg" fullWidth onClick={risk.start}>{t.risk.startBtn}</Button>
+
+          {/* HARD RULE 2: this page scores. It carries the disclaimer. */}
+          <Disclaimer className="mt-6" />
         </section>
       )}
 
@@ -122,10 +140,23 @@ export function RiskAssessmentPage() {
                 <circle cx="96" cy="96" r="78" fill="none" stroke="rgba(214,51,132,0.12)" strokeWidth="18" />
                 <motion.circle cx="96" cy="96" r="78" fill="none" stroke="#D63384" strokeWidth="18" strokeLinecap="round" strokeDasharray={490} initial={{ strokeDashoffset: 490 }} animate={{ strokeDashoffset: 490 - (490 * pct) / 100 }} />
               </svg>
-              <div className="absolute inset-0 grid place-items-center"><span className="text-5xl font-black text-ink">{pct}%</span></div>
+              {/* The number used to render as a bare "68%" directly above the
+                  words "Risk level: Elevated". A frightened woman reads that as
+                  "I have a 68% chance of breast cancer" — a probability of
+                  disease, which HARD RULE 1 forbids outright. It is an awareness
+                  score out of 100 built from the factors SHE ticked, so it now
+                  says so, in words, right where the number is. */}
+              <div className="absolute inset-0 grid place-items-center">
+                <span className="text-5xl font-black text-ink">{pct}</span>
+              </div>
             </div>
-            <p className="mt-2 text-sm font-black text-muted">{t.risk.riskLevelLabel}</p>
+            <p className="mt-2 text-caption font-bold text-muted">{t.risk.scoreCaption}</p>
+            <p className="mt-3 text-caption font-black text-muted">{t.risk.riskLevelLabel}</p>
             <h2 className="text-3xl font-black text-gradient">{levelLabel}</h2>
+
+            <p className="mt-4 rounded-2xl bg-sunken p-3 text-caption leading-relaxed text-muted">
+              {t.risk.notAProbability}
+            </p>
           </div>
           <div className="rounded-[2rem] border border-white/70 bg-card/85 p-6 shadow-petal-xl">
             <h1 className="text-3xl font-black text-ink">{t.risk.summary}</h1>
@@ -151,7 +182,11 @@ export function RiskAssessmentPage() {
                 </Button>
               </div>
             )}
-            <p className="mt-5 rounded-2xl bg-white/60 p-4 text-sm font-bold leading-6 text-muted">{t.disclaimer.short}</p>
+            {/* Was a one-off <p> with disclaimer.short. HARD RULE 2 says use the
+                shared component — a hand-rolled paragraph drifts, and this is
+                the screen where the disclaimer matters most. `full` here: the
+                result is the most consequential thing the app ever shows. */}
+            <Disclaimer full withTitle className="mt-5" />
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <Button onClick={copy} leftIcon={<Share2 size={18} />}>{copied ? t.risk.shared : t.risk.shareBtn}</Button>
               <Button

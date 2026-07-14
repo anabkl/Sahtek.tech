@@ -28,7 +28,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     related: ['self_check', 'prevention', 'when_to_see_doctor'],
     disclaimer: true,
     responses: {
-      ar: 'العلامات اللي خاصك تراقبي 🎀:\n— كتلة فالثدي أو تحت الإبط\n— تغيّر فالشكل أو الحجم\n— احمرار أو تنقير الجلد (بحال قشرة البرتقالة)\n— إفرازات من الحلمة أو انكماشها\nأغلب التغييرات ماشي سرطان، ولكن إلا لاحظتي شي حاجة جديدة، ما تخافيش وسيري عند الطبيب باش يطمّنك. 💗',
+      ar: 'العلامات اللي خاصك تراقبي 🎀:\n— كتلة فالثدي أو تحت الإبط\n— تغيّر فالشكل أو الحجم\n— احمرار أو تنقير الجلد (بحال قشرة البرتقالة)\n— إفرازات من الحلمة أو انكماشها\nأغلب التغييرات ماشي سرطان. إلا لاحظتي شي حاجة جديدة، حجزي موعد مع طبيب — هي أسرع طريقة باش تعرفي. 💗',
       fr: 'Les signes à surveiller 🎀 :\n— une masse dans le sein ou sous l’aisselle\n— un changement de forme ou de taille\n— une rougeur ou un capitonnage de la peau\n— un écoulement du mamelon ou une rétraction\nLa plupart des changements ne sont pas un cancer, mais si vous remarquez quelque chose de nouveau, consultez un médecin pour être rassurée. 💗',
       en: 'Signs to watch for 🎀:\n— a lump in the breast or underarm\n— a change in shape or size\n— redness or dimpling of the skin\n— nipple discharge or retraction\nMost changes are not cancer, but if you notice anything new, do not worry alone — see a doctor to be reassured. 💗',
       es: 'Señales a vigilar 🎀:\n— un bulto en la mama o la axila\n— un cambio de forma o tamaño\n— enrojecimiento o hoyuelos en la piel\n— secreción o retracción del pezón\nLa mayoría de los cambios no son cáncer, pero si notas algo nuevo, no te preocupes sola — consulta a un médico para quedarte tranquila. 💗',

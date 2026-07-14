@@ -3,6 +3,7 @@ import { Bot, Mic, Send, Sparkles, Trash2, UserRound } from 'lucide-react';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { Disclaimer } from '@/components/ui/Disclaimer';
 import { SafetyNote } from '@/components/ui/SafetyNote';
 import { useToast } from '@/components/ui/toastStore';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -251,6 +252,11 @@ export function ChatPage() {
       </section>
 
       {/* One-time notice before the microphone is ever switched on. */}
+      {/* The disclaimer was seeded as the first assistant BUBBLE — it scrolls
+          out of view the moment she asks anything. A disclaimer she cannot see
+          is not a disclaimer. This one is pinned to the page. */}
+      <Disclaimer className="mt-4" />
+
       <Modal open={micNoticeOpen} onClose={() => setMicNoticeOpen(false)} title={t.chat.micNoticeTitle}>
         <SafetyNote variant="privacy" title={t.chat.micNoticeTitle}>
           {t.chat.micNoticeBody}

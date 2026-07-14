@@ -1,6 +1,8 @@
 // Full rebuild — no Leaflet, pure MapLibre (mapcn pattern)
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { SafetyNote } from '@/components/ui/SafetyNote';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Map as MlMap, Marker, Popup, NavigationControl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -204,7 +206,7 @@ async function geocodeCity(query: string): Promise<{ lat: number; lng: number; n
 
 // ── Main Component ──
 export default function DoctorsPage() {
-  const { lang } = useLanguage();
+  const { lang, t: tr } = useLanguage();
   const t = (key: string) => T[key]?.[lang] || T[key]?.en || key;
 
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -481,6 +483,13 @@ export default function DoctorsPage() {
         {t('subtitle')}
       </p>
 
+      {/* These listings are unvetted OpenStreetMap data. Presenting a list of
+          named doctors with no caveat reads as a vetted referral — a claim we
+          have not earned and cannot stand behind. Say so, above the results. */}
+      <div style={{ marginBottom: 16 }}>
+        <SafetyNote variant="care">{tr.doctors.notVerified}</SafetyNote>
+      </div>
+
       {/* Location bar */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         <button
@@ -714,6 +723,11 @@ export default function DoctorsPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* HARD RULE 2: this page routes a woman toward care. */}
+      <div style={{ marginTop: 24 }}>
+        <Disclaimer />
       </div>
     </div>
   );

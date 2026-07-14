@@ -6,7 +6,7 @@ export const fr: Translation = {
   common: {
     start: 'Commencer', next: 'Suivant', previous: 'Précédent', back: 'Retour', finish: 'Terminer', retry: 'Réessayer',
     close: 'Fermer', loading: 'Chargement...', send: 'Envoyer', copy: 'Copier', copied: 'Copié', you: 'Vous',
-    assistant: 'Sahtek IA', of: 'sur', step: 'Étape', optional: 'optionnel', demoMode: 'API en direct',
+    assistant: 'Sahtek IA', of: 'sur', step: 'Étape', optional: 'optionnel',
     comingSoon: 'Bientôt', learnMore: 'En savoir plus', getStarted: 'Commencer', skip: 'Passer',
     menu: 'Menu',
     stopAudio: 'Arrêter le son',
@@ -223,6 +223,11 @@ export const fr: Translation = {
         'Chaque page qui donne des repères porte un avertissement médical visible.',
       ],
       reviewTitle: 'Relecture médicale',
+      reviewPendingTitle: 'Pas encore relu par un médecin nommé',
+      reviewPendingBody:
+        'Ce contenu suit les règles éditoriales ci-dessus, mais aucun médecin nommé ne l’a encore relu. Nous le disons franchement plutôt que d’afficher un badge « validé par des experts » que nous n’avons pas mérité. Si vous êtes médecin au Maroc et souhaitez le relire, écrivez-nous.',
+      sourcesTitle: 'Sources',
+      sourcesPending: 'Nous n’avons pas encore publié de liste de sources. En attendant, considérez ce contenu comme de la sensibilisation, rien de plus.',
       methodImageAlt: 'Illustration : les étapes d’écriture et de relecture du contenu de Sahtek.',
     },
     faq: {
@@ -718,7 +723,10 @@ export const fr: Translation = {
   risk: {
     title: 'Sensibilisation au risque', subtitle: 'Dix questions privées et un score éducatif simple.',
     intro: 'Cette estimation informe, mais ne diagnostique pas.', startBtn: 'Commencer', questionOf: 'Question {n} sur {total}',
-    analyzing: 'Analyse...', yourScore: 'Score de sensibilisation', riskLevelLabel: 'Niveau', levelLow: 'Faible',
+    analyzing: 'Analyse...', yourScore: 'Score de sensibilisation', riskLevelLabel: 'Niveau de sensibilisation',
+    scoreCaption: 'points de sensibilisation sur 100',
+    notAProbability: 'Ce n’est pas une probabilité de développer un cancer du sein. Cela reflète uniquement les facteurs que vous avez cochés — ce n’est pas un verdict sur votre corps.',
+    privacyNote: 'Vos réponses restent sur cet appareil. Rien n’est envoyé.', levelLow: 'Faible',
     levelModerate: 'Modéré', levelHigh: 'Élevé', summary: 'Résumé', riskFactors: 'Signaux', protectiveFactors: 'Protections',
     recommendations: 'Recommandations', nextSteps: 'Prochaines étapes', factorChartTitle: 'Résultat',
     shareBtn: 'Copier pour le médecin', shared: 'Copié', retakeBtn: 'Refaire', priorityHigh: 'Priorité',
@@ -750,6 +758,7 @@ export const fr: Translation = {
     fallbackNote: 'Affichage des grands centres de cancérologie au Maroc.',
     attribution: 'Données cartographiques © OpenStreetMap',
     you: 'Vous êtes ici',
+    notVerified: 'Ces lieux proviennent de données cartographiques publiques (OpenStreetMap). Sahtek ne les vérifie pas et n’en recommande aucun — vérifiez les informations avant de vous déplacer.',
   },
   chat: {
     title: 'Assistante Sahtek', subtitle: 'Posez vos questions sur la santé du sein.', online: 'Répond depuis votre appareil',

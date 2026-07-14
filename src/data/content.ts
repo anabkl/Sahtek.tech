@@ -82,7 +82,7 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       introduction:
         'سرطان الثدي عندو عدة علامات. مهم تعرفيهم باش تقدري تتصرفي بسرعة. أغلب التغييرات ماشي سرطان، ولكن كل تغيير جديد خاصو يتفحص.',
       call_to_action:
-        'إذا لاحظتي أي واحدة من هاد الأعراض، ما تخافيش ولكن سيري عند الطبيب فأقرب وقت.',
+        'إلا لاحظتي شي وحدة من هاد العلامات، حجزي موعد مع طبيب فأقرب وقت. أغلب التغييرات ماشي سرطان، والطبيب هو أسرع طريقة باش تعرفي.',
       sections: [
         {
           title: 'علامات مرئية',
@@ -127,7 +127,7 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       introduction:
         'Le cancer du sein peut présenter plusieurs signes. Les connaître permet d’agir vite. La plupart des changements ne sont pas un cancer, mais chaque nouveau changement mérite un examen.',
       call_to_action:
-        'Si vous remarquez l’un de ces signes, ne paniquez pas mais consultez un médecin au plus vite.',
+        'Si vous remarquez l’un de ces signes, prenez rendez-vous rapidement. La plupart des changements ne sont pas un cancer, et un médecin est le moyen le plus rapide de le savoir.',
       sections: [
         {
           title: 'Signes visibles',
@@ -172,7 +172,7 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       introduction:
         'Breast cancer can show several signs. Knowing them helps you act quickly. Most changes are not cancer, but every new change deserves a check.',
       call_to_action:
-        'If you notice any of these signs, do not panic - but see a doctor as soon as possible.',
+        'If you notice any of these signs, book an appointment soon. Most changes are not cancer, and a doctor is the fastest way to know.',
       sections: [
         {
           title: 'Visible signs',
@@ -217,7 +217,7 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       introduction:
         'El cáncer de mama puede presentar varias señales. Conocerlas permite actuar rápido. La mayoría de los cambios no son cáncer, pero todo cambio nuevo merece un examen.',
       call_to_action:
-        'Si notas alguna de estas señales, no te asustes, pero consulta a un médico lo antes posible.',
+        'Si notas alguna de estas señales, pide cita pronto y consulta a un médico lo antes posible.',
       sections: [
         {
           title: 'Señales visibles',
@@ -262,7 +262,7 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       introduction:
         'Brustkrebs kann mehrere Anzeichen zeigen. Sie zu kennen hilft, schnell zu handeln. Die meisten Veränderungen sind kein Krebs, aber jede neue Veränderung verdient eine Untersuchung.',
       call_to_action:
-        'Wenn du eines dieser Anzeichen bemerkst, keine Panik — aber geh so bald wie möglich zur Ärztin.',
+        'Wenn dir eines dieser Anzeichen auffällt, vereinbare bald einen Termin. Die meisten Veränderungen sind kein Krebs, und eine Ärztin ist der schnellste Weg, es zu wissen.',
       sections: [
         {
           title: 'Sichtbare Anzeichen',
@@ -307,7 +307,7 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       introduction:
         'Рак груди может проявляться несколькими признаками. Знание их помогает действовать быстро. Большинство изменений — не рак, но каждое новое изменение заслуживает осмотра.',
       call_to_action:
-        'Если вы заметили любой из этих признаков, не паникуйте — но как можно скорее обратитесь к врачу.',
+        'Если вы заметили любой из этих признаков, как можно скорее обратитесь к врачу.',
       sections: [
         {
           title: 'Видимые признаки',
@@ -352,7 +352,7 @@ export const symptomsContent: Record<Language, ContentResponse> = {
       introduction:
         'O câncer de mama pode apresentar vários sinais. Conhecê-los permite agir rápido. A maioria das mudanças não é câncer, mas toda mudança nova merece um exame.',
       call_to_action:
-        'Se você notar algum desses sinais, não entre em pânico — mas procure um médico o quanto antes.',
+        'Se você notar algum desses sinais, procure um médico o quanto antes.',
       sections: [
         {
           title: 'Sinais visíveis',
@@ -557,7 +557,7 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
     title: 'دليل الفحص الذاتي',
     best_time: 'من 3 ل5 أيام بعد نهاية الدورة الشهرية',
     total_duration_minutes: 5,
-    important_note: 'الفحص الذاتي ماشي بديل للفحص الطبي. إلا لاحظتي أي تغيير، ما تخافيش وسيري عند الطبيب.',
+    important_note: 'الفحص الذاتي ماشي بديل للفحص الطبي. إلا لاحظتي أي تغيير، حجزي موعد مع طبيب.',
     disclaimer: 'هاد الدليل للتوعية فقط وماشي استشارة طبية.',
     steps: [
       {
@@ -611,7 +611,7 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
     title: 'Guide d?auto-examen',
     best_time: '3 ? 5 jours apr?s la fin des r?gles',
     total_duration_minutes: 5,
-    important_note: 'L?auto-examen ne remplace pas un examen m?dical. Si vous remarquez un changement, ne paniquez pas et consultez un m?decin.',
+    important_note: 'L?auto-examen ne remplace pas un examen m?dical. Si vous remarquez un changement, consultez un m?decin.',
     disclaimer: 'Ce guide est ? but de sensibilisation uniquement, pas une consultation m?dicale.',
     steps: [
       {
@@ -665,7 +665,7 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
     title: 'Self-check guide',
     best_time: '3 to 5 days after your period ends',
     total_duration_minutes: 5,
-    important_note: 'A self-check does not replace a medical exam. If you notice a change, do not panic and see a doctor.',
+    important_note: 'A self-check does not replace a medical exam. If you notice a change, book an appointment with a doctor.',
     disclaimer: 'This guide is for awareness only, not a medical consultation.',
     steps: [
       {
@@ -719,7 +719,7 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
     title: 'Guía de autoexamen',
     best_time: '3 a 5 días después del final de la regla',
     total_duration_minutes: 5,
-    important_note: 'El autoexamen no sustituye un examen médico. Si notas un cambio, no te asustes y consulta a un médico.',
+    important_note: 'El autoexamen no sustituye un examen médico. Si notas un cambio, pide cita pronto y consulta a un médico.',
     disclaimer: 'Esta guía es solo para concienciación, no una consulta médica.',
     steps: [
       {
@@ -773,7 +773,7 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
     title: 'Anleitung zur Selbstuntersuchung',
     best_time: '3 bis 5 Tage nach dem Ende der Periode',
     total_duration_minutes: 5,
-    important_note: 'Die Selbstuntersuchung ersetzt keine ärztliche Untersuchung. Wenn du eine Veränderung bemerkst, keine Panik — geh zur Ärztin.',
+    important_note: 'Die Selbstuntersuchung ersetzt keine ärztliche Untersuchung. Wenn du eine Veränderung bemerkst, vereinbare einen Termin bei einer Ärztin.',
     disclaimer: 'Diese Anleitung dient nur der Aufklärung, nicht der medizinischen Beratung.',
     steps: [
       {
@@ -827,7 +827,7 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
     title: 'Руководство по самообследованию',
     best_time: 'С 3 по 5 день после окончания месячных',
     total_duration_minutes: 5,
-    important_note: 'Самообследование не заменяет медицинский осмотр. Если вы заметили изменение, не паникуйте — обратитесь к врачу.',
+    important_note: 'Самообследование не заменяет медицинский осмотр. Если вы заметили изменение, обратитесь к врачу.',
     disclaimer: 'Это руководство только для информирования, а не медицинская консультация.',
     steps: [
       {
@@ -881,7 +881,7 @@ export const selfCheckGuide: Record<Language, SelfCheckGuide> = {
     title: 'Guia de autoexame',
     best_time: '3 a 5 dias após o fim da menstruação',
     total_duration_minutes: 5,
-    important_note: 'O autoexame não substitui um exame médico. Se você notar uma mudança, não entre em pânico e procure um médico.',
+    important_note: 'O autoexame não substitui um exame médico. Se você notar uma mudança, procure um médico.',
     disclaimer: 'Este guia é apenas para conscientização, não uma consulta médica.',
     steps: [
       {

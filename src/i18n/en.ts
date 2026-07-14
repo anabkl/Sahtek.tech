@@ -11,6 +11,8 @@ export const en = {
     riskFactors: 'Risk factors',
     companion: 'The assistant',
     whenToSeek: 'When to seek help',
+    faq: 'FAQ',
+    about: 'About',
     selfCheck: 'Self-check',
     risk: 'Risk',
     chat: 'Chat',
@@ -484,6 +486,18 @@ export const en = {
     ],
     ctaDoctors: 'Find a doctor near you',
     ctaSelfCheck: 'Start the guided self-check',
+  },
+  aboutPage: {
+    eyebrow: 'Why Sahtek',
+    title: 'Know your body, and act early',
+    intro:
+      'Sahtek is a Moroccan companion for breast-health awareness. It explains, it teaches, and it tells you when to see a doctor — without fear, without embarrassment, and in your own language.',
+    missionTitle: 'Our mission',
+    mission:
+      'In Morocco, most breast cancers are found late. Not because women do not care, but because the information usually arrives in a language they do not read, or in a tone that frightens them. We write in Darija, calmly, with no clinical imagery — so that knowing arrives before illness does.',
+    principlesTitle: 'Our principles',
+    ctaPrimary: 'Start the guided self-check',
+    ctaSecondary: 'See the 12 signs',
   },
   learn: {
     title: 'Learn breast health',

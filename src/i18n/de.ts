@@ -13,6 +13,8 @@ export const de: Translation = {
     riskFactors: 'Risikofaktoren',
     companion: 'Die Assistentin',
     whenToSeek: 'Wann Hilfe suchen',
+    faq: 'FAQ',
+    about: 'Über uns',
     selfCheck: 'Selbstuntersuchung',
     risk: 'Risiko',
     chat: 'Chat',
@@ -407,6 +409,18 @@ export const de: Translation = {
     ],
     ctaDoctors: 'Eine Ärztin in deiner Nähe finden',
     ctaSelfCheck: 'Geführte Selbstuntersuchung starten',
+  },
+  aboutPage: {
+    eyebrow: 'Warum Sahtek',
+    title: 'Den eigenen Körper kennen und früh handeln',
+    intro:
+      'Sahtek ist eine marokkanische Begleiterin für Brustgesundheits-Aufklärung. Sie erklärt, sie lehrt, und sie sagt dir, wann du zur Ärztin gehst — ohne Angst, ohne Scham und in deiner Sprache.',
+    missionTitle: 'Unsere Mission',
+    mission:
+      'In Marokko wird Brustkrebs meist spät entdeckt. Nicht, weil Frauen es nicht kümmert, sondern weil die Information meist in einer Sprache kommt, die sie nicht lesen, oder in einem Ton, der Angst macht. Wir schreiben auf Darija, ruhig und ohne klinische Bilder — damit das Wissen vor der Krankheit ankommt.',
+    principlesTitle: 'Unsere Prinzipien',
+    ctaPrimary: 'Geführte Selbstuntersuchung starten',
+    ctaSecondary: 'Die 12 Anzeichen ansehen',
   },
   learn: {
     title: 'Brustgesundheit lernen',

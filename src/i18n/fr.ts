@@ -2,7 +2,7 @@ import type { Translation } from './en';
 
 export const fr: Translation = {
   app: { name: 'Sahtek', latinName: 'Sahtek', tagline: 'Votre compagne IA pour la santé du sein' },
-  nav: { home: 'Accueil', signs: 'Signes', learn: 'Apprendre', riskFactors: 'Facteurs de risque', companion: 'L’assistante', whenToSeek: 'Quand consulter', selfCheck: 'Auto-examen', risk: 'Risque', chat: 'Chat', doctors: 'Médecins', reminder: 'Rappel' },
+  nav: { home: 'Accueil', signs: 'Signes', learn: 'Apprendre', riskFactors: 'Facteurs de risque', companion: 'L’assistante', whenToSeek: 'Quand consulter', faq: 'FAQ', about: 'À propos', selfCheck: 'Auto-examen', risk: 'Risque', chat: 'Chat', doctors: 'Médecins', reminder: 'Rappel' },
   common: {
     start: 'Commencer', next: 'Suivant', previous: 'Précédent', back: 'Retour', finish: 'Terminer', retry: 'Réessayer',
     close: 'Fermer', loading: 'Chargement...', send: 'Envoyer', copy: 'Copier', copied: 'Copié', you: 'Vous',
@@ -432,6 +432,18 @@ export const fr: Translation = {
     ],
     ctaDoctors: 'Trouver un médecin près de chez vous',
     ctaSelfCheck: 'Commencer l’auto-examen guidé',
+  },
+  aboutPage: {
+    eyebrow: 'Pourquoi Sahtek',
+    title: 'Connaître son corps, et agir tôt',
+    intro:
+      'Sahtek est une compagne marocaine de sensibilisation à la santé du sein. Elle explique, elle enseigne, et elle vous dit quand consulter — sans peur, sans gêne, et dans votre langue.',
+    missionTitle: 'Notre mission',
+    mission:
+      'Au Maroc, la plupart des cancers du sein sont détectés tard. Non parce que les femmes s’en désintéressent, mais parce que l’information arrive souvent dans une langue qu’elles ne lisent pas, ou sur un ton qui fait peur. Nous écrivons en darija, calmement, sans imagerie clinique — pour que le savoir arrive avant la maladie.',
+    principlesTitle: 'Nos principes',
+    ctaPrimary: 'Commencer l’auto-examen guidé',
+    ctaSecondary: 'Voir les 12 signes',
   },
   learn: {
     title: 'Comprendre la santé du sein', subtitle: 'Information claire, soutien et prochaines étapes.',

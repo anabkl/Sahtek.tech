@@ -34,6 +34,8 @@ const ALL_LINKS: DrawerLink[] = [
   { to: '/companion', key: 'companion' },
   { to: '/doctors', key: 'doctors' },
   { to: '/reminder', key: 'reminder' },
+  { to: '/faq', key: 'faq' },
+  { to: '/about', key: 'about' },
 ];
 
 /** Sticky top bar: logo lockup, primary links, language, theme, mobile drawer. */

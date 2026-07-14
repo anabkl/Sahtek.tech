@@ -13,6 +13,8 @@ export const es: Translation = {
     riskFactors: 'Factores de riesgo',
     companion: 'La asistente',
     whenToSeek: 'Cuándo buscar ayuda',
+    faq: 'Preguntas',
+    about: 'Sobre nosotros',
     selfCheck: 'Autoexamen',
     risk: 'Riesgo',
     chat: 'Chat',
@@ -407,6 +409,18 @@ export const es: Translation = {
     ],
     ctaDoctors: 'Encontrar un médico cerca de ti',
     ctaSelfCheck: 'Iniciar el autoexamen guiado',
+  },
+  aboutPage: {
+    eyebrow: 'Por qué Sahtek',
+    title: 'Conocer tu cuerpo y actuar a tiempo',
+    intro:
+      'Sahtek es una compañera marroquí de concienciación sobre la salud mamaria. Explica, enseña y te dice cuándo consultar: sin miedo, sin vergüenza y en tu idioma.',
+    missionTitle: 'Nuestra misión',
+    mission:
+      'En Marruecos, la mayoría de los cánceres de mama se detectan tarde. No porque las mujeres no se preocupen, sino porque la información suele llegar en un idioma que no leen o con un tono que asusta. Escribimos en darija, con calma y sin imágenes clínicas, para que el saber llegue antes que la enfermedad.',
+    principlesTitle: 'Nuestros principios',
+    ctaPrimary: 'Iniciar el autoexamen guiado',
+    ctaSecondary: 'Ver las 12 señales',
   },
   learn: {
     title: 'Aprende sobre la salud mamaria',

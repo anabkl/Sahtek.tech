@@ -6,10 +6,11 @@
   "description": "AI-Powered Breast Cancer Self-Checking & Awareness App for Moroccan Women",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/generate-seo.mjs",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "seo": "node scripts/generate-seo.mjs"
   },
   "dependencies": {
     "axios": "^1.7.7",

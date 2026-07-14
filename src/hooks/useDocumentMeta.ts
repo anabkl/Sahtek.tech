@@ -1,94 +1,156 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { APP } from '@/config/constants';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { APP, SUPPORTED_LANGUAGES } from '@/config/constants';
 import { useLanguage } from '@/hooks/useLanguage';
-import type { Translation } from '@/i18n';
+import { DEFAULT_LOCALE, INDEXED_LOCALES, hreflangFor, seoRouteFor } from '@/seo/routes';
+import { buildSchema } from '@/seo/schema';
+import type { Language } from '@/types/api';
 
 /** Longest a description should be before search engines truncate it. */
 const MAX_DESCRIPTION = 155;
 
-/**
- * Per-route title and description, in the active language.
- *
- * These are DERIVED from the copy each page already renders — `t.signsPage.title`
- * is the page's <h1>, so it is also its <title>. Authoring a second, parallel set
- * of meta strings would mean 11 routes x 2 strings x 7 languages of copy that
- * nobody looks at, and which would silently drift from the headings it describes.
- */
-function metaFor(pathname: string, t: Translation): { title: string; description: string } {
-  switch (pathname) {
-    case '/signs':
-      return { title: t.signsPage.title, description: t.signsPage.intro };
-    case '/when-to-seek-help':
-      return { title: t.whenToSeekPage.title, description: t.whenToSeekPage.intro };
-    case '/risk-factors':
-      return { title: t.riskFactorsPage.title, description: t.riskFactorsPage.intro };
-    case '/companion':
-      return { title: t.companionPage.title, description: t.companionPage.intro };
-    case '/learn':
-      return { title: t.learn.title, description: t.learn.subtitle };
-    case '/self-check':
-      return { title: t.selfCheck.title, description: t.selfCheck.subtitle };
-    case '/risk':
-      return { title: t.risk.title, description: t.risk.subtitle };
-    case '/chat':
-      return { title: t.chat.title, description: t.chat.subtitle };
-    case '/doctors':
-      return { title: t.doctors.title, description: t.doctors.subtitle };
-    case '/reminder':
-      return { title: t.nav.reminder, description: t.reminder.stepDaySubtitle };
-    default:
-      // Home, and anything unrouted.
-      return { title: t.app.tagline, description: t.home.heroSubtitle };
-  }
-}
+const SITE_ORIGIN = 'https://sahtek.tech';
 
-function setMeta(name: string, content: string, attr: 'name' | 'property' = 'name') {
-  let tag = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${name}"]`);
+function setMeta(key: string, content: string, attr: 'name' | 'property' = 'name') {
+  let tag = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
   if (!tag) {
     tag = document.createElement('meta');
-    tag.setAttribute(attr, name);
+    tag.setAttribute(attr, key);
     document.head.appendChild(tag);
   }
   tag.setAttribute('content', content);
 }
 
+function setLink(rel: string, href: string, hreflang?: string) {
+  const selector = hreflang
+    ? `link[rel="${rel}"][hreflang="${hreflang}"]`
+    : `link[rel="${rel}"]:not([hreflang])`;
+  let tag = document.head.querySelector<HTMLLinkElement>(selector);
+  if (!tag) {
+    tag = document.createElement('link');
+    tag.setAttribute('rel', rel);
+    if (hreflang) tag.setAttribute('hreflang', hreflang);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('href', href);
+}
+
 /**
- * Keeps <title>, the meta description and og:* in step with the route AND the
- * active language. Mount once, in Layout.
+ * Owns everything in <head> that depends on the route or the language:
+ * title, description, canonical, hreflang, Open Graph, Twitter, and JSON-LD.
  *
- * SCOPE: this runs in the browser. Google renders JS and will see it; the social
- * crawlers (WhatsApp, Facebook, iMessage) do NOT, and will always see the static
- * tags in index.html. See public/og/README.md — do not "fix" that here.
+ * SCOPE — this runs in the browser.
+ *
+ * Google renders JavaScript, so it sees all of this, including the JSON-LD that
+ * drives rich results. The SOCIAL crawlers (WhatsApp, Facebook, iMessage, Slack)
+ * do NOT run JS — they read the HTML the server returns. That is why
+ * `scripts/generate-seo.mjs` bakes the same tags, from the same registry, into a
+ * static HTML file per route at build time. This hook and that script are two
+ * renderings of one source; do not let them disagree.
  */
 export function useDocumentMeta() {
   const { t, lang, dir } = useLanguage();
   const { pathname } = useLocation();
+  const [params] = useSearchParams();
 
   useEffect(() => {
-    const { title, description } = metaFor(pathname, t);
-
-    /* The brand mark follows the script: صحّتك in Arabic, "Sahtek" in Latin.
-       An Arabic wordmark stranded in an English tab title reads as a bug. */
+    const route = seoRouteFor(pathname);
     const brand = lang === 'ar' ? APP.name : APP.latinName;
 
+    const title = route.title(t);
     const fullTitle = pathname === '/' ? `${brand} — ${title}` : `${title} · ${brand}`;
 
-    const trimmed =
-      description.length > MAX_DESCRIPTION
-        ? `${description.slice(0, MAX_DESCRIPTION - 1).trimEnd()}…`
-        : description;
+    const raw = route.description(t);
+    const description =
+      raw.length > MAX_DESCRIPTION ? `${raw.slice(0, MAX_DESCRIPTION - 1).trimEnd()}…` : raw;
+
+    /* The canonical carries ?lang for every non-default locale, because that is
+       what makes the locales distinct URLs — and hreflang is meaningless without
+       distinct URLs. The Darija default is the bare path. */
+    const suffix = lang === DEFAULT_LOCALE ? '' : `?lang=${lang}`;
+    const url = `${SITE_ORIGIN}${pathname}${suffix}`;
 
     document.title = fullTitle;
-    setMeta('description', trimmed);
+    setMeta('description', description);
+    setLink('canonical', url);
 
-    // og:* mirrors the above so an in-app share sheet (which reads the live DOM)
-    // gets the right language. Link-preview crawlers still read index.html.
+    // ── hreflang: one alternate per indexed locale, plus x-default ──────────
+    for (const locale of INDEXED_LOCALES) {
+      const href =
+        locale === DEFAULT_LOCALE
+          ? `${SITE_ORIGIN}${pathname}`
+          : `${SITE_ORIGIN}${pathname}?lang=${locale}`;
+      setLink('alternate', href, hreflangFor(locale));
+    }
+    setLink('alternate', `${SITE_ORIGIN}${pathname}`, 'x-default');
+
+    // ── Open Graph / Twitter ───────────────────────────────────────────────
+    const ogImage = `${SITE_ORIGIN}${route.ogImage ?? '/og/sahtek-og.png'}`;
+    setMeta('og:type', pathname === '/' ? 'website' : 'article', 'property');
+    setMeta('og:site_name', APP.latinName, 'property');
     setMeta('og:title', fullTitle, 'property');
-    setMeta('og:description', trimmed, 'property');
+    setMeta('og:description', description, 'property');
+    setMeta('og:url', url, 'property');
+    setMeta('og:image', ogImage, 'property');
     setMeta('og:locale', lang === 'ar' ? 'ar_MA' : lang, 'property');
+    setMeta('twitter:card', 'summary_large_image');
+    setMeta('twitter:title', fullTitle);
+    setMeta('twitter:description', description);
+    setMeta('twitter:image', ogImage);
+
+    // ── JSON-LD ────────────────────────────────────────────────────────────
+    const schema = buildSchema(route.schema, {
+      t,
+      origin: SITE_ORIGIN,
+      url,
+      title,
+      description,
+      locale: hreflangFor(lang),
+    });
+    let ld = document.head.querySelector<HTMLScriptElement>('script[data-seo="jsonld"]');
+    if (!ld) {
+      ld = document.createElement('script');
+      ld.type = 'application/ld+json';
+      ld.dataset.seo = 'jsonld';
+      document.head.appendChild(ld);
+    }
+    ld.textContent = JSON.stringify(schema);
 
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
-  }, [pathname, t, lang, dir]);
+  }, [pathname, t, lang, dir, params]);
+}
+
+/**
+ * Makes the language addressable: `/signs?lang=fr` renders French.
+ *
+ * Without this the seven locales share one URL, which means hreflang has nothing
+ * to point at and Google can only ever index the Darija. Reading the param on
+ * navigation is what turns "a site with a language switch" into "a site with
+ * language variants".
+ */
+export function useLanguageFromUrl() {
+  const [params, setParams] = useSearchParams();
+  const { lang, setLang } = useLanguage();
+
+  const requested = params.get('lang') as Language | null;
+
+  useEffect(() => {
+    if (requested && SUPPORTED_LANGUAGES.includes(requested) && requested !== lang) {
+      setLang(requested);
+    }
+  }, [requested, lang, setLang]);
+
+  /* Keep the URL honest after an in-app switch, so the address bar is always a
+     shareable link to what she is actually looking at. The default locale drops
+     the param rather than carrying `?lang=ar` everywhere. */
+  useEffect(() => {
+    if (requested === lang) return;
+    if (lang === DEFAULT_LOCALE && !requested) return;
+
+    const next = new URLSearchParams(params);
+    if (lang === DEFAULT_LOCALE) next.delete('lang');
+    else next.set('lang', lang);
+    setParams(next, { replace: true });
+  }, [lang, requested, params, setParams]);
 }

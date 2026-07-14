@@ -20,6 +20,8 @@ const EXPLORE: { to: string; key: keyof Translation['nav'] }[] = [
   { to: '/chat', key: 'chat' },
   { to: '/doctors', key: 'doctors' },
   { to: '/reminder', key: 'reminder' },
+  { to: '/faq', key: 'faq' },
+  { to: '/about', key: 'about' },
 ];
 
 const SOCIAL_ICONS: Record<string, LucideIcon> = {

@@ -2,7 +2,7 @@ import type { Translation } from './en';
 
 export const ar: Translation = {
   app: { name: 'صحّتك', latinName: 'Sahtek', tagline: 'رفيقتك الذكية للتوعية بصحة الثدي' },
-  nav: { home: 'الرئيسية', signs: 'العلامات', learn: 'تعلمي', riskFactors: 'عوامل الخطر', companion: 'المساعدة', whenToSeek: 'إمتى تمشي لطبيب', selfCheck: 'الفحص', risk: 'المخاطر', chat: 'الدردشة', doctors: 'الأطباء', reminder: 'تذكير' },
+  nav: { home: 'الرئيسية', signs: 'العلامات', learn: 'تعلمي', riskFactors: 'عوامل الخطر', companion: 'المساعدة', whenToSeek: 'إمتى تمشي لطبيب', faq: 'أسئلة', about: 'علاش صحّتك', selfCheck: 'الفحص', risk: 'المخاطر', chat: 'الدردشة', doctors: 'الأطباء', reminder: 'تذكير' },
   common: {
     start: 'بداي', next: 'التالي', previous: 'السابق', back: 'رجوع', finish: 'سالي', retry: 'عاودي',
     close: 'سدي', loading: 'كيتحمل...', send: 'صيفطي', copy: 'نسخي', copied: 'تنسخ', you: 'نتي',
@@ -431,6 +431,18 @@ export const ar: Translation = {
     ],
     ctaDoctors: 'لقاي طبيب قريب منك',
     ctaSelfCheck: 'بداي الفحص المرشد',
+  },
+  aboutPage: {
+    eyebrow: 'علاش صحّتك',
+    title: 'باش تعرفي جسمك، وتتحركي بكري',
+    intro:
+      'صحّتك رفيقة مغربية للتوعية بصحة الثدي. كتشرح، كتعلم، وكتقولك إمتى تمشي لطبيب — بلا خوف، بلا حشومة، وبالدارجة ديالك.',
+    missionTitle: 'المهمة ديالنا',
+    mission:
+      'فالمغرب، أغلب حالات سرطان الثدي كتتكتشف متأخرة. ماشي لأن النساء ما مهتماتش، ولكن لأن المعلومة غالبا كتكون بلغة ما فهاماهاش، ولا مكتوبة بطريقة كتخوف. حنا كنكتبو بالدارجة، بهدوء، وبلا صور قاسحة — باش المعرفة توصل قبل المرض.',
+    principlesTitle: 'المبادئ ديالنا',
+    ctaPrimary: 'بداي الفحص المرشد',
+    ctaSecondary: 'شوفي 12 العلامات',
   },
   learn: {
     title: 'تعلمي على صحة الثدي', subtitle: 'معلومات واضحة، دعم حنين، وخطوات عملية.',

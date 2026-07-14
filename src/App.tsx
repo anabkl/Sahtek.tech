@@ -11,7 +11,9 @@ import { WhenToSeekHelpPage } from '@/pages/WhenToSeekHelpPage';
 import { SelfCheckPage } from '@/pages/SelfCheckPage';
 import { RiskAssessmentPage } from '@/pages/RiskAssessmentPage';
 import { RiskFactorsPage } from '@/pages/RiskFactorsPage';
+import { AboutPage } from '@/pages/AboutPage';
 import { ChatPage } from '@/pages/ChatPage';
+import { FaqPage } from '@/pages/FaqPage';
 import { CompanionPage } from '@/pages/CompanionPage';
 import { ReminderPage } from '@/pages/ReminderPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -74,6 +76,8 @@ export default function App() {
           <Route index element={<HomePage />} />
           <Route path="signs" element={<SignsPage />} />
           <Route path="when-to-seek-help" element={<WhenToSeekHelpPage />} />
+          <Route path="faq" element={<FaqPage />} />
+          <Route path="about" element={<AboutPage />} />
           <Route path="learn" element={<LearnPage />} />
           <Route path="self-check" element={<SelfCheckPage />} />
           <Route path="risk-factors" element={<RiskFactorsPage />} />

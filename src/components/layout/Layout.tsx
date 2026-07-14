@@ -7,7 +7,7 @@ import { Navbar } from './Navbar';
 import { NavArrows } from './NavArrows';
 import { ToastViewport } from '@/components/ui/Toast';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useDocumentMeta } from '@/hooks/useDocumentMeta';
+import { useDocumentMeta, useLanguageFromUrl } from '@/hooks/useDocumentMeta';
 import { useSpeech } from '@/hooks/useSpeech';
 
 export function Layout() {
@@ -24,6 +24,9 @@ export function Layout() {
   /* Owns <title>, the meta description, og:*, and <html lang|dir> — all of them
      following the active language and route. This replaces the lang/dir effect
      that used to live here. */
+  /* ?lang=fr makes the French variant a real, shareable URL — which is what
+     hreflang needs to point at. */
+  useLanguageFromUrl();
   useDocumentMeta();
 
   useEffect(() => {
